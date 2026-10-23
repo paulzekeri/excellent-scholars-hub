@@ -1,0 +1,118 @@
+@extends('layouts.app')
+
+@section('title', 'Learner Dashboard')
+
+@section('content')
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">My Dashboard</h1>
+        <p class="text-gray-600 mt-1">Welcome back, {{ auth()->user()->name }}!</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+        <a href="{{ route('learner.classes') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">My Classes</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $myClasses->count() }}</p>
+                </div>
+                <i class="fas fa-chalkboard text-indigo-600 text-3xl"></i>
+            </div>
+        </a>
+        <a href="{{ route('learner.assignments') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Pending Assignments</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $pendingAssignments }}</p>
+                </div>
+                <i class="fas fa-tasks text-green-600 text-3xl"></i>
+            </div>
+        </a>
+        <a href="{{ route('learner.materials') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Materials</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $materials->count() }}</p>
+                </div>
+                <i class="fas fa-folder-open text-blue-600 text-3xl"></i>
+            </div>
+        </a>
+        <a href="{{ route('learner.classes') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Upcoming Sessions</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $upcomingCount }}</p>
+                </div>
+                <i class="fas fa-calendar text-yellow-600 text-3xl"></i>
+            </div>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- My Classes -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">My Classes</h2>
+                <a href="{{ route('learner.classes') }}" class="text-sm text-indigo-600 hover:text-indigo-800">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="space-y-4">
+                @forelse($myClasses as $class)
+                    <a href="{{ route('learner.classes') }}" class="block border rounded-lg p-4 hover:bg-gray-50 transition">
+                        <h3 class="font-semibold text-gray-800">{{ $class->name }}</h3>
+                        <p class="text-sm text-gray-600">Tutor: {{ $class->tutor->user->name }}</p>
+                        <p class="text-xs text-gray-500">{{ $class->subject ?? 'General' }}</p>
+                        <div class="mt-2 flex items-center text-xs text-indigo-600">
+                            <i class="fas fa-calendar mr-1"></i> 
+                            {{ $class->schedules_count ?? $class->schedules()->where('start_time', '>', now())->count() }} upcoming session(s)
+                        </div>
+                    </a>
+                @empty
+                    <p class="text-gray-500 text-center py-4">You are not enrolled in any classes yet.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Upcoming Classes (Schedules) -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h2>
+                <a href="{{ route('learner.classes') }}" class="text-sm text-indigo-600 hover:text-indigo-800">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="space-y-4">
+                @forelse($upcomingClasses as $schedule)
+                    <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold text-gray-800">{{ $schedule->title }}</p>
+                                <p class="text-sm text-gray-600">{{ $schedule->class->name }}</p>
+                                <p class="text-xs text-gray-500">
+                                    <i class="far fa-calendar-alt mr-1"></i>
+                                    {{ \Carbon\Carbon::parse($schedule->start_time)->format('D, M d, Y') }}
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    <i class="far fa-clock mr-1"></i>
+                                    {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}
+                                </p>
+                            </div>
+                            @if($schedule->meeting_link && $schedule->status == 'scheduled')
+                                <a href="{{ route('learner.class.join', $schedule) }}" target="_blank" 
+                                    class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition flex items-center">
+                                    <i class="fas fa-video mr-1"></i> Join
+                                </a>
+                            @else
+                                <span class="text-gray-400 text-sm"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8">
+                        <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">No upcoming sessions scheduled.</p>
+                        <p class="text-xs text-gray-400 mt-1">Sessions appear here when your tutor creates schedules for your classes.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
