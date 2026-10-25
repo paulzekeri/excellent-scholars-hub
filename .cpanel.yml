@@ -1,0 +1,28 @@
+---
+# cPanel → Git™ Version Control → "Deploy HEAD Commit" pipeline for:
+#   UAT subdomain : uat-esh.lit-grp.com
+#   Document root : /home/CPANELUSER/esh-uat/public
+#
+# BEFORE the first deploy, replace the two placeholders below with the values for
+# your account (check them over SSH with: `whoami`, `which php`, `which composer`):
+#   CPANELUSER  e.g. litgrp
+#   PHP_BIN     e.g. /usr/local/bin/php  (or /opt/cpanel/ea-php81/root/usr/bin/php)
+#   COMPOSER_BIN e.g. /usr/local/bin/composer (or /opt/cpanel/composer/bin/composer)
+#
+# The pipeline copies application code only: .env, vendor/, storage/ uploads and the
+# database stay on the server, so a deploy never destroys live data.
+deployment:
+  tasks:
+    - export APP_PATH=/home/CPANELUSER/esh-uat
+    - export PHP_BIN=/usr/local/bin/php
+    - export COMPOSER_BIN=/usr/local/bin/composer
+    - /bin/mkdir -p $APP_PATH
+    - /bin/cp -R app bootstrap config database public resources routes $APP_PATH
+    - /bin/cp artisan composer.json composer.lock $APP_PATH
+    - /bin/cp .env.uat.example .env.production.example DEPLOYMENT.md $APP_PATH
+    - cd $APP_PATH && $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
+    - cd $APP_PATH && $PHP_BIN artisan migrate --force
+    - cd $APP_PATH && $PHP_BIN artisan storage:link
+    - cd $APP_PATH && $PHP_BIN artisan config:cache
+    - cd $APP_PATH && $PHP_BIN artisan view:cache
+    - cd $APP_PATH && $PHP_BIN artisan esh:health

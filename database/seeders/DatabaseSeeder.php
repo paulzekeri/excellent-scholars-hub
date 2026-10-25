@@ -40,6 +40,17 @@ class DatabaseSeeder extends Seeder
             ['name' => 'parent', 'description' => 'Parent/Guardian']
         );
 
+        // Demo data must never reach the production database: every demo login uses the
+        // password "password". Set SEED_DEMO_ACCOUNTS=true to force it (UAT uses this).
+        if (! $this->shouldSeedDemoAccounts()) {
+            if ($this->command) {
+                $this->command->warn('Demo users, class and schedule were skipped (SEED_DEMO_ACCOUNTS is off).');
+                $this->command->line('Create the first real login with: php artisan esh:create-admin --role=ceo');
+            }
+
+            return;
+        }
+
         // Users are matched on email so re-seeding an existing install only adds
         // the accounts that are missing (e.g. the dedicated CEO account).
         $ceoUser = User::firstOrCreate(
@@ -167,5 +178,14 @@ class DatabaseSeeder extends Seeder
                 'status' => 'scheduled',
             ]
         );
+    }
+
+    /**
+     * Demo accounts are seeded on local/UAT installs; a production install must opt in
+     * explicitly (SEED_DEMO_ACCOUNTS=true) because the demo passwords are public.
+     */
+    private function shouldSeedDemoAccounts(): bool
+    {
+        return filter_var(env('SEED_DEMO_ACCOUNTS', ! app()->environment('production')), FILTER_VALIDATE_BOOLEAN);
     }
 }

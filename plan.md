@@ -78,3 +78,14 @@
 - [x] **Parent dashboard improvements** — per-child counters (schedule / pending / completed / materials) that open tabbed details, attendance rate, missed-class alerts, unrecorded-session notice, child-ownership guard and feature tests
 - [x] Documentation updated (`README.md`, in-app user guide)
 
+## Phase 10: Deployment
+- [x] UAT target confirmed: `uat-esh.lit-grp.com` (cPanel, docroot `esh-uat/public`)
+- [x] `.env.uat.example` / `.env.production.example` templates (secure cookies, UAT-only demo seeding)
+- [x] `DEPLOYMENT.md` runbook (SSH deploy, cPanel Git pipeline, release-zip fallback, smoke tests, production promotion, rollback)
+- [x] `.cpanel.yml` deployment pipeline (composer install, migrate, storage link, caches, health check)
+- [x] `deploy/build-release.ps1` release packager for File Manager uploads
+- [x] `php artisan esh:health` post-deploy check
+- [x] `php artisan esh:create-admin` first-production-login command
+- [x] `DatabaseSeeder` guard: demo accounts skipped in production unless `SEED_DEMO_ACCOUNTS=true`
+- [x] `tests/Feature/DeploymentToolingTest.php` (6 tests)
+

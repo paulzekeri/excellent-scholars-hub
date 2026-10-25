@@ -66,7 +66,57 @@ php artisan db:seed
 roles, classes and schedules that do not exist yet and never overwrites existing records. You can also create extra
 CEO/administrator logins from *Users → New User* once signed in as the CEO.
 
+Demo accounts are seeded automatically on `local`/`testing`/UAT installs. In production they are skipped unless
+`SEED_DEMO_ACCOUNTS=true`; create the first real login instead:
+
+```bash
+php artisan esh:create-admin --role=ceo
+```
+
+## Deployment
+
+UAT lives at **`https://uat-esh.lit-grp.com`** (cPanel subdomain whose document root is the app's `public/` folder).
+The full runbook — subdomain/PHP/database setup, the cPanel Git pipeline (`.cpanel.yml`), the no-SSH release-zip
+fallback (`deploy/build-release.ps1`), the UAT smoke-test matrix, production promotion and rollback — is in
+**[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+Environment templates:
+
+| File | Use |
+|---|---|
+| `.env.example` | local development |
+| `.env.uat.example` | UAT (`APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`) |
+| `.env.production.example` | go-live (`SEED_DEMO_ACCOUNTS=false`, `LOG_LEVEL=warning`) |
+
+Two commands support the deploy:
+
+```bash
+php artisan esh:health                       # PHP/extensions, APP_KEY/URL, DB, pending migrations,
+                                             # writable storage, public/storage link, upload limits, admin + demo users
+php artisan esh:create-admin --role=ceo      # first real CEO/admin login on a fresh production database
+```
+
+Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` needed on the server), and
+`route:cache`/`optimize` must not be used because `routes/web.php` contains closures — cache with
+`php artisan config:cache` and `php artisan view:cache`.
+
 ## Feature change log
+
+### UAT deployment kit (`uat-esh.lit-grp.com`)
+- **`DEPLOYMENT.md`** — cPanel runbook: subdomain/PHP/MySQL setup, SSH deploy, cPanel Git pipeline, no-SSH release zip,
+  UAT smoke-test matrix, UAT → production promotion, rollback and troubleshooting.
+- **`.cpanel.yml`** — cPanel *Git™ Version Control* deployment tasks (composer install, `migrate --force`, `storage:link`,
+  config/view caches, `esh:health`) that never overwrite `.env` or `storage/` uploads.
+- **`.env.uat.example` / `.env.production.example`** — environment templates (`uat-esh.lit-grp.com`, secure cookies,
+  demo seeding on UAT only).
+- **`php artisan esh:health`** — post-deploy check of PHP/extensions, `APP_KEY`/`APP_URL`, database, pending migrations,
+  writable `storage`/`bootstrap/cache`, `public/storage` link, upload limits, admin logins and leftover demo accounts.
+- **`php artisan esh:create-admin`** — creates the first CEO/administrator login (and the role rows) on a fresh
+  production database.
+- **`deploy/build-release.ps1`** — builds a ready-to-upload release zip (vendor included, `.env`/`esh_lms.sql` excluded).
+- **`DatabaseSeeder` safety guard** — demo users/class/schedule are skipped when `APP_ENV=production` unless
+  `SEED_DEMO_ACCOUNTS=true`, so public demo passwords can never reach production.
+- Feature tests: `tests/Feature/DeploymentToolingTest.php` (6 tests).
 
 ### Parent dashboard: per-child stats, details & missed classes
 - Each child card on `/parent/dashboard` now shows clickable counters — **upcoming classes**, **pending assignments**,
