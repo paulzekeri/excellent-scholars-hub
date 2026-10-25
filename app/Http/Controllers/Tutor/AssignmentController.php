@@ -47,6 +47,8 @@ class AssignmentController extends Controller
 
     public function submissions(Assignment $assignment)
     {
+        $this->ensureOwnedAssignment($assignment);
+
         $submissions = Submission::where('assignment_id', $assignment->id)
             ->with('learner.user')
             ->get();
@@ -55,6 +57,8 @@ class AssignmentController extends Controller
 
     public function downloadFile(Submission $submission)
     {
+        $this->ensureOwnedAssignment($submission->assignment);
+
         if (!$submission->file_path || !Storage::disk('public')->exists($submission->file_path)) {
             return redirect()->back()->with('error', 'File not found.');
         }
@@ -64,8 +68,11 @@ class AssignmentController extends Controller
 
     public function grade(Request $request, Submission $submission)
     {
+        $assignment = $submission->assignment;
+        $this->ensureOwnedAssignment($assignment);
+
         $request->validate([
-            'score' => 'required|integer|min:0',
+            'score' => 'required|integer|min:0|max:' . $assignment->total_points,
             'feedback' => 'nullable|string',
         ]);
 
@@ -77,5 +84,15 @@ class AssignmentController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Submission graded successfully.');
+    }
+
+    /**
+     * Tutors may only review and grade assignments for their own classes.
+     */
+    private function ensureOwnedAssignment(Assignment $assignment)
+    {
+        $tutor = auth()->user()->tutor;
+
+        abort_unless($tutor && (int) $assignment->tutor_id === (int) $tutor->id, 403, 'You are not allowed to access this assignment.');
     }
 }

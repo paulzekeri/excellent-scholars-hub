@@ -60,6 +60,16 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
     public function hasRole($slug)
     {
         return $this->role && $this->role->slug === $slug;
@@ -68,6 +78,27 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->hasRole('admin');
+    }
+
+    public function isCeo()
+    {
+        return $this->hasRole('ceo');
+    }
+
+    /**
+     * The CEO works inside the admin area, so both roles share admin access.
+     */
+    public function isAdministrator()
+    {
+        return $this->isAdmin() || $this->isCeo();
+    }
+
+    /**
+     * Only the CEO may view or record payments.
+     */
+    public function canManagePayments()
+    {
+        return $this->isCeo();
     }
 
     public function isTutor()
@@ -83,5 +114,10 @@ class User extends Authenticatable
     public function isParent()
     {
         return $this->hasRole('parent');
+    }
+
+    public function unreadMessagesCount()
+    {
+        return $this->receivedMessages()->where('is_read', false)->count();
     }
 }

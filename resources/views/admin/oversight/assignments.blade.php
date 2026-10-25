@@ -50,6 +50,13 @@
                         <p class="text-gray-600 text-sm mb-4">{{ Str::limit($assignment->description, 200) }}</p>
                     @endif
 
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <a href="{{ route('admin.oversight.assignments.submissions', $assignment) }}"
+                            class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+                            <i class="fas fa-clipboard-check mr-2"></i> Review &amp; Grade Submissions ({{ $assignment->submissions->count() }})
+                        </a>
+                    </div>
+
                     <div class="border-t pt-4">
                         <h4 class="text-sm font-semibold text-gray-700 mb-2">Submissions ({{ $assignment->submissions->count() }})</h4>
                         @if($assignment->submissions->count() > 0)

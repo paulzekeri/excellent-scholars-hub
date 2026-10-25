@@ -1,3 +1,118 @@
+# Excellent Scholars Hub (ESH)
+
+A web-based Learning Management System (LMS) built on **Laravel 8**, **MySQL** and **Tailwind CSS**, with
+role-specific dashboards for the **CEO**, **Administrators**, **Tutors**, **Learners** and **Parents/Guardians**.
+
+The full end-user documentation lives inside the app at **Help → User Guide** (`/help/user-guide`).
+
+## Roles & access rules
+
+| Role | Slug | Area | Key permissions |
+|------|------|------|-----------------|
+| CEO | `ceo` | Admin area | Everything an administrator can do **plus exclusive access to Payments** |
+| Administrator | `admin` | Admin area | Users, classes, schedules, oversight, notifications, messages |
+| Tutor | `tutor` | Tutor area | Own classes only: schedules, attendance, assignments & grading, materials |
+| Learner | `learner` | Learner area | Enrolled classes, assignment submission, materials, schedules |
+| Parent/Guardian | `parent` | Parent area | Per-child stats & details (schedule, assignments, materials), attendance & missed classes, grades, messaging the school |
+
+Implemented guards:
+
+- **Payments are CEO-only.** The payments routes are grouped behind the `role:ceo` middleware and
+  `Admin\PaymentController` re-checks `canManagePayments()` in its constructor, so administrators/tutors who hit
+  the URL directly receive **403 Forbidden**. The Payments link and dashboard stat card are hidden for non-CEO users.
+- **Administrators and the CEO can review submissions.** `/admin/assignments` → *Review & Grade Submissions*
+  (`admin.oversight.assignments.submissions`, `admin.oversight.submissions.grade`) lets them download a learner's
+  file, set a score (validated against the assignment's total points) and add feedback. Tutors are restricted to
+  assignments they own — anything else returns **403**.
+- **In-app messaging is parents ↔ CEO/administrators.** `/messages` lists contacts per role, stores messages in the
+  `messages` table, files a `Notification` for the recipient, and marks incoming messages as read when a thread is
+  opened. Tutors and learners receive **403**.
+
+## Default seeded accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| CEO | `ceo@esh.com` | `password` |
+| Administrator | `admin@esh.com` | `password` |
+| Tutor | `tutor@esh.com` | `password` |
+| Learner | `learner@esh.com` | `password` |
+| Parent | `parent@esh.com` | `password` |
+
+
+## Installation
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+# configure DB_* values in .env, then:
+php artisan migrate --seed
+npm install && npm run dev     # or: npm run production
+php artisan serve
+```
+
+Running `php artisan migrate` creates the `ceo` role automatically
+(`2023_01_01_000014_add_ceo_role_to_roles_table`) and the `messages` table
+(`2023_01_01_000015_create_messages_table`). On existing installs the migration promotes the oldest administrator to
+the `ceo` role so at least one CEO account keeps payment access.
+
+To add a dedicated `ceo@esh.com` account (plus any other missing demo account), re-run the seeder:
+
+```bash
+php artisan db:seed
+```
+
+`DatabaseSeeder` uses `firstOrCreate`, so it is safe to run on a populated database: it only inserts accounts,
+roles, classes and schedules that do not exist yet and never overwrites existing records. You can also create extra
+CEO/administrator logins from *Users → New User* once signed in as the CEO.
+
+## Feature change log
+
+### Parent dashboard: per-child stats, details & missed classes
+- Each child card on `/parent/dashboard` now shows clickable counters — **upcoming classes**, **pending assignments**,
+  **completed assignments** and **published materials** — plus an attendance rate and a red **"N missed"** badge when a
+  tutor has marked the child absent.
+- Counters open the child's detail screen (`parent.child.progress`) on the matching tab. Tabs: *Overview*, *Class
+  Schedule*, *Pending Assignments*, *Completed Assignments*, *Materials Shared* and *Attendance*, each paginated.
+- The attendance tab lists every recorded session, highlights **missed classes** (status `absent`) and separately reports
+  past sessions where the tutor has **not recorded attendance yet**, so unmarked sessions are never mistaken for absences.
+- `Parent\DashboardController` now guards child access with `abort_unless($learner->parent_id === $parent->id, 403)`
+  (previously any parent could open any learner by ID) and renders an empty state for a parent account without a
+  parent profile.
+
+### Admin learner ↔ parent linking
+- `Admin\UserController` now accepts an optional `parent_id` when creating or updating a learner (validated with
+  `exists:parents,id`) and writes it to `learners.parent_id`, so a learner created by an administrator can be
+  attached to a parent account (one parent → many learners).
+- The *Create User* / *Edit User* screens show a "Parent / Guardian" selector that only appears for the learner
+  role; the learner profile is created automatically if an existing user is switched to the learner role.
+- The *Users* table gained a **Parent / Guardian** column (linked parent name, *Not linked*, or learner count for
+  parents) and a parent's edit screen lists all linked learners.
+- In-app user guide updated with the linking steps.
+
+### CEO-only payments
+- New `ceo` role (migration + seeder) and helpers on `User`: `isCeo()`, `isAdministrator()`, `canManagePayments()`.
+- `/admin/payments*` routes moved behind `role:ceo`; `Admin\PaymentController` constructor aborts with 403 otherwise.
+- Navigation Payments dropdown entry and dashboard payments stat card are rendered only for the CEO.
+- Login redirect and the admin UI treat the CEO as an administrator, so no separate CEO screens are needed.
+- `Admin\UserController` hides the `ceo` role from non-CEO administrators and refuses to edit/assign it.
+
+### Assignment submission review for admins & teachers
+- `Admin\OversightController` gained `submissions()`, `gradeSubmission()` and `downloadSubmission()` for cross-class review.
+- `Tutor\AssignmentController` now verifies ownership before showing submissions/grading, and validates the score
+  against `total_points`.
+- Oversight assignments page links every assignment to a "Review & Grade Submissions" screen.
+
+### Parent ↔ CEO/administrator messaging
+- `messages` table + `Message` model (`between()` scope), `MessageController` (`index`, `show`, `store`) with
+  role-based contact lists and 2,000-character limit.
+- Each message files an in-app `Notification` for the recipient; the navigation shows unread badges (desktop + mobile).
+- Parents get a "Message the School" button and unread badge on their dashboard.
+
+---
+
+## Laravel Framework README
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">

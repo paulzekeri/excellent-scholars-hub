@@ -12,7 +12,8 @@ class NotificationController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('role:admin');
+        // The CEO shares the admin area, so both roles may manage notifications.
+        $this->middleware('role:admin,ceo');
     }
 
     public function index()

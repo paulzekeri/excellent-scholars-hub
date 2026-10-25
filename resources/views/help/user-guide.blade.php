@@ -87,6 +87,9 @@
                     <a href="#for-parents" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
                         <i class="fas fa-users mr-2"></i>For Parents/Guardians
                     </a>
+                    <a href="#messages" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                        <i class="fas fa-comments mr-2"></i>Messages (Parents ↔ CEO/Admin)
+                    </a>
                     <a href="#notifications" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
                         <i class="fas fa-bell mr-2"></i>Notifications
                     </a>
@@ -108,10 +111,11 @@
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">What is Excellent Scholars Hub?</h3>
                 <p class="text-gray-600 mb-6">
-                    Excellent Scholars Hub (ESH) is a web-based Learning Management System (LMS) designed to connect 
-                    <strong>Administrators</strong>, <strong>Tutors</strong>, <strong>Learners (Students)</strong>, and 
-                    <strong>Parents/Guardians</strong> in one seamless platform. It enables class management, assignment 
-                    submissions, attendance tracking, learning material sharing, payment recording, and progress monitoring.
+                    Excellent Scholars Hub (ESH) is a web-based Learning Management System (LMS) designed to connect
+                    <strong>Administrators</strong>, the <strong>CEO</strong>, <strong>Tutors</strong>,
+                    <strong>Learners (Students)</strong>, and <strong>Parents/Guardians</strong> in one seamless platform.
+                    It enables class management, assignment submissions, attendance tracking, learning material sharing,
+                    payment recording (CEO only), messaging, and progress monitoring.
                 </p>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">How to Create an Account</h3>
@@ -147,7 +151,7 @@
                 </ol>
 
                 <div class="tip-box">
-                    <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you are an <strong>Administrator</strong>, your account will be created by the system owner directly — you won't register via the public form.</p>
+                    <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you are an <strong>Administrator</strong> or the <strong>CEO</strong>, your account will be created by the system owner directly — you won't register via the public form.</p>
                 </div>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">How to Log In</h3>
@@ -184,7 +188,9 @@
                     After logging in, you'll see a navigation bar at the top with links to different sections based on your role. 
                     The main menu includes your <strong>Dashboard</strong> (home page), along with role-specific sections like 
                     Classes, Assignments, Materials, etc. You can also access <strong>Notifications</strong> and use the 
-                    <strong>Logout</strong> button to sign out. On mobile devices, use the hamburger menu (☰) to access navigation links.
+                    <strong>Logout</strong> button to sign out. <strong>Parents/Guardians</strong>, <strong>Administrators</strong>
+                    and the <strong>CEO</strong> additionally get a <strong>Messages</strong> link for private in-app conversations.
+                    On mobile devices, use the hamburger menu (☰) to access navigation links.
                 </p>
             </section>
 
@@ -194,18 +200,19 @@
                     <i class="fas fa-user-shield text-red-500 mr-2"></i>For Administrators
                 </h2>
                 <p class="text-gray-600 mb-6">
-                    As an <strong>Administrator</strong>, you have full control over the platform. You can manage users, 
-                    classes, schedules, payments, and send notifications. Your dashboard gives you an overview of key 
-                    platform statistics.
+                    As an <strong>Administrator</strong> you have full control over the platform: you manage users,
+                    classes, schedules, oversight and notifications. The <strong>CEO</strong> works inside the same admin
+                    area but also has exclusive access to the <strong>Payments</strong> module. Your dashboard gives you
+                    an overview of key platform statistics.
                 </p>
                 <div class="info-box mb-6">
                     <p class="text-sm"><strong><i class="fas fa-map-signs mr-1"></i> Admin Navigation Tip:</strong></p>
                     <p class="text-sm mt-1">The admin menu uses <strong>hover dropdowns</strong> to keep the bar compact:</p>
                     <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                        <li><strong>Academics ▼</strong> — Hover to access <em>Classes</em>, <em>Schedules</em>, and <em>Payments</em></li>
-                        <li><strong>Oversight ▼</strong> — Hover to access <em>Attendance</em>, <em>Assignments</em>, and <em>Materials</em></li>
+                        <li><strong>Academics ▼</strong> — Hover to access <em>Classes</em>, <em>Schedules</em>, and <em>Payments</em> (<strong>CEO only</strong>)</li>
+                        <li><strong>Oversight ▼</strong> — Hover to access <em>Attendance</em>, <em>Assignments</em> (including submission review &amp; grading), and <em>Materials</em></li>
                     </ul>
-                    <p class="text-sm mt-2">Standalone links: <strong>Dashboard</strong>, <strong>Users</strong>, <strong>Notifications</strong></p>
+                    <p class="text-sm mt-2">Standalone links: <strong>Dashboard</strong>, <strong>Users</strong>, <strong>Messages</strong>, <strong>Notifications</strong></p>
                 </div>
 
                 <!-- Admin Dashboard -->
@@ -215,7 +222,9 @@
                     </h3>
                     <p class="text-gray-600 mb-2">Your dashboard displays:</p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
-                        <li>Total Users, Tutors, Learners, Classes, Schedules, and Payments</li>
+                        <li>Total Users, Tutors, Learners, Classes, and Schedules</li>
+                        <li>A <strong>Payments</strong> stat card — <strong>visible to the CEO only</strong></li>
+                        <li>An <strong>Unread Messages</strong> card that links straight to your inbox</li>
                         <li>Recent Users (newest registrations)</li>
                         <li>Upcoming Classes (next scheduled sessions)</li>
                     </ul>
@@ -241,13 +250,17 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-indigo-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in the user details (name, email, role, password).</span>
+                            <span class="text-gray-600">Fill in the user details (name, email, role, password). For a <strong>Learner</strong>, also pick their <strong>Parent / Guardian</strong> from the extra field that appears below the role.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-indigo-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create User"</strong> to save.</span>
                         </li>
                     </ol>
+
+                    <div class="tip-box">
+                        <p class="text-sm text-gray-700"><strong>💡 Linking learners to parents:</strong> one parent can be linked to <strong>many learners</strong>, and each learner has one parent. Create the parent account first (role <strong>Parent</strong>), then link learners to that parent when you create or edit them. The <strong>Users</strong> list shows the linked parent next to each learner (or <em>Not linked</em>), and opening a parent's <strong>Edit</strong> page lists every learner linked to them.</p>
+                    </div>
 
                     <p class="font-medium text-gray-700 mb-2">To edit or delete a user:</p>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
@@ -333,13 +346,20 @@
                 <!-- Manage Payments -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-money-bill text-pink-600 mr-2"></i>5. Managing Payments
+                        <i class="fas fa-money-bill text-pink-600 mr-2"></i>5. Managing Payments <span class="text-xs font-bold text-pink-600 align-middle">(CEO ONLY)</span>
                     </h3>
+                    <div class="info-box mb-3">
+                        <p class="text-sm text-gray-700">
+                            <strong>🔒 Access:</strong> Payments are restricted to the <strong>CEO</strong> account. Regular
+                            administrators do not see the Payments link at all, and any attempt to open the payment pages
+                            directly is refused with a <strong>"403 Forbidden"</strong> error.
+                        </p>
+                    </div>
                     <p class="text-gray-600 mb-3">Record and track payments from learners/parents.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-indigo-600 font-bold">1.</span>
-                            <span class="text-gray-600">Go to <strong>"Payments"</strong> in the navigation menu.</span>
+                            <span class="text-gray-600">Log in as the <strong>CEO</strong>, then go to <strong>Academics ▼ → Payments</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-indigo-600 font-bold">2.</span>
@@ -380,9 +400,10 @@
                         <i class="fas fa-eye text-indigo-600 mr-2"></i>7. Admin Oversight — Monitoring Activities
                     </h3>
                     <p class="text-gray-600 mb-3">
-                        As an Administrator, you have full visibility into what's happening across all classes. You can 
-                        monitor <strong>Attendance</strong>, <strong>Assignments & Submissions</strong>, and 
-                        <strong>Learning Materials</strong> for every class — giving you complete oversight over tutors and learners.
+                        As an Administrator (and as the CEO), you have full visibility into what's happening across all
+                        classes. You can review <strong>Attendance</strong>, <strong>Assignments & Submissions</strong>
+                        (including grading learner work), and <strong>Learning Materials</strong> for every class —
+                        giving you complete oversight over tutors and learners.
                     </p>
 
                     <h4 class="font-medium text-gray-700 mb-2">
@@ -425,6 +446,34 @@
                         </li>
                     </ol>
 
+                    <div class="info-box mb-4">
+                        <p class="text-sm text-gray-700">
+                            <strong>✅ New:</strong> Administrators and the CEO are no longer limited to viewing submissions —
+                            they can open a learner's file, give it a <strong>score</strong>, add <strong>feedback</strong>,
+                            and mark it as <strong>graded</strong>, exactly as the class tutor would.
+                        </p>
+                    </div>
+
+                    <p class="font-medium text-gray-700 mb-2">Reviewing &amp; Grading a Submission:</p>
+                    <ol class="space-y-2 mb-4">
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-gray-600">Click <strong>"Review &amp; Grade Submissions (n)"</strong> on an assignment card.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-gray-600">Click <strong>"Download"</strong> next to a learner to open their submitted file.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-gray-600">Enter the <strong>Score</strong> (out of the assignment's total points) and optional <strong>Feedback</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-gray-600">Click <strong>"Save Grade"</strong> — the submission status changes to <span class="text-green-600 font-medium">Graded</span> and the learner (and their parent) sees the score immediately.</span>
+                        </li>
+                    </ol>
+
                     <h4 class="font-medium text-gray-700 mb-2">
                         <i class="fas fa-folder text-purple-500 mr-1"></i> Viewing Learning Materials
                     </h4>
@@ -448,7 +497,7 @@
                     </ol>
 
                     <div class="info-box">
-                        <p class="text-sm text-gray-700"><strong>📌 Note:</strong> These oversight pages are <strong>read-only</strong>. They allow you to monitor activity across the platform without interfering with tutors' work.</p>
+                        <p class="text-sm text-gray-700"><strong>📌 Note:</strong> <strong>Attendance</strong> and <strong>Learning Materials</strong> oversight pages are <strong>read-only</strong> — they let you monitor activity without interfering with tutors' work. <strong>Assignment submissions</strong> are the exception: admins and the CEO can grade them. Tutors, in turn, can only open and grade assignments that belong to them, so a tutor can never edit another tutor's grades.</p>
                     </div>
                 </div>
             </section>
@@ -595,6 +644,9 @@
                     </ol>
                     <div class="info-box mt-3">
                         <p class="text-sm text-gray-700"><strong>📌 Note:</strong> After grading, the student's score and feedback are visible to both the learner and their parent/guardian on their respective dashboards.</p>
+                    </div>
+                    <div class="warning-box mt-3">
+                        <p class="text-sm text-gray-700"><strong>⚠️ Own assignments only:</strong> You can only open and grade assignments that are assigned to <strong>you</strong>. If you try to open another tutor's assignment or submissions, the system refuses access and returns a <strong>"403 Forbidden"</strong> page. If a class needs to be reassigned, ask an administrator to update the class tutor.</p>
                     </div>
                 </div>
 
@@ -772,8 +824,9 @@
                     <i class="fas fa-users text-yellow-600 mr-2"></i>For Parents / Guardians
                 </h2>
                 <p class="text-gray-600 mb-6">
-                    As a <strong>Parent or Guardian</strong>, you can monitor your child's academic progress, view their 
-                    attendance records, check assignment scores, and see upcoming class schedules — all from your dashboard.
+                    As a <strong>Parent or Guardian</strong>, you can monitor your child's academic progress, view their
+                    attendance records, check assignment scores, see upcoming class schedules, and send a private message
+                    to the school's CEO or an administrator — all from your dashboard.
                 </p>
 
                 <div class="info-box mb-6">
@@ -794,11 +847,17 @@
                         Each card includes:
                     </p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
-                        <li>Your child's <strong>Name</strong> and <strong>Grade Level</strong></li>
-                        <li><strong>Email</strong> and <strong>Phone</strong> contact details</li>
-                        <li>Number of <strong>Enrolled Classes</strong></li>
-                        <li>A <strong>"View Progress"</strong> button to dive deeper</li>
+                        <li>Your child's <strong>Name</strong>, <strong>Grade Level</strong>, <strong>Email</strong> and <strong>Phone</strong></li>
+                        <li>Four clickable counters: <strong>Class Schedule</strong> (upcoming sessions), <strong>Assignments Pending</strong>,
+                            <strong>Assignments Completed</strong> and <strong>Materials Shared</strong></li>
+                        <li>An <strong>attendance rate</strong> with the number of sessions attended</li>
+                        <li>A red <strong>"N missed"</strong> badge whenever a tutor has marked your child absent</li>
+                        <li>A <strong>"View Full Details"</strong> button that opens the child's report</li>
+                        <li>A <strong>"Message the School"</strong> button (with a red badge when the school has replied unread)</li>
                     </ul>
+                    <div class="tip-box">
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Tap any counter to jump straight to that list — for example, tap <strong>Assignments Pending</strong> to see exactly which assignments are outstanding.</p>
+                    </div>
                 </div>
 
                 <!-- View Child Progress -->
@@ -807,10 +866,11 @@
                         <i class="fas fa-chart-line text-green-600 mr-2"></i>2. Viewing Your Child's Progress
                     </h3>
                     <p class="text-gray-600 mb-3">
-                        Click <strong>"View Progress"</strong> on any child's card to see a detailed report containing:
+                        Tap any counter on a child's card — or <strong>"View Full Details"</strong> — to open that child's report.
+                        The report is split into tabs:
                     </p>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
                                 <i class="fas fa-clipboard-check text-blue-500 mr-2"></i>Attendance
@@ -826,9 +886,8 @@
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
                                 <i class="fas fa-tasks text-green-500 mr-2"></i>Assignments
                             </h4>
-                            <p class="text-sm text-gray-600">A complete table of all assignments with: Title, Class, Due Date, 
-                                Submission Status (Submitted ✅ / Missing ❌), Score, Status (Graded/Pending), and 
-                                Teacher's Feedback.</p>
+                            <p class="text-sm text-gray-600">Two tabs: <strong>Pending</strong> (not submitted yet — overdue ones in red)
+                                and <strong>Completed</strong> (submitted date, score, status and the tutor's feedback).</p>
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
@@ -837,11 +896,137 @@
                             <p class="text-sm text-gray-600">A list of upcoming scheduled sessions for your child, with the 
                                 session title, class name, date, and time.</p>
                         </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                <i class="fas fa-folder-open text-indigo-500 mr-2"></i>Materials
+                            </h4>
+                            <p class="text-sm text-gray-600">Every material shared with your child's classes — title, class,
+                                tutor, size and date — with a <strong>Download</strong> button.</p>
+                        </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
+                                <i class="fas fa-calendar-times text-red-500 mr-2"></i>Missed Classes
+                            </h4>
+                            <p class="text-sm text-gray-600">Sessions your child was marked <span class="text-red-600">Absent</span>
+                                for, with the class, date and any tutor note. Past sessions the tutor has not marked yet are shown
+                                separately, so unrecorded sessions are never counted as missed.</p>
+                        </div>
                     </div>
 
                     <div class="tip-box">
-                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you have multiple children, you can view progress for each one individually by clicking their respective "View Progress" button from the dashboard.</p>
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you have multiple children, each one has their own report. A red <strong>"N missed"</strong> badge on the dashboard means a tutor has marked that child absent — open the <strong>Attendance</strong> tab to see exactly which sessions were missed.</p>
                     </div>
+                </div>
+
+                <!-- Parent Messaging -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-comments text-indigo-600 mr-2"></i>3. Messaging the School
+                    </h3>
+                    <p class="text-gray-600 mb-3">
+                        You can contact the school directly from inside the app — no external email needed. Messages are
+                        private between you and the person you are talking to.
+                    </p>
+                    <ol class="space-y-2 mb-3">
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-gray-600">Click <strong>"Message the School"</strong> on your dashboard, or <strong>"Messages"</strong> in the navigation menu.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-gray-600">Under <strong>"School Administration"</strong>, pick the <strong>CEO</strong> or an <strong>administrator</strong> from the list.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-gray-600">Type your message (up to <strong>2,000 characters</strong>) and click <strong>"Send"</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-gray-600">Replies appear in the same conversation thread. A red <strong>"n new"</strong> badge shows unread replies, and the school also receives a notification in their bell menu.</span>
+                        </li>
+                    </ol>
+                    <div class="tip-box">
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Open a conversation to read it — messages are marked as read automatically, so the unread badges clear as soon as you open the thread.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== MESSAGES ========== -->
+            <section id="messages" class="guide-section bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-comments text-indigo-600 mr-2"></i>Messages — Parents ↔ CEO / Admin
+                </h2>
+                <p class="text-gray-600 mb-4">
+                    The <strong>Messages</strong> feature gives parents/guardians and the school leadership a private,
+                    in-app channel. Messages stay inside Excellent Scholars Hub, so there is a clear record of every
+                    conversation for both sides.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-gray-50 border rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
+                            <i class="fas fa-users text-yellow-600 mr-2"></i> Who can message
+                        </h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            <li><strong>Parents/Guardians</strong> can message the <strong>CEO</strong> and every <strong>administrator</strong>.</li>
+                            <li><strong>CEO</strong> and <strong>administrators</strong> can reply to any <strong>parent/guardian</strong>.</li>
+                            <li><strong>Tutors</strong> and <strong>learners</strong> do not have access to Messages.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 border rounded-lg p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
+                            <i class="fas fa-bell text-indigo-600 mr-2"></i> Notifications built in
+                        </h4>
+                        <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            <li>Every message creates a notification for the recipient.</li>
+                            <li>The <strong>Messages</strong> menu item shows a red unread count badge.</li>
+                            <li>Opening a conversation marks incoming messages as read.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">For Parents — Starting a Conversation</h3>
+                <ol class="space-y-2 mb-6">
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">1.</span>
+                        <span class="text-gray-600">Click <strong>"Message the School"</strong> on your dashboard or <strong>"Messages"</strong> in the menu.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">2.</span>
+                        <span class="text-gray-600">Choose the <strong>CEO</strong> (purple badge) or an <strong>administrator</strong> (red badge) from <strong>"School Administration"</strong>.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">3.</span>
+                        <span class="text-gray-600">Write your question or update and click <strong>"Send"</strong>. Your message history stays on this page for reference.</span>
+                    </li>
+                </ol>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">For the CEO / Administrators — Replying to Parents</h3>
+                <ol class="space-y-2 mb-4">
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">1.</span>
+                        <span class="text-gray-600">Click <strong>"Messages"</strong> in the admin menu — a red badge shows how many unread parent messages you have.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">2.</span>
+                        <span class="text-gray-600">Under <strong>"Parents &amp; Guardians"</strong>, the list shows each parent's last message preview, when it was sent, and their unread count.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">3.</span>
+                        <span class="text-gray-600">Open a parent to read the full thread (messages are marked read), then reply in the box at the bottom.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-indigo-600 font-bold">4.</span>
+                        <span class="text-gray-600">The admin dashboard also shows an <strong>"Unread Messages"</strong> card linking straight to your inbox.</span>
+                    </li>
+                </ol>
+
+                <div class="info-box">
+                    <p class="text-sm text-gray-700">
+                        <strong>📌 Note:</strong> Administrators and the CEO share the parent inbox — if a parent writes to
+                        one administrator, that administrator can reply in the same thread. Only active accounts appear in
+                        the contact list, so deactivated users cannot start or receive conversations.
+                    </p>
                 </div>
             </section>
 
@@ -862,10 +1047,17 @@
                 </ul>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Managing Your Notifications</h3>
-                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
                     <li><strong>Unread notifications</strong> are highlighted with a colored left border</li>
                     <li>Click <strong>"Mark read"</strong> on individual notifications to dismiss them</li>
                     <li>Use <strong>"Mark all as read"</strong> to clear all notifications at once</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Message Notifications</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li>When a parent messages the school (or the school replies), the recipient gets a notification titled <strong>"New message from …"</strong> with a preview of the first 140 characters.</li>
+                    <li>The <strong>Messages</strong> menu item separately shows a red count of unread conversations.</li>
+                    <li>The two counters are independent: opening a thread clears the Messages badge, while the notification itself is cleared with <strong>"Mark read"</strong> or <strong>"Mark all as read"</strong> in your Notifications page.</li>
                 </ul>
             </section>
 
@@ -903,7 +1095,7 @@
 
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ How do I see my child's grades?</h3>
-                        <p class="text-gray-600 text-sm">Log in as a <strong>Parent</strong>, go to your Dashboard, and click <strong>"View Progress"</strong> on your child's card. You'll see a detailed breakdown of attendance, assignments, scores, and feedback.</p>
+                        <p class="text-gray-600 text-sm">Log in as a <strong>Parent</strong>, go to your Dashboard, and click <strong>"View Full Details"</strong> on your child's card (or tap the <strong>Assignments Completed</strong> counter). The <strong>Completed Assignments</strong> and <strong>Attendance</strong> tabs show scores, feedback and attendance history.</p>
                     </div>
 
                     <div class="border-b pb-4">
@@ -914,6 +1106,26 @@
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ The page looks strange or isn't working properly.</h3>
                         <p class="text-gray-600 text-sm">Try refreshing the page (F5 or Ctrl+R). Clear your browser cache if issues persist. Make sure you're using a modern browser (Chrome, Firefox, Edge, or Safari). If the problem continues, contact support.</p>
+                    </div>
+
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ I'm an administrator but I can't see the Payments menu.</h3>
+                        <p class="text-gray-600 text-sm">Payments are restricted to the <strong>CEO</strong> account only. Administrators do not see the Payments link, and opening the payment pages directly returns a <strong>"403 Forbidden"</strong> error. If you believe you should have this access, ask the CEO about upgrading your role.</p>
+                    </div>
+
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ Can an administrator grade assignments, or only the tutor?</h3>
+                        <p class="text-gray-600 text-sm">Both can. Tutors grade their own assignments, and <strong>Administrators / the CEO</strong> can grade any submission from <strong>Oversight ▼ → Assignments → "Review &amp; Grade Submissions"</strong>. A tutor trying to open another tutor's assignment gets a "403 Forbidden" page.</p>
+                    </div>
+
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ How do I contact the school as a parent?</h3>
+                        <p class="text-gray-600 text-sm">Click <strong>"Message the School"</strong> on your dashboard, or <strong>"Messages"</strong> in the menu, then choose the CEO or an administrator. Your conversation thread keeps the full history, and the school is notified instantly.</p>
+                    </div>
+
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ Why can't a tutor or learner open Messages?</h3>
+                        <p class="text-gray-600 text-sm">Messaging is intentionally limited to <strong>parents/guardians</strong> and <strong>school leadership (CEO and administrators)</strong>. Tutors and learners who open the Messages URL directly receive a "403 Forbidden" page. Learners can still reach their tutor through class sessions, and tutors can raise issues with an administrator.</p>
                     </div>
 
                     <div>

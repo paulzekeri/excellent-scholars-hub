@@ -15,13 +15,17 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+
         $data = [
             'totalUsers' => User::count(),
             'totalTutors' => Tutor::count(),
             'totalLearners' => Learner::count(),
             'totalClasses' => Classes::count(),
             'totalSchedules' => ClassSchedule::count(),
-            'totalPayments' => Payment::count(),
+            // Payments are CEO-only, so only the CEO sees payment figures.
+            'totalPayments' => $user->canManagePayments() ? Payment::count() : null,
+            'unreadMessages' => $user->unreadMessagesCount(),
             'recentUsers' => User::with('role')->latest()->take(5)->get(),
             'upcomingClasses' => ClassSchedule::with('class', 'tutor.user')
                 ->where('start_time', '>', now())

@@ -23,6 +23,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent / Guardian</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                     </tr>
@@ -35,12 +36,31 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $user->phone ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full 
-                                    @if($user->role->slug == 'admin') bg-red-100 text-red-800
+                                    @if($user->role->slug == 'ceo') bg-purple-100 text-purple-800
+                                    @elseif($user->role->slug == 'admin') bg-red-100 text-red-800
                                     @elseif($user->role->slug == 'tutor') bg-green-100 text-green-800
                                     @elseif($user->role->slug == 'learner') bg-blue-100 text-blue-800
                                     @else bg-yellow-100 text-yellow-800 @endif">
                                     {{ ucfirst($user->role->name) }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                @if($user->isLearner())
+                                    @if($user->learner && $user->learner->parent && $user->learner->parent->user)
+                                        {{ $user->learner->parent->user->name }}
+                                    @else
+                                        <span class="text-amber-600"><i class="fas fa-exclamation-circle mr-1"></i>Not linked</span>
+                                    @endif
+                                @elseif($user->isParent())
+                                    @if($user->parent)
+                                        @php $childCount = $user->parent->children->count(); @endphp
+                                        <span class="text-gray-400">Parent of {{ $childCount }} {{ \Illuminate\Support\Str::plural('learner', $childCount) }}</span>
+                                    @else
+                                        <span class="text-gray-400">No parent profile</span>
+                                    @endif
+                                @else
+                                    <span class="text-gray-400">&mdash;</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">

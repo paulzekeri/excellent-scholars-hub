@@ -13,7 +13,7 @@
                     <tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recipient</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    @foreach($notifications as $notification)
+                    @forelse($notifications as $notification)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-sm font-medium">{{ $notification->title }}</td>
                         <td class="px-6 py-4 text-sm">{{ ucfirst($notification->type) }}</td>
@@ -21,14 +21,127 @@
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($notification->is_read) bg-green-100 text-green-800 @else bg-yellow-100 text-yellow-800 @endif">{{ $notification->is_read ? 'Read' : 'Unread' }}</span></td>
                         <td class="px-6 py-4 text-sm">{{ $notification->created_at->format('M d, Y h:i A') }}</td>
                         <td class="px-6 py-4 text-sm">
-                            <form action="{{ route('admin.notifications.destroy', $notification) }}" method="POST" class="inline" onsubmit="return confirm('Delete this notification?')">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></form>
+                            <div class="flex items-center gap-4">
+                                <button type="button"
+                                    class="notification-read-btn text-indigo-600 hover:text-indigo-800"
+                                    title="Read notification"
+                                    data-title="{{ $notification->title }}"
+                                    data-type="{{ ucfirst($notification->type) }}"
+                                    data-recipient="{{ $notification->user_id ? ($notification->user->name ?? 'Deleted User') : 'All Users' }}"
+                                    data-status="{{ $notification->is_read ? 'Read' : 'Unread' }}"
+                                    data-date="{{ $notification->created_at->format('M d, Y h:i A') }}"
+                                    data-message="{{ $notification->message }}">
+                                    <i class="fas fa-eye mr-1"></i> Read
+                                </button>
+                                <form action="{{ route('admin.notifications.destroy', $notification) }}" method="POST" class="inline" onsubmit="return confirm('Delete this notification?')">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></form>
+                            </div>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                            <i class="fas fa-bell-slash text-3xl text-gray-300 mb-2"></i>
+                            <p>No notifications sent yet.</p>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         <div class="p-4 border-t">{{ $notifications->links() }}</div>
     </div>
 </div>
+
+<!-- Read notification modal -->
+<div id="notification-modal" class="fixed inset-0 z-50 hidden overflow-y-auto px-4 py-10" role="dialog" aria-modal="true" aria-labelledby="notification-modal-title">
+    <div class="absolute inset-0 bg-black bg-opacity-50" data-modal-close></div>
+    <div class="relative max-w-lg mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
+        <div class="px-6 py-4 bg-indigo-600 flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-wide text-indigo-200">Notification</p>
+                <h2 id="notification-modal-title" class="text-lg font-semibold text-white"></h2>
+            </div>
+            <button type="button" data-modal-close class="text-indigo-200 hover:text-white" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-xs uppercase text-gray-400">Type</p>
+                    <p id="notification-modal-type" class="text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase text-gray-400">Status</p>
+                    <p id="notification-modal-status" class="text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase text-gray-400">Recipient</p>
+                    <p id="notification-modal-recipient" class="text-gray-700"></p>
+                </div>
+                <div>
+                    <p class="text-xs uppercase text-gray-400">Sent</p>
+                    <p id="notification-modal-date" class="text-gray-700"></p>
+                </div>
+            </div>
+            <div>
+                <p class="text-xs uppercase text-gray-400">Message</p>
+                <p id="notification-modal-message" class="text-sm text-gray-700 whitespace-pre-line mt-1"></p>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 border-t flex justify-end">
+            <button type="button" data-modal-close class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">Close</button>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('notification-modal');
+        if (!modal) return;
+
+        var fields = {
+            title: document.getElementById('notification-modal-title'),
+            type: document.getElementById('notification-modal-type'),
+            status: document.getElementById('notification-modal-status'),
+            recipient: document.getElementById('notification-modal-recipient'),
+            date: document.getElementById('notification-modal-date'),
+            message: document.getElementById('notification-modal-message')
+        };
+
+        function openModal(button) {
+            fields.title.textContent = button.dataset.title || '';
+            fields.type.textContent = button.dataset.type || '';
+            fields.status.textContent = button.dataset.status || '';
+            fields.recipient.textContent = button.dataset.recipient || '';
+            fields.date.textContent = button.dataset.date || '';
+            fields.message.textContent = button.dataset.message || '';
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        document.querySelectorAll('.notification-read-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                openModal(button);
+            });
+        });
+
+        modal.querySelectorAll('[data-modal-close]').forEach(function (element) {
+            element.addEventListener('click', closeModal);
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+    });
+</script>
+@endpush

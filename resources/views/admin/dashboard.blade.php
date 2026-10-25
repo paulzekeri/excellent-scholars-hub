@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard')
+@section('title', auth()->user()->isCeo() ? 'CEO Dashboard' : 'Admin Dashboard')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+        <h1 class="text-3xl font-bold text-gray-800">{{ auth()->user()->isCeo() ? 'CEO Dashboard' : 'Admin Dashboard' }}</h1>
         <p class="text-gray-600 mt-1">Overview of the Excellent Scholars Hub platform</p>
     </div>
 
@@ -71,6 +71,7 @@
             </div>
         </div>
 
+        @if(auth()->user()->canManagePayments())
         <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500">
             <div class="flex items-center justify-between">
                 <div>
@@ -82,6 +83,19 @@
                 </div>
             </div>
         </div>
+        @endif
+
+        <a href="{{ route('messages.index') }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-teal-500 hover:bg-teal-50 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Unread Messages</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $unreadMessages }}</p>
+                </div>
+                <div class="bg-teal-100 p-3 rounded-full">
+                    <i class="fas fa-comments text-teal-600 text-xl"></i>
+                </div>
+            </div>
+        </a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -103,7 +117,8 @@
                                 <td class="px-4 py-3 text-sm text-gray-800">{{ $user->name }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-600">{{ $user->email }}</td>
                                 <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full 
-                                    @if($user->role->slug == 'admin') bg-red-100 text-red-800
+                                    @if($user->role->slug == 'ceo') bg-purple-100 text-purple-800
+                                    @elseif($user->role->slug == 'admin') bg-red-100 text-red-800
                                     @elseif($user->role->slug == 'tutor') bg-green-100 text-green-800
                                     @elseif($user->role->slug == 'learner') bg-blue-100 text-blue-800
                                     @else bg-yellow-100 text-yellow-800 @endif">

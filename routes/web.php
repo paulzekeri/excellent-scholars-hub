@@ -18,6 +18,7 @@ use App\Http\Controllers\Learner\DashboardController as LearnerDashboard;
 use App\Http\Controllers\Learner\ClassController as LearnerClassController;
 use App\Http\Controllers\Learner\AssignmentController as LearnerAssignmentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MessageController;
 use App\Models\Notification;
 
 /*
@@ -29,7 +30,7 @@ use App\Models\Notification;
 Route::get('/', function () {
     if (auth()->check()) {
         $user = auth()->user();
-        if ($user->isAdmin()) return redirect()->route('admin.dashboard');
+        if ($user->isAdministrator()) return redirect()->route('admin.dashboard');
         if ($user->isTutor()) return redirect()->route('tutor.dashboard');
         if ($user->isParent()) return redirect()->route('parent.dashboard');
         if ($user->isLearner()) return redirect()->route('learner.dashboard');
@@ -49,10 +50,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/help/user-guide', function () {
         return view('help.user-guide');
     })->name('help.user-guide');
+
+    // In-app messaging (parents <-> CEO / administrators)
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
 });
 
-// Admin Routes
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+// Admin Routes (Administrators and the CEO share this area)
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->group(function () {
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     
     Route::resource('users', AdminUserController::class);
@@ -61,7 +67,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::delete('/classes/{class}/unenroll/{learner}', [AdminClassController::class, 'unenroll'])->name('classes.unenroll');
 
     Route::resource('schedules', AdminScheduleController::class);
-    Route::resource('payments', AdminPaymentController::class)->only(['index', 'create', 'store', 'show']);
     
     Route::resource('notifications', AdminNotificationController::class)->only(['index', 'create', 'store', 'destroy']);
     
@@ -70,8 +75,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/attendance/class/{classId}', [AdminOversightController::class, 'attendanceByClass'])->name('oversight.attendance.class');
     Route::get('/assignments', [AdminOversightController::class, 'assignments'])->name('oversight.assignments');
     Route::get('/assignments/class/{classId}', [AdminOversightController::class, 'assignmentsByClass'])->name('oversight.assignments.class');
+    Route::get('/assignments/{assignment}/submissions', [AdminOversightController::class, 'submissions'])->name('oversight.assignments.submissions');
+    Route::post('/submissions/{submission}/grade', [AdminOversightController::class, 'gradeSubmission'])->name('oversight.submissions.grade');
+    Route::get('/submissions/{submission}/download', [AdminOversightController::class, 'downloadSubmission'])->name('oversight.submissions.download');
     Route::get('/materials', [AdminOversightController::class, 'materials'])->name('oversight.materials');
     Route::get('/materials/class/{classId}', [AdminOversightController::class, 'materialsByClass'])->name('oversight.materials.class');
+});
+
+// Payments are CEO-only: regular administrators cannot view or record payments.
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:ceo'])->group(function () {
+    Route::resource('payments', AdminPaymentController::class)->only(['index', 'create', 'store', 'show']);
 });
 
 // Tutor Routes

@@ -1,8 +1,13 @@
 <nav class="bg-white shadow-lg border-b">
+    @php
+        $navUnreadMessages = (auth()->user()->isParent() || auth()->user()->isAdministrator())
+            ? auth()->user()->unreadMessagesCount()
+            : 0;
+    @endphp
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center">
-                <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->isTutor() ? route('tutor.dashboard') : (auth()->user()->isParent() ? route('parent.dashboard') : route('learner.dashboard'))) }}" class="flex items-center">
+                <a href="{{ auth()->user()->isAdministrator() ? route('admin.dashboard') : (auth()->user()->isTutor() ? route('tutor.dashboard') : (auth()->user()->isParent() ? route('parent.dashboard') : route('learner.dashboard'))) }}" class="flex items-center">
                     <span class="text-xl font-bold text-indigo-600">ESH</span>
                     <span class="ml-1 text-gray-600 text-sm hidden sm:inline">Excellent Scholars Hub</span>
                 </a>
@@ -10,12 +15,18 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex md:items-center md:space-x-4">
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->isAdministrator())
                     <a href="{{ route('admin.dashboard') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
                         <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
                     </a>
                     <a href="{{ route('admin.users.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
                         <i class="fas fa-users mr-1"></i> Users
+                    </a>
+                    <a href="{{ route('messages.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-comments mr-1"></i> Messages
+                        @if($navUnreadMessages > 0)
+                            <span class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 ml-1">{{ $navUnreadMessages }}</span>
+                        @endif
                     </a>
                     <!-- Academics Dropdown: Classes, Schedules, Payments -->
                     <div class="relative group">
@@ -27,12 +38,14 @@
                             <a href="{{ route('admin.classes.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-t-lg">
                                 <i class="fas fa-chalkboard mr-3 text-yellow-600 w-4"></i> Classes
                             </a>
-                            <a href="{{ route('admin.schedules.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">
+                            <a href="{{ route('admin.schedules.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 {{ auth()->user()->isCeo() ? '' : 'rounded-b-lg' }}">
                                 <i class="fas fa-calendar mr-3 text-purple-600 w-4"></i> Schedules
                             </a>
-                            <a href="{{ route('admin.payments.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-b-lg">
-                                <i class="fas fa-money-bill mr-3 text-pink-600 w-4"></i> Payments
-                            </a>
+                            @if(auth()->user()->isCeo())
+                                <a href="{{ route('admin.payments.index') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-b-lg">
+                                    <i class="fas fa-money-bill mr-3 text-pink-600 w-4"></i> Payments <span class="ml-auto text-xs text-pink-600">CEO</span>
+                                </a>
+                            @endif
                         </div>
                     </div>
                     <!-- Oversight Dropdown -->
@@ -72,6 +85,12 @@
                 @elseif(auth()->user()->isParent())
                     <a href="{{ route('parent.dashboard') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
                         <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                    </a>
+                    <a href="{{ route('messages.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-comments mr-1"></i> Messages
+                        @if($navUnreadMessages > 0)
+                            <span class="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 ml-1">{{ $navUnreadMessages }}</span>
+                        @endif
                     </a>
                 @elseif(auth()->user()->isLearner())
                     <a href="{{ route('learner.dashboard') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
@@ -128,12 +147,20 @@
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
         <div class="px-4 py-3 space-y-2">
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->isAdministrator())
                 <a href="{{ route('admin.dashboard') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Dashboard</a>
                 <a href="{{ route('admin.users.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Users</a>
+                <a href="{{ route('messages.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">
+                    Messages
+                    @if($navUnreadMessages > 0)
+                        <span class="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 ml-2">{{ $navUnreadMessages }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('admin.classes.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Classes</a>
                 <a href="{{ route('admin.schedules.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Schedules</a>
-                <a href="{{ route('admin.payments.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Payments</a>
+                @if(auth()->user()->isCeo())
+                    <a href="{{ route('admin.payments.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Payments (CEO)</a>
+                @endif
                 <a href="{{ route('admin.oversight.attendance') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Attendance</a>
                 <a href="{{ route('admin.oversight.assignments') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Assignments</a>
                 <a href="{{ route('admin.oversight.materials') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Materials</a>
@@ -145,6 +172,12 @@
                 <a href="{{ route('tutor.materials.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Materials</a>
             @elseif(auth()->user()->isParent())
                 <a href="{{ route('parent.dashboard') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Dashboard</a>
+                <a href="{{ route('messages.index') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">
+                    Messages
+                    @if($navUnreadMessages > 0)
+                        <span class="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 ml-2">{{ $navUnreadMessages }}</span>
+                    @endif
+                </a>
             @elseif(auth()->user()->isLearner())
                 <a href="{{ route('learner.dashboard') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">Dashboard</a>
                 <a href="{{ route('learner.classes') }}" class="block text-gray-700 hover:bg-indigo-50 px-3 py-2 rounded">My Classes</a>

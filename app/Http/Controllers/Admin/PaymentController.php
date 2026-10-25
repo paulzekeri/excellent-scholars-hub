@@ -10,6 +10,16 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    public function __construct()
+    {
+        // Payments are CEO-only; routes are also protected by the role:ceo middleware.
+        $this->middleware(function ($request, $next) {
+            abort_unless(auth()->check() && auth()->user()->canManagePayments(), 403, 'Only the CEO can access payments.');
+
+            return $next($request);
+        });
+    }
+
     public function index()
     {
         $payments = Payment::with('user', 'learner.user')
