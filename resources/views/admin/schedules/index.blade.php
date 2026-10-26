@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
-        <div><h1 class="text-3xl font-bold text-gray-800">Manage Schedules</h1><p class="text-gray-600 mt-1">All class schedules</p></div>
+        <div><h1 class="text-3xl font-bold text-gray-800">Manage Schedules</h1><p class="text-gray-600 mt-1">All class schedules &mdash; upcoming sessions first, then most recent past sessions</p></div>
         <a href="{{ route('admin.schedules.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-plus mr-1"></i> New Schedule</a>
     </div>
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -15,12 +15,13 @@
                 <tbody class="divide-y divide-gray-200">
                     @foreach($schedules as $schedule)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm font-medium">{{ $schedule->title }}</td>
+                        <td class="px-6 py-4 text-sm font-medium"><a href="{{ route('admin.schedules.show', $schedule) }}" class="text-gray-800 hover:text-indigo-600">{{ $schedule->title }}</a></td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->tutor->user->name }}</td>
                         <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'ongoing') bg-yellow-100 text-yellow-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-red-100 text-red-800 @endif">{{ ucfirst($schedule->status) }}</span></td>
                         <td class="px-6 py-4 text-sm">
+                            <a href="{{ route('admin.schedules.show', $schedule) }}" class="text-blue-600 hover:text-blue-800 mr-3" title="View session &amp; join"><i class="fas fa-eye"></i></a>
                             <a href="{{ route('admin.schedules.edit', $schedule) }}" class="text-indigo-600 hover:text-indigo-800 mr-3"><i class="fas fa-edit"></i></a>
                             <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></form>
                         </td>

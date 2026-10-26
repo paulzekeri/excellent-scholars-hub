@@ -137,11 +137,16 @@
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Classes</h2>
             <div class="space-y-4">
                 @forelse($upcomingClasses as $schedule)
-                    <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg">
-                        <p class="font-semibold text-gray-800">{{ $schedule->title }}</p>
-                        <p class="text-sm text-gray-600">{{ $schedule->class->name }} - {{ $schedule->tutor->user->name }}</p>
-                        <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</p>
-                    </div>
+                    <a href="{{ route('admin.schedules.show', $schedule) }}" class="block border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg hover:bg-indigo-100 transition">
+                        <div class="flex justify-between items-start gap-3">
+                            <div>
+                                <p class="font-semibold text-gray-800">{{ $schedule->title }}</p>
+                                <p class="text-sm text-gray-600">{{ $schedule->class->name }} - {{ $schedule->tutor->user->name }}</p>
+                                <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-indigo-400 mt-1"></i>
+                        </div>
+                    </a>
                 @empty
                     <p class="text-gray-500 text-center">No upcoming classes</p>
                 @endforelse

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assignment;
 use App\Models\ClassSchedule;
 use App\Models\Classes;
+use App\Models\LearningMaterial;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
 
@@ -12,10 +14,69 @@ class ScheduleController extends Controller
 {
     public function index()
     {
+        // Upcoming and ongoing sessions first (soonest at the top), then past
+        // sessions most-recent-first, so the live session is always on page one.
         $schedules = ClassSchedule::with('class', 'tutor.user')
-            ->orderBy('start_time')
+            ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
+            ->orderByRaw('CASE WHEN start_time >= ? THEN start_time END ASC', [now()])
+            ->orderByRaw('CASE WHEN start_time < ? THEN start_time END DESC', [now()])
             ->paginate(10);
+
         return view('admin.schedules.index', compact('schedules'));
+    }
+
+    /**
+     * Read-only session detail for administrators and the CEO: shows who is
+     * enrolled, whether attendance was marked, and offers a single Join action.
+     */
+    public function show(ClassSchedule $schedule)
+    {
+        $schedule->load(['class.tutor.user', 'class.learners.user', 'tutor.user', 'attendance.learner.user']);
+
+        $class = $schedule->class;
+        $enrolledLearners = $class ? $class->learners : collect();
+        $attendanceByLearner = $schedule->attendance->keyBy('learner_id');
+
+        // Enrolled learners first, then any attendance record belonging to a
+        // learner who has since been unenrolled, so the session log stays complete.
+        $attendanceRows = $enrolledLearners->map(function ($learner) use ($attendanceByLearner) {
+            return [
+                'learner' => $learner,
+                'record' => $attendanceByLearner->get($learner->id),
+                'enrolled' => true,
+            ];
+        })->concat(
+            $schedule->attendance
+                ->reject(function ($record) use ($enrolledLearners) {
+                    return $enrolledLearners->contains('id', $record->learner_id);
+                })
+                ->filter(function ($record) {
+                    return $record->learner !== null;
+                })
+                ->map(function ($record) {
+                    return [
+                        'learner' => $record->learner,
+                        'record' => $record,
+                        'enrolled' => false,
+                    ];
+                })
+        )->sortBy(function ($row) {
+            return $row['learner']->user->name ?? '';
+        })->values();
+
+        return view('admin.schedules.show', [
+            'schedule' => $schedule,
+            'class' => $class,
+            'attendanceRows' => $attendanceRows,
+            'attendanceSummary' => [
+                'present' => $schedule->attendance->where('status', 'present')->count(),
+                'late' => $schedule->attendance->where('status', 'late')->count(),
+                'absent' => $schedule->attendance->where('status', 'absent')->count(),
+                'excused' => $schedule->attendance->where('status', 'excused')->count(),
+            ],
+            'assignmentCount' => $class ? Assignment::where('class_id', $class->id)->count() : 0,
+            'materialCount' => $class ? LearningMaterial::where('class_id', $class->id)->count() : 0,
+        ]);
     }
 
     public function create()
