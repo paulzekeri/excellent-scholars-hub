@@ -87,7 +87,8 @@ class AdminNotificationAccessTest extends TestCase
             ->assertSee('Reminder')
             ->assertSee('A nudge about something still to be done, usually with a deadline.')
             ->assertSee('Alert')
-            ->assertSee('Urgent or exceptional news that needs immediate attention.');
+            ->assertSee('Urgent or exceptional news that needs immediate attention.')
+            ->assertDontSee('value="message"', false);
     }
 
     public function test_admin_must_pick_one_of_the_supported_notification_types()
@@ -95,16 +96,20 @@ class AdminNotificationAccessTest extends TestCase
         $admin = $this->makeUser('admin', 'Test Admin Type Guard');
         $recipient = $this->makeUser('learner', 'Test Learner Type Guard');
 
-        $this->actingAs($admin)
-            ->post(route('admin.notifications.store'), [
-                'title' => 'Unsupported type',
-                'message' => 'This must never be stored.',
-                'type' => 'announcement',
-                'user_id' => $recipient->id,
-            ])
-            ->assertSessionHasErrors('type');
+        // "announcement" is the old documentation wording and "message" is reserved
+        // for the system generated notifications created by direct messages.
+        foreach (['announcement', 'message'] as $unsupportedType) {
+            $this->actingAs($admin)
+                ->post(route('admin.notifications.store'), [
+                    'title' => 'Unsupported ' . $unsupportedType,
+                    'message' => 'This must never be stored.',
+                    'type' => $unsupportedType,
+                    'user_id' => $recipient->id,
+                ])
+                ->assertSessionHasErrors('type');
 
-        $this->assertDatabaseMissing('notifications', ['title' => 'Unsupported type']);
+            $this->assertDatabaseMissing('notifications', ['title' => 'Unsupported ' . $unsupportedType]);
+        }
     }
 
     public function test_each_supported_type_is_saved_as_a_delivered_in_app_notification()
