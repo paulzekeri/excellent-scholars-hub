@@ -1,27 +1,26 @@
 ---
-# cPanel → Git™ Version Control → "Deploy HEAD Commit" pipeline for:
-#   UAT subdomain : uat-esh.lit-grp.com
-#   Document root : /home/CPANELUSER/esh-uat/public
+# Fallback deploy path: cPanel → Git™ Version Control → "Deploy HEAD Commit".
 #
-# BEFORE the first deploy, replace the two placeholders below with the values for
-# your account (check them over SSH with: `whoami`, `which php`, `which composer`):
-#   CPANELUSER  e.g. litgrp
-#   PHP_BIN     e.g. /usr/local/bin/php  (or /opt/cpanel/ea-php81/root/usr/bin/php)
-#   COMPOSER_BIN e.g. /usr/local/bin/composer (or /opt/cpanel/composer/bin/composer)
+# The primary pipeline is the GitHub Actions workflow
+# (.github/workflows/deploy-cpanel.yml), which publishes on every push to main.
+# Use this file only when the repository is cloned through cPanel's own Git
+# Version Control, which runs the tasks below after pulling.
 #
-# The pipeline copies application code only: .env, vendor/, storage/ uploads and the
-# database stay on the server, so a deploy never destroys live data.
+# Both produce the SAME layout: the whole app lives in the subdomain's document
+# root and the repository's root .htaccess forwards requests into public/.
 deployment:
   tasks:
-    - export APP_PATH=/home/CPANELUSER/esh-uat
-    - export PHP_BIN=/usr/local/bin/php
-    - export COMPOSER_BIN=/usr/local/bin/composer
+    # App folder = the document root of uat-esh.lit-grp.com on this account.
+    - export APP_PATH=/home/litgrpco/uat-esh.lit-grp.com
+    # PHP 8.1 from EasyApache; falls back to the account default binary.
+    - export PHP_BIN=/opt/cpanel/ea-php81/root/usr/bin/php
+    - test -x $PHP_BIN || export PHP_BIN=/usr/local/bin/php
     - /bin/mkdir -p $APP_PATH
+    # Application code only: .env, storage/ uploads and vendor/ stay untouched.
     - /bin/cp -R app bootstrap config database public resources routes $APP_PATH
-    - /bin/cp artisan composer.json composer.lock $APP_PATH
-    - /bin/cp .env.uat.example .env.production.example DEPLOYMENT.md $APP_PATH
-    - cd $APP_PATH && $COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction
-    - cd $APP_PATH && $PHP_BIN artisan migrate --force
+    - /bin/cp artisan composer.json composer.lock .htaccess .user.ini $APP_PATH
+    - cd $APP_PATH && composer install --no-dev --optimize-autoloader --no-interaction
+    - cd $APP_PATH && $PHP_BIN artisan migrate --force --seed
     - cd $APP_PATH && $PHP_BIN artisan storage:link
     - cd $APP_PATH && $PHP_BIN artisan config:cache
     - cd $APP_PATH && $PHP_BIN artisan view:cache

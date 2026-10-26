@@ -75,10 +75,13 @@ php artisan esh:create-admin --role=ceo
 
 ## Deployment
 
-UAT lives at **`https://uat-esh.lit-grp.com`** (cPanel subdomain whose document root is the app's `public/` folder).
-The full runbook — subdomain/PHP/database setup, the cPanel Git pipeline (`.cpanel.yml`), the no-SSH release-zip
-fallback (`deploy/build-release.ps1`), the UAT smoke-test matrix, production promotion and rollback — is in
-**[DEPLOYMENT.md](DEPLOYMENT.md)**.
+UAT lives at **`https://uat-esh.lit-grp.com`** — a cPanel subdomain whose document root holds the whole app
+(the repository's root `.htaccess` forwards every request into `public/`). Every push to `main` is published
+by **GitHub Actions** (`.github/workflows/deploy-cpanel.yml`: build `vendor/`, SFTP mirror, prune, then
+`migrate`/`storage:link`/caches/`esh:health` over SSH) — the same pipeline pattern used for `dev.lit-grp.com`.
+The full runbook — secrets, subdomain/PHP/database setup, the cPanel Git pipeline (`.cpanel.yml`), the
+release-zip fallback (`deploy/build-release.ps1`), the UAT smoke-test matrix, production promotion and
+rollback — is in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 Environment templates:
 
@@ -103,10 +106,17 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 ## Feature change log
 
 ### UAT deployment kit (`uat-esh.lit-grp.com`)
-- **`DEPLOYMENT.md`** — cPanel runbook: subdomain/PHP/MySQL setup, SSH deploy, cPanel Git pipeline, no-SSH release zip,
-  UAT smoke-test matrix, UAT → production promotion, rollback and troubleshooting.
-- **`.cpanel.yml`** — cPanel *Git™ Version Control* deployment tasks (composer install, `migrate --force`, `storage:link`,
-  config/view caches, `esh:health`) that never overwrite `.env` or `storage/` uploads.
+- **`.github/workflows/deploy-cpanel.yml`** — push-to-`main` pipeline: Composer install with `--no-dev`, SFTP
+  mirror (`lftp`) to `~/uat-esh.lit-grp.com/`, pruning of files removed from the repo, then `migrate --force
+  --seed`, `storage:link`, `config:cache`, `view:cache` and `esh:health` over SSH. Never uploads `.env`,
+  `storage/` uploads or `public/storage`.
+- **`.htaccess` (repository root)** — forwards every request into `public/` and returns 403 for `.env`,
+  `artisan`, `composer.*`, `*.log`, `*.sql`, `*.sh`, `*.yml`, so the app can live inside the document root.
+- **`.user.ini`** — 100 MB upload limits, 256 MB memory and `session.upload_progress.enabled=0`.
+- **`DEPLOYMENT.md`** — cPanel runbook: secrets, subdomain/PHP/MySQL setup, GitHub Actions deploy, cPanel Git
+  pipeline, release zip, UAT smoke-test matrix, UAT → production promotion, rollback and troubleshooting.
+- **`.cpanel.yml`** — fallback cPanel *Git™ Version Control* tasks (composer install, `migrate --force --seed`,
+  `storage:link`, config/view caches, `esh:health`) that never overwrite `.env` or `storage/` uploads.
 - **`.env.uat.example` / `.env.production.example`** — environment templates (`uat-esh.lit-grp.com`, secure cookies,
   demo seeding on UAT only).
 - **`php artisan esh:health`** — post-deploy check of PHP/extensions, `APP_KEY`/`APP_URL`, database, pending migrations,

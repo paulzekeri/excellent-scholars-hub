@@ -79,13 +79,20 @@
 - [x] Documentation updated (`README.md`, in-app user guide)
 
 ## Phase 10: Deployment
-- [x] UAT target confirmed: `uat-esh.lit-grp.com` (cPanel, docroot `esh-uat/public`)
+- [x] UAT target confirmed: `uat-esh.lit-grp.com` (cPanel account `litgrpco`; the document root holds the app and the
+      root `.htaccess` forwards every request into `public/`, so no docroot change is needed)
 - [x] `.env.uat.example` / `.env.production.example` templates (secure cookies, UAT-only demo seeding)
-- [x] `DEPLOYMENT.md` runbook (SSH deploy, cPanel Git pipeline, release-zip fallback, smoke tests, production promotion, rollback)
-- [x] `.cpanel.yml` deployment pipeline (composer install, migrate, storage link, caches, health check)
+- [x] `.github/workflows/deploy-cpanel.yml`: push to `main` → Composer install → SFTP mirror (`lftp`) → prune deleted
+      files → `migrate --force --seed`, `storage:link`, `config:cache`, `view:cache`, `esh:health` over SSH
+      (same pattern as `tcntiu-debug/Smart-Church`, which publishes `dev.lit-grp.com` on push)
+- [x] root `.htaccess` front controller (403 for `.env`/`artisan`/`composer.*`/`*.sql|log|sh|yml`) + `.user.ini`
+      (100M uploads, 256M memory, `session.upload_progress.enabled=0`)
+- [x] `DEPLOYMENT.md` runbook (Actions deploy, manual SSH, cPanel Git pipeline, release-zip fallback, smoke tests,
+      production promotion, rollback)
+- [x] `.cpanel.yml` fallback pipeline (same layout; composer install, migrate, storage link, caches, health check)
 - [x] `deploy/build-release.ps1` release packager for File Manager uploads
 - [x] `php artisan esh:health` post-deploy check
 - [x] `php artisan esh:create-admin` first-production-login command
 - [x] `DatabaseSeeder` guard: demo accounts skipped in production unless `SEED_DEMO_ACCOUNTS=true`
-- [x] `tests/Feature/DeploymentToolingTest.php` (6 tests)
+- [x] `tests/Feature/DeploymentToolingTest.php` (7 tests)
 

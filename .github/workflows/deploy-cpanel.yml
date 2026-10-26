@@ -1,0 +1,325 @@
+name: Deploy to cPanel (UAT)
+
+# ---------------------------------------------------------------------------
+# Push to main  ->  build the app on the runner  ->  publish over SFTP to
+# https://uat-esh.lit-grp.com  ->  run the artisan post-deploy steps.
+#
+# Same mechanism as tcntiu-debug/Smart-Church (.github/workflows/deploy-cpanel.yml),
+# which is how dev.lit-grp.com is published: nobody logs in by hand, the GitHub
+# runner builds vendor/, mirrors a staged tree over SFTP (lftp) and then deletes
+# the files `git rm` removed from the repository.
+#
+# LAYOUT ON THE SERVER
+#   The cPanel document root (default /home/litgrpco/uat-esh.lit-grp.com) holds the
+#   whole Laravel app and the repository's root .htaccess forwards every request
+#   into public/. So app/, config/, storage/, vendor/ and .env are never reachable
+#   from a URL, and the document root does not have to be changed in cPanel.
+#
+# Required repository secrets   (Settings -> Secrets and variables -> Actions):
+#   CPANEL_HOST      SSH/SFTP host - 147.124.220.162 or ftp.lit-grp.com
+#   CPANEL_USER      cPanel username - litgrpco
+#   CPANEL_PASSWORD  matching cPanel/SSH password
+#
+# Optional repository variables (same screen, "Variables" tab):
+#   CPANEL_SSH_PORT    22 (default)
+#   CPANEL_REMOTE_DIR  app folder RELATIVE to the account home
+#                      (default: uat-esh.lit-grp.com/)
+#
+# NEVER uploaded (they only exist on the server): .env, storage/ uploads,
+# public/storage, bootstrap/cache/*.php, .well-known.
+# ---------------------------------------------------------------------------
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      note:
+        description: Short note describing this manual deployment
+        required: false
+        default: Manual deployment
+
+concurrency:
+  group: cpanel-deploy-uat-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # Read the run history to find the last SUCCESSFUL deploy (pruning baseline).
+  actions: read
+
+env:
+  # Laravel 8 supports PHP 7.3 - 8.1. Building on 8.0 keeps vendor/ runnable on a
+  # cPanel domain set to 8.0 *or* 8.1 (see DEPLOYMENT.md section 0).
+  PHP_VERSION: '8.0'
+
+jobs:
+  deploy:
+    name: Build and publish to cPanel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Full history: the pruning step diffs this commit against the last
+          # successfully deployed one to know exactly what was deleted.
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: bcmath, ctype, curl, dom, fileinfo, filter, gd, hash, json, mbstring, openssl, pdo, pdo_mysql, session, simplexml, tokenize
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-
+
+      - name: Validate deployment secrets
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_PASSWORD: ${{ secrets.CPANEL_PASSWORD }}
+        run: |
+          missing=0
+          for pair in "CPANEL_HOST:$CPANEL_HOST" "CPANEL_USER:$CPANEL_USER" "CPANEL_PASSWORD:$CPANEL_PASSWORD"; do
+            name="${pair%%:*}"
+            value="${pair#*:}"
+            if [ -z "$value" ]; then
+              echo "::error title=Missing repository secret::$name is not set. Add it under Settings > Secrets and variables > Actions (see DEPLOYMENT.md section 2)."
+              missing=1
+            fi
+          done
+          exit $missing
+
+      # Build-only .env: composer/artisan need an app key on the runner. It is
+      # excluded from the upload, so the server .env is never touched.
+      - name: Create build-time .env
+        run: cp .env.example .env
+
+      - name: Install Composer dependencies (production)
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate build-time application key
+        run: php artisan key:generate --force
+
+      - name: Smoke test the build
+        run: |
+          php -l public/index.php
+          php -r "require 'vendor/autoload.php'; echo 'Composer autoloader OK', PHP_EOL;"
+          php artisan --version
+
+      - name: Publish to cPanel (SFTP mirror)
+        env:
+          SSHPASS: ${{ secrets.CPANEL_PASSWORD }}
+          SSH_HOST: ${{ secrets.CPANEL_HOST }}
+          SSH_USER: ${{ secrets.CPANEL_USER }}
+          SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp rsync
+
+          STAGE="$RUNNER_TEMP/site"
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE"
+          rsync -a \
+            --exclude='.git' --exclude='.github' --exclude='.idea' \
+            --exclude='.vscode' --exclude='node_modules' \
+            --exclude='.gitignore' --exclude='.gitattributes' \
+            --exclude='.env' --exclude='.env.*' \
+            --exclude='.cpanel.yml' \
+            --exclude='deploy' --exclude='tests' --exclude='phpunit.xml' \
+            --exclude='README.md' --exclude='DEPLOYMENT.md' --exclude='plan.md' \
+            --exclude='esh_lms.sql' --exclude='*.zip' \
+            --exclude='public/storage' --exclude='public/hot' \
+            --exclude='storage/app/public/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='storage/logs/*' \
+            --exclude='bootstrap/cache/*.php' \
+            "$GITHUB_WORKSPACE/" "$STAGE/"
+
+          echo "Staged $(find "$STAGE" -type f | wc -l) files. Root listing:"
+          ls -la "$STAGE" | head -40
+
+          echo "==> Mirroring to sftp://${SSH_HOST}:${SSH_PORT}/${REMOTE_DIR%/}"
+          set +e
+          LFTP_PASSWORD="$SSHPASS" lftp --env-password -u "$SSH_USER" "sftp://${SSH_HOST}:${SSH_PORT}" >lftp.out 2>&1 <<LFTP
+          set sftp:connect-program "ssh -a -x -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"
+          set sftp:auto-confirm yes
+          set net:max-retries 3
+          set net:timeout 30
+          set net:reconnect-interval-base 5
+          set mirror:parallel-transfer-count 4
+          mkdir -p "${REMOTE_DIR%/}"
+          mirror -R --verbose=1 --no-perms --no-symlinks "$STAGE/" "${REMOTE_DIR%/}"
+          bye
+          LFTP
+          rc=$?
+          set -e
+          echo "::notice title=lftp output::$(tail -c 2500 lftp.out | tr '\n' '|')"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=SFTP upload failed (lftp exit $rc)::see the 'lftp output' notice"
+            exit 1
+          fi
+
+      # A mirror only ADDS and OVERWRITES, so a file deleted from the repository
+      # would survive on the server forever. This removes exactly the paths git
+      # reports as deleted since the last successful run of this workflow, while
+      # protecting everything that only exists on the server.
+      - name: Prune files deleted from the repository
+        env:
+          SSHPASS: ${{ secrets.CPANEL_PASSWORD }}
+          SSH_HOST: ${{ secrets.CPANEL_HOST }}
+          SSH_USER: ${{ secrets.CPANEL_USER }}
+          SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          BEFORE_SHA: ${{ github.event.before }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq lftp
+
+          BASELINE="$(gh api -X GET \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/deploy-cpanel.yml/runs?status=success&per_page=1" \
+            --jq '.workflow_runs[0].head_sha' 2>/dev/null | tr -d '[:space:]' || true)"
+
+          if ! git cat-file -e "${BASELINE:-none}^{commit}" 2>/dev/null; then
+            BASELINE="${BEFORE_SHA:-}"
+          fi
+          if ! git cat-file -e "${BASELINE:-none}^{commit}" 2>/dev/null; then
+            BASELINE="$(git rev-list --max-parents=0 HEAD | tail -1)"
+          fi
+          echo "Pruning removals between ${BASELINE:0:7} and ${GITHUB_SHA:0:7}"
+
+          # Server-only paths survive even a mistaken `git rm`.
+          PROTECTED='^(\.env($|\.)|bootstrap/cache/|storage/|public/storage$|public/hot$|\.well-known/|vendor/|node_modules/)'
+
+          # Paths the publish step never uploads, so there is nothing to prune.
+          NEVER_UPLOADED='^(tests/|deploy/|\.github/|\.git|\.idea/|\.vscode/|\.gitignore$|\.gitattributes$|\.cpanel\.yml$|phpunit\.xml$|README\.md$|DEPLOYMENT\.md$|plan\.md$|esh_lms\.sql$|.*\.zip$)'
+
+          git diff --no-renames --diff-filter=D --name-only "$BASELINE" "$GITHUB_SHA" \
+            | grep -v -E "$PROTECTED" | grep -v -E "$NEVER_UPLOADED" > "$RUNNER_TEMP/prune.txt" || true
+
+          if [ ! -s "$RUNNER_TEMP/prune.txt" ]; then
+            echo "Nothing to prune - the server already matches the repository."
+            exit 0
+          fi
+
+          echo "Remote paths to remove:"
+          sed 's/^/   - /' "$RUNNER_TEMP/prune.txt"
+
+          awk -F/ '{d=""; for(i=1;i<NF;i++){d=d (i>1?"/":"") $i; print d}}' \
+            "$RUNNER_TEMP/prune.txt" | sort -ru > "$RUNNER_TEMP/prune-dirs.txt"
+
+          {
+            echo 'set sftp:connect-program "ssh -a -x -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=25"'
+            echo 'set sftp:auto-confirm yes'
+            echo 'set net:max-retries 3'
+            echo 'set net:timeout 30'
+            echo "cd \"${REMOTE_DIR%/}\""
+            while IFS= read -r file; do echo "rm -f \"$file\""; done < "$RUNNER_TEMP/prune.txt"
+            while IFS= read -r dir; do echo "rmdir -f \"$dir\""; done < "$RUNNER_TEMP/prune-dirs.txt"
+            echo 'bye'
+          } > "$RUNNER_TEMP/prune.lftp"
+
+          PRUNE_CMDS="$(cat "$RUNNER_TEMP/prune.lftp")"
+
+          set +e
+          LFTP_PASSWORD="$SSHPASS" lftp --env-password -u "$SSH_USER" "sftp://${SSH_HOST}:${SSH_PORT}" >lftp-prune.out 2>&1 <<LFTP
+          $PRUNE_CMDS
+          LFTP
+          rc=$?
+          set -e
+
+          echo "::notice title=lftp prune output::$(tail -c 2000 lftp-prune.out | tr '\n' '|')"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error title=SFTP prune failed (lftp exit $rc)::the code deploy succeeded but stale files were left behind - see the 'lftp prune output' notice"
+            exit 1
+          fi
+          echo "Pruned $(wc -l < "$RUNNER_TEMP/prune.txt") path(s) from ${REMOTE_DIR%/}"
+
+      # The upload only needs SFTP. The commands below need a shell, which this
+      # cPanel account has (cPanel > Terminal). When SSH command execution is not
+      # allowed the step only warns: the files are live and the same commands can be
+      # run once from cPanel > Terminal (see DEPLOYMENT.md section 2).
+      - name: Post-deploy artisan commands (SSH)
+        env:
+          SSHPASS: ${{ secrets.CPANEL_PASSWORD }}
+          SSH_HOST: ${{ secrets.CPANEL_HOST }}
+          SSH_USER: ${{ secrets.CPANEL_USER }}
+          SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq sshpass
+
+          SCRIPT=$(cat <<'EOS'
+          set -eu
+          cd "__REMOTE_DIR__"
+          PHP="$(command -v php || echo /usr/local/bin/php)"
+          if [ ! -x "$PHP" ]; then
+            echo "No php binary found (tried PATH and /usr/local/bin/php)." >&2
+            exit 3
+          fi
+          echo "PHP $("$PHP" -r 'echo PHP_VERSION;') at $PHP"
+          "$PHP" artisan migrate --force --seed
+          "$PHP" artisan storage:link || true
+          if [ ! -e public/storage ]; then
+            echo "public/storage is missing - material and submission downloads would 404." >&2
+            exit 4
+          fi
+          "$PHP" artisan config:cache
+          "$PHP" artisan view:cache
+          "$PHP" artisan esh:health
+          EOS
+          )
+          SCRIPT="${SCRIPT/__REMOTE_DIR__/${REMOTE_DIR%/}}"
+          PAYLOAD="$(printf '%s' "$SCRIPT" | base64 -w0)"
+
+          set +e
+          sshpass -e ssh -p "$SSH_PORT" \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=25 \
+            "$SSH_USER@$SSH_HOST" "echo $PAYLOAD | base64 -d | bash -s" 2>&1 | tee remote.out
+          rc=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$rc" -eq 0 ]; then
+            echo "Post-deploy commands finished."
+          elif [ "$rc" -eq 255 ]; then
+            echo "::warning title=No SSH command execution::Files were deployed, but the artisan post-deploy steps could not run over SSH (exit 255). Run them once in cPanel > Terminal inside ${REMOTE_DIR%/}: php artisan migrate --force --seed && php artisan storage:link && php artisan config:cache && php artisan view:cache && php artisan esh:health"
+          else
+            echo "::error title=Post-deploy commands failed (exit $rc)::see the log above - the code is deployed but the database or caches may be stale"
+            exit 1
+          fi
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          {
+            echo "## cPanel deployment"
+            echo ""
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| Site | https://uat-esh.lit-grp.com |"
+            echo "| Commit | \`${GITHUB_SHA:0:12}\` |"
+            echo "| Transport | \`sftp\` (lftp mirror) |"
+            echo "| Remote directory | \`${REMOTE_DIR:-uat-esh.lit-grp.com/}\` |"
+            echo "| Run | ${{ github.run_id }} (attempt ${{ github.run_attempt }}) |"
+            echo ""
+            echo "Check the site, then walk the smoke-test matrix in DEPLOYMENT.md section 5."
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}

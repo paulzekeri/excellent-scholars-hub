@@ -104,7 +104,7 @@ $archive = New-Object System.IO.Compression.ZipArchive($stream, [System.IO.Compr
 try {
     $baseLength = $staging.Length + 1
 
-    Get-ChildItem -LiteralPath $staging -Recurse -File | ForEach-Object {
+    Get-ChildItem -LiteralPath $staging -Recurse -File -Force | ForEach-Object {
         $entryName = $_.FullName.Substring($baseLength).Replace('\', '/')
         [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
             $archive,

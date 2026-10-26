@@ -1,0 +1,45 @@
+# =====================================================================
+# ESH LMS - cPanel front controller
+# ---------------------------------------------------------------------
+# The cPanel document root for uat-esh.lit-grp.com is a normal folder
+# (/home/litgrpco/uat-esh.lit-grp.com) that receives the whole Laravel
+# application, because changing the document root to public/ is not always
+# possible. This file therefore lives in that folder and forwards every
+# request into public/, so app/, config/, database/, storage/, vendor/ and
+# .env are never reachable from a URL.
+#
+# Local development is unaffected: "php artisan serve" does not read this
+# file, and XAMPP still serves the app from public/ when you open
+# http://localhost/excellent-scholars-hub/public/.
+# =====================================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Leave requests that already resolve into public/ alone (prevents loops
+    # and keeps the /public/storage symlink working).
+    RewriteRule ^public/ - [L]
+
+    # Never intercept domain/SSL validation requests (AutoSSL, Let's Encrypt).
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+
+    # Everything else is handled by Laravel's front controller.
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Do not expose directory listings.
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Belt-and-braces: refuse direct HTTP access to sensitive files. This only
+# matters because the application is deployed inside the document root.
+<FilesMatch "(^\.env|^composer\.(json|lock)$|^artisan$|^\.user\.ini$|\.(log|sql|bak|old|ini|yml|yaml|lock|sh|md|ps1)$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

@@ -6,7 +6,7 @@ that host but applies to any cPanel + MySQL + Apache environment.
 
 | Environment | URL | App path (suggested) | Database | Demo accounts |
 |---|---|---|---|---|
-| Staging / UAT | `https://uat-esh.lit-grp.com` | `/home/CPANELUSER/esh-uat` | `CPANELUSER_esh_uat` | yes (`SEED_DEMO_ACCOUNTS=true`) |
+| Staging / UAT | `https://uat-esh.lit-grp.com` | `/home/litgrpco/uat-esh.lit-grp.com` (document root) | `litgrpco_esh_uat` | yes (`SEED_DEMO_ACCOUNTS=true`) |
 | Production | `https://lms.lit-grp.com` | `/home/CPANELUSER/esh-live` | `CPANELUSER_esh_live` | **never** (`SEED_DEMO_ACCOUNTS=false`) |
 
 > **Hostname note:** `uat_esh.lit-grp.com` (with an underscore) is **not a valid DNS hostname** and
@@ -20,10 +20,12 @@ that host but applies to any cPanel + MySQL + Apache environment.
   `tokenizer`, `xml`, `ctype` (all standard on cPanel).
 * **MySQL 5.7+/MariaDB 10.3+** database + user, created in *cPanel → MySQL® Databases*
   (grant ALL on the app database only).
-* **Composer 2** on the server (`composer --version`). cPanel ships it; it is also bundled with
-  the terminal. If it is missing, use the release-zip path in §4.
-* **`upload_max_filesize` and `post_max_size` ≥ 100M** (*MultiPHP INI Editor*) because materials and
-  submissions validate at `max:102400` (100 MB).
+* **No Composer on the server**: the Actions workflow builds `vendor/` on the runner (§2) and the
+  release zip ships it (§4). Only the manual SSH path (§2.4) and `.cpanel.yml` (§3) need `composer`
+  on the account, where cPanel's Terminal provides it.
+* **`upload_max_filesize` and `post_max_size` ≥ 100M** because materials and submissions validate at
+  `max:102400` (100 MB). The committed `.user.ini` sets 100M/104M/256M; confirm the same values in
+  *MultiPHP INI Editor* if the account ignores `.user.ini`.
 * **Free SSL** via *cPanel → SSL/TLS Status → Run AutoSSL* so `https://` works before you set
   `SESSION_SECURE_COOKIE=true`.
 * No queue worker and no cron job are required: `QUEUE_CONNECTION=sync`, notifications are in-app,
@@ -32,9 +34,11 @@ that host but applies to any cPanel + MySQL + Apache environment.
 
 ## 1. Create the subdomain and database (cPanel UI)
 
-1. **Domains → Create A New Domain** → `uat-esh.lit-grp.com`, **uncheck** "Share document root",
-   document root `esh-uat/public`. If cPanel insists on `public_html/uat-esh`, accept it for now and
-   use the symlink fallback in §3.
+1. **Domains → Create A New Domain** → `uat-esh.lit-grp.com`, and keep the document root cPanel
+   proposes (`/home/litgrpco/uat-esh.lit-grp.com`). The repository ships a root `.htaccess` that
+   forwards every request into `public/`, so the document root does **not** have to be changed and
+   `.env`, `app/`, `vendor/` stay unreachable from a URL. Pointing the document root straight at
+   `public/` also works if cPanel lets you set it.
 2. **MultiPHP Manager** → assign **PHP 8.1** (or 8.0) to `uat-esh.lit-grp.com`.
 3. **MultiPHP INI Editor** → set `upload_max_filesize=100M`, `post_max_size=104M`,
    `max_execution_time=300`, `memory_limit=256M` for that domain.
@@ -43,17 +47,52 @@ that host but applies to any cPanel + MySQL + Apache environment.
    (e.g. `cpuser_esh_uat`) — note the full names for `.env`.
 5. **SSL/TLS Status** → Run AutoSSL for `uat-esh.lit-grp.com` (needs DNS to resolve first).
 
-## 2. Deploy over SSH (recommended)
+## 2. Deploy on every push (GitHub Actions) — recommended
 
-The repository is <https://github.com/tcntiu-debug/excellent-scholars-hub> (branch `main`). The
-server needs read access; use a **deploy key** or an HTTPS personal access token if the repo stays
-private.
+`.github/workflows/deploy-cpanel.yml` publishes the app on every push to `main`: the runner builds
+`vendor/`, mirrors the staged tree over SFTP and then runs the artisan steps on the server. Nothing
+has to be installed on the account and no SSH session is opened by hand.
+
+### 2.1 One-time repository setup
+
+*Settings → Secrets and variables → Actions* in
+<https://github.com/tcntiu-debug/excellent-scholars-hub>:
+
+| Kind | Name | Value |
+|---|---|---|
+| Secret | `CPANEL_HOST` | `147.124.220.162` (or `ftp.lit-grp.com`) |
+| Secret | `CPANEL_USER` | `litgrpco` |
+| Secret | `CPANEL_PASSWORD` | the cPanel/SSH password |
+| Variable (optional) | `CPANEL_SSH_PORT` | `22` (the default) |
+| Variable (optional) | `CPANEL_REMOTE_DIR` | `uat-esh.lit-grp.com/` (the default) |
+
+### 2.2 What a deploy does
+
+1. `composer install --no-dev --optimize-autoloader` on the runner, so `vendor/` needs no server shell.
+2. `rsync` a staged tree, then `lftp` mirrors it to `~/uat-esh.lit-grp.com/` over SFTP. Never
+   uploaded: `.env`, `storage/` uploads, `public/storage`, `bootstrap/cache/*.php`, `.well-known`.
+3. Prunes exactly the files `git rm` removed since the last successful run.
+4. Over SSH (the same shell *cPanel → Terminal* uses): `migrate --force --seed`, `storage:link`,
+   `config:cache`, `view:cache`, `esh:health`. If the account refuses shell commands the step only
+   warns and prints the commands to paste into *cPanel → Terminal*.
+5. Writes a summary table to the workflow run page.
+
+### 2.3 First-time server state (already prepared on UAT)
+
+`~/uat-esh.lit-grp.com/.env` is created once and never overwritten by a deploy. It needs at least:
+`APP_KEY` (51 characters, `base64:…`), `APP_ENV=production`, `APP_DEBUG=false`,
+`APP_URL=https://uat-esh.lit-grp.com`, the `DB_*` block, `MAIL_MAILER=log`,
+`SESSION_SECURE_COOKIE=true` and `SEED_DEMO_ACCOUNTS=true` (UAT demo logins).
+
+### 2.4 Manual fallback: deploy over SSH
+
+If Actions is not an option, the same layout can be maintained by hand:
 
 ```bash
-# 1. Get the code (first deploy)
+# 1. Get the code (first deploy only)
 cd ~
-git clone https://github.com/LIT-GRP/excellent-scholars-hub.git esh-uat
-cd esh-uat
+git clone https://github.com/tcntiu-debug/excellent-scholars-hub.git uat-esh.lit-grp.com
+cd uat-esh.lit-grp.com
 
 # 2. PHP dependencies (vendor/ is git-ignored)
 composer install --no-dev --optimize-autoloader --no-interaction
@@ -84,7 +123,7 @@ php artisan view:cache
 ### Later deploys (same server)
 
 ```bash
-cd ~/esh-uat
+cd ~/uat-esh.lit-grp.com
 git pull --ff-only origin main
 composer install --no-dev --optimize-autoloader --no-interaction
 php artisan migrate --force
@@ -96,45 +135,46 @@ php artisan esh:health
 
 ### Document root
 
-The web root **must** be the `public/` folder. Two supported layouts:
+The folder the subdomain points at **is** the app root, and the repository's root `.htaccess`
+forwards every request into `public/`. Two supported layouts:
 
-* Preferred: the subdomain's document root is `/home/CPANELUSER/esh-uat/public`.
-* If cPanel forces `public_html/uat-esh`, remove that folder and point it at the app instead:
+* Default (what the Actions pipeline and `.cpanel.yml` use): document root
+  `/home/litgrpco/uat-esh.lit-grp.com`, with `.htaccess`, `.env` and `public/` inside it. Nothing to
+  configure in cPanel beyond creating the subdomain.
+* Stricter: set the document root to `/home/litgrpco/uat-esh.lit-grp.com/public` in
+  *Domains → Manage*. The `.htaccess` in `public/` then handles everything and the root
+  `.htaccess` is simply never reached.
 
-```bash
-rm -rf ~/public_html/uat-esh
-ln -s ~/esh-uat/public ~/public_html/uat-esh
-```
+`.env` and the upload folders are protected either way: dotfiles are hidden by LiteSpeed, and the
+root `.htaccess` returns 403 for `.env`, `.log`, `.sql`, `.sh`, `.yml`, `artisan` and `composer.*`.
 
-`.env`, `storage/`, `vendor/` and the database dump then stay outside `public_html` — never upload
-`.env` into a web-served folder.
+## 3. Alternative: cPanel Git pipeline (`.cpanel.yml`)
 
-## 3. Deploy through the cPanel Git pipeline (`.cpanel.yml`)
-
-The repository ships `.cpanel.yml`, which cPanel's **Git™ Version Control** runs on *Deploy HEAD
-Commit*. Use it when you prefer "push → click deploy" over SSH.
+The repository also ships `.cpanel.yml`, which cPanel's **Git™ Version Control** runs on *Deploy HEAD
+Commit* — use it when cPanel itself clones the repository. It produces the same layout (whole app in
+the document root, root `.htaccess` → `public/`).
 
 1. *cPanel → Git™ Version Control → Create* → clone
-   `https://github.com/tcntiu-debug/excellent-scholars-hub.git`, branch `main` (a private repo needs
-   credentials in the clone URL).
-2. Edit `.cpanel.yml` in your local clone: replace `CPANELUSER`, `PHP_BIN` and `COMPOSER_BIN`
-   with the real values, commit and push.
-3. Create `/home/CPANELUSER/esh-uat/.env` once (from `.env.uat.example`) and run
-   `php artisan key:generate --force` over SSH — the pipeline never overwrites `.env`.
-4. Point the `uat-esh.lit-grp.com` document root at `/home/CPANELUSER/esh-uat/public`
-   (*Domains → Manage*), then run *Deploy HEAD Commit*.
+   `https://github.com/tcntiu-debug/excellent-scholars-hub.git`, branch `main`, repository path
+   `repositories/esh-uat`.
+2. The committed `.cpanel.yml` already targets `/home/litgrpco/uat-esh.lit-grp.com` and
+   `/opt/cpanel/ea-php81/root/usr/bin/php`; change those two values for a different account or PHP
+   version.
+3. Create `~/uat-esh.lit-grp.com/.env` once (from `.env.uat.example`, see §2.3) — the pipeline never
+   overwrites `.env`, `storage/` uploads or `vendor/`.
+4. Run *Pull or Deploy → Update from Remote → Deploy HEAD Commit*.
 
-The pipeline copies `app bootstrap config database public resources routes` + `artisan` +
-`composer.json`/`composer.lock`, runs `composer install --no-dev`, `migrate --force`,
-`storage:link`, rebuilds the config/view caches and ends with `esh:health`. Because it does not copy
-`storage/`, learner uploads survive redeploys.
+The tasks copy `app bootstrap config database public resources routes`, `artisan`,
+`composer.json`/`composer.lock`, `.htaccess` and `.user.ini`, run `composer install --no-dev`,
+`migrate --force --seed`, `storage:link`, rebuild the config/view caches and end with `esh:health`.
+The task log is shown on the same page and a failing task stops the deploy.
 
 > `route:cache` / `optimize` are intentionally **not** in the pipeline: `routes/web.php` defines
 > closures (`/` and `/help/user-guide`), which cannot be serialised.
 
-## 4. Deploy without SSH (release zip via File Manager)
+## 4. Deploy without any pipeline (release zip via File Manager)
 
-Use this if the host has no terminal access (Composer can also be run locally).
+Last resort, e.g. a host with neither Actions nor a terminal (Composer can run locally).
 
 ```powershell
 # On Windows, from the repository root:
@@ -142,29 +182,28 @@ powershell -ExecutionPolicy Bypass -File deploy\build-release.ps1
 # -> deploy\esh-uat-release.zip (~13 MB, vendor/ included, no .env and no esh_lms.sql)
 ```
 
-1. *cPanel → File Manager* → create `esh-uat` **outside** `public_html` → upload the zip → *Extract*.
-2. Create `.env` from `.env.uat.example` (File Manager → New File), fill in DB credentials and
-   `APP_URL=https://uat-esh.lit-grp.com`.
+1. *cPanel → File Manager* → upload the zip **into the document root**
+   (`uat-esh.lit-grp.com`) → *Extract* → delete the zip. The tree already contains `.htaccess`,
+   `.user.ini`, `public/` and `vendor/`.
+2. Create `.env` from `.env.uat.example` (File Manager → New File), fill in the DB credentials,
+   `APP_URL=https://uat-esh.lit-grp.com` and the `SEED_DEMO_ACCOUNTS=true` line.
 3. Generate the key without a terminal — run this locally (PHP installed) and paste the result into
    `APP_KEY=`:
    ```powershell
    php -r "echo 'base64:'.base64_encode(random_bytes(32));"
    ```
 4. Database: *phpMyAdmin* → select the UAT database → *Import* `esh_lms.sql` (local dump,
-   MariaDB 10.4, 32 KB) — **or** skip the import and enable the cPanel Terminal just once for
-   `php artisan migrate --force --seed`.
-5. The `public/storage` link cannot be created from File Manager. If the Terminal is available run
-   `php artisan storage:link`. If it is not, open a ticket with the host or add a small PHP script
-   that calls `symlink('../storage/app/public', __DIR__.'/storage')` and delete it afterwards —
-   **without** the link, material and submission downloads return 404.
-6. Set the document root of `uat-esh.lit-grp.com` to `esh-uat/public` (or the symlink fallback in §2).
+   MariaDB 10.4) — **or** enable the cPanel Terminal once for `php artisan migrate --force --seed`.
+5. The `public/storage` link cannot be created from File Manager. Run `php artisan storage:link` in
+   the Terminal; if the account has none, open a ticket with the host — **without** the link,
+   material and submission downloads return 404.
 
 ## 5. Smoke-test the UAT deployment
 
 Run the built-in check first (works over SSH or cPanel Terminal):
 
 ```bash
-cd ~/esh-uat && php artisan esh:health
+cd ~/uat-esh.lit-grp.com && php artisan esh:health
 ```
 
 It verifies PHP 7.3–8.1 + extensions, `APP_KEY`, `APP_URL`, DB connectivity, pending migrations,
@@ -187,20 +226,25 @@ Then walk through the app on `https://uat-esh.lit-grp.com`:
 | 9 | Messages (`/messages`) as parent ↔ CEO | Thread opens, notification badge decreases |
 | 10 | `/help/user-guide` | Guide renders, includes the parent dashboard + missed-class help |
 | 11 | Any broken URL | Laravel 404 page, never a stack trace (`APP_DEBUG=false`) |
+| 12 | `https://uat-esh.lit-grp.com/.env`, `/artisan`, `/composer.json`, `/app/Models/User.php` | **403** for the dotfile/blocked names, **404** for the app path — the root `.htaccess` forwards into `public/`, so no source file is served |
 
 ## 6. Promoting UAT → production
 
 1. **Back up first**: *cPanel → Backup* (or phpMyAdmin export) of the live DB, plus a copy of the
-   current `~/esh-live` folder.
+   current production folder.
 2. Create a **separate** database/user and subdomain (e.g. `lms.lit-grp.com`) — never point
-   production at the UAT database.
-3. Deploy the same commit (`main`) to `~/esh-live` with §2 or §3, but:
-   * copy `.env.production.example` → `.env` (`APP_ENV=production`, `APP_DEBUG=false`,
-     `LOG_LEVEL=warning`, `SEED_DEMO_ACCOUNTS=false`, real `APP_URL`);
-   * run `php artisan migrate --force` **without** `--seed`;
-   * create the first real login with `php artisan esh:create-admin --role=ceo`
-     (it also creates the missing `admin/tutor/learner/parent` role rows);
-   * run `php artisan storage:link` and `php artisan esh:health`.
+   production at the UAT database. Its document root becomes the production app folder
+   (`/home/litgrpco/lms.lit-grp.com`).
+3. Deploy the same commit (`main`): copy `.github/workflows/deploy-cpanel.yml` to
+   `deploy-cpanel-prod.yml`, change the secret names (`PROD_CPANEL_*`), `CPANEL_REMOTE_DIR`
+   (`lms.lit-grp.com/`) and restrict it to `on.push.branches: [production]` so a UAT push can never
+   reach live (the same split Smart-Church uses). Then create the production `.env` from
+   `.env.production.example` (`APP_ENV=production`, `APP_DEBUG=false`, `LOG_LEVEL=warning`,
+   `SEED_DEMO_ACCOUNTS=false`, real `APP_URL`) and run:
+   * `php artisan migrate --force` **without** `--seed`;
+   * `php artisan esh:create-admin --role=ceo` (it also creates the missing
+     `admin/tutor/learner/parent` role rows);
+   * `php artisan storage:link` and `php artisan esh:health`.
 4. Delete the demo accounts if the database was cloned from UAT: `ceo@esh.com`, `admin@esh.com`,
    `tutor@esh.com`, `learner@esh.com`, `parent@esh.com` (all use the password `password`).
    `esh:health` warns while they exist.
@@ -224,9 +268,11 @@ Then walk through the app on `https://uat-esh.lit-grp.com`:
 | Upload of a large material fails | `upload_max_filesize`/`post_max_size` below 100M in *MultiPHP INI Editor*. |
 | Login redirects back to `/login` | `SESSION_SECURE_COOKIE=true` while the site is still served over `http://` — either finish AutoSSL or set it to `false`. |
 
-**Rollback:** `git checkout <previous-commit>` in `~/esh-uat`, then `composer install --no-dev`,
+**Rollback:** revert the commit and push (`git revert <sha> && git push`) — the workflow republishes
+the previous code and its prune step removes the files the revert deleted. Manual installs:
+`git checkout <previous-commit>` in `~/uat-esh.lit-grp.com`, then `composer install --no-dev` and
 `php artisan config:cache && php artisan view:cache`. Schema changes: `php artisan migrate:rollback
---step=1` (only migrations from the last batch). Restore the database from the pre-deploy dump if the
-rollback touches data.
+--step=1` (only migrations from the last batch). Restore the pre-deploy database dump if the rollback
+touches data.
 
 

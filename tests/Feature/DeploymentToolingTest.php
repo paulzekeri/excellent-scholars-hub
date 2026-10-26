@@ -119,4 +119,25 @@ class DeploymentToolingTest extends TestCase
 
         $this->assertNotNull(User::where('email', 'ceo@esh.com')->first(), 'Local/testing installs seed the demo accounts by default.');
     }
+
+    /** @test */
+    public function cpanel_deployment_files_are_present_and_never_cache_routes()
+    {
+        $root = base_path();
+
+        $this->assertFileExists($root.'/.htaccess');
+        $this->assertFileExists($root.'/.user.ini');
+        $this->assertFileExists($root.'/.github/workflows/deploy-cpanel.yml');
+
+        $htaccess = file_get_contents($root.'/.htaccess');
+        $this->assertStringContainsString('RewriteRule ^(.*)$ public/$1 [L]', $htaccess);
+        $this->assertStringContainsString('Require all denied', $htaccess);
+
+        $workflow = file_get_contents($root.'/.github/workflows/deploy-cpanel.yml');
+        $this->assertStringContainsString("--exclude='.env'", $workflow, 'The pipeline must never overwrite the server .env.');
+        $this->assertStringContainsString('artisan storage:link', $workflow);
+        $this->assertStringContainsString('artisan esh:health', $workflow);
+        $this->assertStringNotContainsString('route:cache', $workflow, 'routes/web.php uses closures, so route caching is impossible.');
+        $this->assertStringNotContainsString('artisan optimize', $workflow);
+    }
 }
