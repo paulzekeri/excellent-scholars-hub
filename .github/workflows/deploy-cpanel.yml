@@ -295,6 +295,12 @@ jobs:
             [ -f "$HOME/$d/index.php" ] && echo "  $d/index.php exists"
             [ -f "$HOME/$d/public/index.php" ] && echo "  $d/public/index.php exists"
           done
+          echo "--- .env files (keys only, no values) ---"
+          for envf in "$HOME/__REMOTE_DIR__/.env" "$HOME/public_html/uat-esh.lit-grp.com/.env"; do
+            [ -f "$envf" ] || { echo "  ${envf#$HOME/} -> missing"; continue; }
+            echo "  ${envf#$HOME/}: $(wc -c < "$envf") bytes, $(grep -c '' "$envf") lines, $(tr -cd '\r' < "$envf" | wc -c) CR bytes"
+            echo "    keys: $(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' "$envf" | tr '\n' ' ')"
+          done
           true
           EOS
           )
