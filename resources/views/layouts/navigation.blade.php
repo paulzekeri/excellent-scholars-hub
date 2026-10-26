@@ -8,8 +8,8 @@
         <div class="flex justify-between h-16">
             <div class="flex items-center">
                 <a href="{{ auth()->user()->isAdministrator() ? route('admin.dashboard') : (auth()->user()->isTutor() ? route('tutor.dashboard') : (auth()->user()->isParent() ? route('parent.dashboard') : route('learner.dashboard'))) }}" class="flex items-center">
-                    <span class="text-xl font-bold text-indigo-600">ESH</span>
-                    <span class="ml-1 text-gray-600 text-sm hidden sm:inline">Excellent Scholars Hub</span>
+                    <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="h-10 w-auto">
+                    <span class="ml-2 text-gray-600 text-sm hidden sm:inline">Excellent Scholars Hub</span>
                 </a>
             </div>
 
