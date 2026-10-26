@@ -38,6 +38,15 @@ Implemented guards:
 | Learner | `learner@esh.com` | `password` |
 | Parent | `parent@esh.com` | `password` |
 
+If a phpMyAdmin import replaced those hashes (each row ends up with a different
+`$2y$...` value, so only the account whose password you know still works), run
+`database/scripts/share-admin-password.sql` against that database. It copies the
+working administrator hash onto every row, re-activates the accounts, clears old
+"remember me" tokens and prints how many distinct hashes remain so you can
+confirm the change. The same file contains a fixed-hash alternative and a query
+that lists accounts missing their `learners`/`tutors`/`parents` profile row.
+Test databases only — never run it on production data.
+
 
 ## Installation
 

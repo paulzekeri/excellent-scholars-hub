@@ -43,6 +43,14 @@ UPDATE users
  WHERE @shared_hash IS NOT NULL;
 
 -- 3. Verify: one single hash across all rows, everyone active.
+--    distinct_passwords = 1  -> the change landed, every account now takes the
+--                               administrator password. If a non-admin login
+--                               STILL fails, the password was never the
+--                               problem: check the DIAGNOSTIC block at the
+--                               bottom of this file and storage/logs/laravel.log.
+--    distinct_passwords > 1  -> the update did not reach this database (wrong
+--                               database selected, or the users.sql import
+--                               loaded different hashes afterwards).
 SELECT COUNT(*)                 AS users_total,
        COUNT(DISTINCT password) AS distinct_passwords,
        SUM(is_active = 1)       AS active_users
