@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
 {
@@ -30,32 +31,32 @@ class NotificationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
-            'type' => 'required|string',
+            'type' => ['required', 'string', Rule::in(Notification::COMPOSABLE_TYPES)],
             'user_id' => 'nullable|exists:users,id',
         ]);
 
-        if ($request->user_id) {
-            Notification::create([
-                'user_id' => $request->user_id,
-                'title' => $request->title,
-                'message' => $request->message,
-                'type' => $request->type,
-                'is_read' => false,
-            ]);
+        // Notifications are delivered in-app, so record that delivery state
+        // instead of leaving the row at the "email / pending" defaults.
+        $attributes = [
+            'title' => $validated['title'],
+            'message' => $validated['message'],
+            'type' => $validated['type'],
+            'channel' => 'in_app',
+            'is_read' => false,
+            'status' => 'sent',
+            'sent_at' => now(),
+        ];
+
+        if (!empty($validated['user_id'])) {
+            Notification::create($attributes + ['user_id' => $validated['user_id']]);
         } else {
-            // Send to all users
+            // Send to all active users
             $users = User::where('is_active', true)->get();
             foreach ($users as $user) {
-                Notification::create([
-                    'user_id' => $user->id,
-                    'title' => $request->title,
-                    'message' => $request->message,
-                    'type' => $request->type,
-                    'is_read' => false,
-                ]);
+                Notification::create($attributes + ['user_id' => $user->id]);
             }
         }
 

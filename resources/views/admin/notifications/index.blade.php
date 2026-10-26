@@ -14,9 +14,14 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($notifications as $notification)
+                    @php $typeMeta = $notification->typeMeta(); @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-sm font-medium">{{ $notification->title }}</td>
-                        <td class="px-6 py-4 text-sm">{{ ucfirst($notification->type) }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="inline-flex items-center px-2 py-1 text-xs rounded-full {{ $typeMeta['badge'] }}">
+                                <i class="fas {{ $typeMeta['icon'] }} mr-1"></i>{{ $typeMeta['label'] }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 text-sm">{{ $notification->user_id ? ($notification->user->name ?? 'Deleted User') : 'All Users' }}</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($notification->is_read) bg-green-100 text-green-800 @else bg-yellow-100 text-yellow-800 @endif">{{ $notification->is_read ? 'Read' : 'Unread' }}</span></td>
                         <td class="px-6 py-4 text-sm">{{ $notification->created_at->format('M d, Y h:i A') }}</td>
@@ -26,7 +31,7 @@
                                     class="notification-read-btn text-indigo-600 hover:text-indigo-800"
                                     title="Read notification"
                                     data-title="{{ $notification->title }}"
-                                    data-type="{{ ucfirst($notification->type) }}"
+                                    data-type="{{ $typeMeta['label'] }}"
                                     data-recipient="{{ $notification->user_id ? ($notification->user->name ?? 'Deleted User') : 'All Users' }}"
                                     data-status="{{ $notification->is_read ? 'Read' : 'Unread' }}"
                                     data-date="{{ $notification->created_at->format('M d, Y h:i A') }}"

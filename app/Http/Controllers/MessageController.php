@@ -82,7 +82,7 @@ class MessageController extends Controller
 
         Notification::create([
             'user_id' => $user->id,
-            'type' => 'message',
+            'type' => Notification::TYPE_MESSAGE,
             'title' => 'New message from ' . auth()->user()->name,
             'message' => Str::limit($validated['body'], 140),
             'channel' => 'in_app',

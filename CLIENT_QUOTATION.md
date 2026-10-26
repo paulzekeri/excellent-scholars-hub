@@ -122,7 +122,8 @@ Excellent Scholars Hub (ESH) is a fully-functional, web-based Learning Managemen
 
 | Feature | Details |
 |---------|---------|
-| Admin can send notifications with title, message, type (announcement, reminder, alert) |
+| Admin can send notifications with title, message, type (information, reminder, alert) |
+| Type-aware badges, colours and per-type filtering on the recipient page |
 | Targeted or broadcast (all users) delivery |
 | Unread count badge on bell icon |
 | Mark individual or all notifications as read |

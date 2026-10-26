@@ -12,13 +12,22 @@ class NotificationController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = Notification::where('user_id', auth()->id())
-            ->orWhereNull('user_id')
+        $type = $request->query('type');
+        $type = in_array($type, Notification::COMPOSABLE_TYPES, true) ? $type : null;
+
+        $notifications = Notification::where(function ($query) {
+                $query->where('user_id', auth()->id())->orWhereNull('user_id');
+            })
+            ->when($type, function ($query) use ($type) {
+                $query->where('type', $type);
+            })
             ->latest()
-            ->paginate(20);
-        return view('notifications.index', compact('notifications'));
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('notifications.index', compact('notifications', 'type'));
     }
 
     public function markRead(Notification $notification)

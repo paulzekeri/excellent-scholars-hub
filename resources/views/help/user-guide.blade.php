@@ -377,7 +377,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
                         <i class="fas fa-bell text-green-600 mr-2"></i>6. Sending Notifications
                     </h3>
-                    <p class="text-gray-600 mb-3">Send announcements to specific users or broadcast to everyone.</p>
+                    <p class="text-gray-600 mb-3">Send notifications to specific users or broadcast to everyone.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-indigo-600 font-bold">1.</span>
@@ -389,7 +389,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-indigo-600 font-bold">3.</span>
-                            <span class="text-gray-600">Enter a <strong>Title</strong>, <strong>Message</strong>, select the <strong>Type</strong> (announcement, reminder, alert, etc.), and optionally choose a specific <strong>Recipient</strong> (leave blank to send to all users).</span>
+                            <span class="text-gray-600">Enter a <strong>Title</strong>, <strong>Message</strong>, select the <strong>Type</strong> (<strong>Information</strong> for general news, <strong>Reminder</strong> for something still to be done, <strong>Alert</strong> for urgent news), and optionally choose a specific <strong>Recipient</strong> (leave blank to send to all users).</span>
                         </li>
                     </ol>
                 </div>
@@ -1036,9 +1036,18 @@
                     <i class="fas fa-bell text-indigo-600 mr-2"></i>Notifications
                 </h2>
                 <p class="text-gray-600 mb-4">
-                    The notification system keeps everyone informed. Administrators can send announcements, reminders, 
+                    The notification system keeps everyone informed. Administrators can send information, reminders, 
                     and alerts. All users receive and manage their notifications in one place.
                 </p>
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Notification Types</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
+                    <li><strong>Information</strong> (<i class="fas fa-info-circle text-indigo-600"></i> indigo badge) &mdash; general news the recipient should know. No action required.</li>
+                    <li><strong>Reminder</strong> (<i class="fas fa-clock text-amber-600"></i> amber badge) &mdash; a nudge about something still to be done, usually with a deadline.</li>
+                    <li><strong>Alert</strong> (<i class="fas fa-exclamation-triangle text-red-600"></i> red badge) &mdash; urgent or exceptional news that needs immediate attention.</li>
+                    <li><strong>Message</strong> (grey badge) &mdash; created automatically when someone sends you a direct message; administrators cannot pick it.</li>
+                </ul>
+
+
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">How to Access Notifications</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
@@ -1048,7 +1057,8 @@
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Managing Your Notifications</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
-                    <li><strong>Unread notifications</strong> are highlighted with a colored left border</li>
+                    <li><strong>Unread notifications</strong> are highlighted with a coloured left border that matches the type (indigo, amber or red)</li>
+                    <li>Use the <strong>All</strong>, <strong>Information</strong>, <strong>Reminder</strong> and <strong>Alert</strong> tabs at the top of the page to show only one type</li>
                     <li>Click <strong>"Mark read"</strong> on individual notifications to dismiss them</li>
                     <li>Use <strong>"Mark all as read"</strong> to clear all notifications at once</li>
                 </ul>
