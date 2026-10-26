@@ -14,10 +14,11 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach($schedules as $schedule)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm font-medium">{{ $schedule->title }}</td>
+                    @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
+                    <tr class="{{ $isToday ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50' }}">
+                        <td class="px-6 py-4 text-sm font-medium {{ $isToday ? 'text-red-700' : '' }}">{{ $schedule->title }}</td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
-                        <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</td>
+                        <td class="px-6 py-4 text-sm {{ $isToday ? 'text-red-700 font-semibold' : '' }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-red-600 text-white">Today</span>@endif</td>
                         <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-yellow-100 text-yellow-800 @endif">{{ ucfirst($schedule->status) }}</span></td>
                         <td class="px-6 py-4 text-sm space-x-2">

@@ -80,16 +80,17 @@
             </div>
             <div class="space-y-4">
                 @forelse($upcomingClasses as $schedule)
-                    <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg">
+                    @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
+                    <div class="border-l-4 {{ $isToday ? 'border-red-500 bg-red-50' : 'border-indigo-500 bg-indigo-50' }} p-4 rounded-r-lg">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="font-semibold text-gray-800">{{ $schedule->title }}</p>
+                                <p class="font-semibold {{ $isToday ? 'text-red-700' : 'text-gray-800' }}">{{ $schedule->title }}@if($isToday) <span class="ml-1 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-red-600 text-white">Today</span>@endif</p>
                                 <p class="text-sm text-gray-600">{{ $schedule->class->name }}</p>
-                                <p class="text-xs text-gray-500">
+                                <p class="text-xs {{ $isToday ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
                                     <i class="far fa-calendar-alt mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('D, M d, Y') }}
                                 </p>
-                                <p class="text-xs text-gray-500">
+                                <p class="text-xs {{ $isToday ? 'text-red-600' : 'text-gray-500' }}">
                                     <i class="far fa-clock mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}
                                 </p>

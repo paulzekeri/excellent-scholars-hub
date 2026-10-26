@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
-        <div><h1 class="text-3xl font-bold text-gray-800">Manage Schedules</h1><p class="text-gray-600 mt-1">All class schedules &mdash; upcoming sessions first, then most recent past sessions</p></div>
+        <div><h1 class="text-3xl font-bold text-gray-800">Manage Schedules</h1><p class="text-gray-600 mt-1">All class schedules &mdash; upcoming sessions first, then most recent past sessions. <span class="text-red-600 font-medium">Sessions scheduled for today are highlighted in red.</span></p></div>
         <a href="{{ route('admin.schedules.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-plus mr-1"></i> New Schedule</a>
     </div>
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -14,11 +14,12 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach($schedules as $schedule)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm font-medium"><a href="{{ route('admin.schedules.show', $schedule) }}" class="text-gray-800 hover:text-indigo-600">{{ $schedule->title }}</a></td>
+                    @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
+                    <tr class="{{ $isToday ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50' }}">
+                        <td class="px-6 py-4 text-sm font-medium"><a href="{{ route('admin.schedules.show', $schedule) }}" class="{{ $isToday ? 'text-red-700 hover:text-red-900' : 'text-gray-800 hover:text-indigo-600' }}">{{ $schedule->title }}</a></td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->tutor->user->name }}</td>
-                        <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</td>
+                        <td class="px-6 py-4 text-sm {{ $isToday ? 'text-red-700 font-semibold' : '' }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-red-600 text-white">Today</span>@endif</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'ongoing') bg-yellow-100 text-yellow-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-red-100 text-red-800 @endif">{{ ucfirst($schedule->status) }}</span></td>
                         <td class="px-6 py-4 text-sm">
                             <a href="{{ route('admin.schedules.show', $schedule) }}" class="text-blue-600 hover:text-blue-800 mr-3" title="View session &amp; join"><i class="fas fa-eye"></i></a>

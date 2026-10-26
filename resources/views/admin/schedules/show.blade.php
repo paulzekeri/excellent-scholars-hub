@@ -24,6 +24,9 @@
             <div>
                 <div class="flex flex-wrap items-center gap-3 mb-2">
                     <span class="px-3 py-1 text-xs font-medium rounded-full {{ $statusStyle }}">{{ ucfirst($schedule->status) }}</span>
+                    @if($schedule->start_time->isToday())
+                        <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-red-600 text-white">Today</span>
+                    @endif
                     @if($platformLabel)
                         <span class="text-xs text-gray-500"><i class="fas fa-video mr-1"></i> {{ $platformLabel }}</span>
                     @endif
@@ -41,7 +44,7 @@
                     @endif
                     <span class="text-gray-400 mx-1">|</span> Tutor: <strong>{{ $schedule->tutor->user->name ?? 'N/A' }}</strong>
                 </p>
-                <p class="text-gray-600 mt-1">
+                <p class="mt-1 {{ $schedule->start_time->isToday() ? 'text-red-600 font-semibold' : 'text-gray-600' }}">
                     <i class="far fa-calendar-alt mr-1"></i> {{ $schedule->start_time->format('D, M d, Y') }}
                     <span class="text-gray-400 mx-1">|</span>
                     <i class="far fa-clock mr-1"></i> {{ $schedule->start_time->format('h:i A') }} - {{ $schedule->end_time->format('h:i A') }}
