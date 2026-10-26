@@ -20,6 +20,12 @@ name: Deploy to cPanel (UAT)
 #   CPANEL_USER      cPanel username - litgrpco
 #   CPANEL_PASSWORD  matching cPanel/SSH password
 #
+# Optional repository secret:
+#   UAT_ENV_CONTENT  the complete server .env file as text. It is used ONCE,
+#                    and only when uat-esh.lit-grp.com/.env is missing or empty;
+#                    CRLF endings are stripped before it is written (chmod 600).
+#                    Leave it unset when .env is managed by hand in File Manager.
+#
 # Optional repository variables (same screen, "Variables" tab):
 #   CPANEL_SSH_PORT    22 (default)
 #   CPANEL_REMOTE_DIR  app folder RELATIVE to the account home
@@ -250,6 +256,72 @@ jobs:
           fi
           echo "Pruned $(wc -l < "$RUNNER_TEMP/prune.txt") path(s) from ${REMOTE_DIR%/}"
 
+      # The repository never ships .env, so a fresh server has none and Laravel
+      # silently falls back to the "forge"/"localhost" defaults in
+      # config/database.php - which is what `Access denied for user
+      # 'forge'@'localhost'` in the migrate output means.
+      #
+      # This step bootstraps it exactly once from the optional UAT_ENV_CONTENT
+      # secret. CRLF endings are stripped (a pasted APP_KEY with a trailing CR is
+      # what made earlier hand-made files invalid) and the file is chmod 600.
+      # As soon as .env exists it is never touched again.
+      - name: Bootstrap server .env (first deploy only)
+        env:
+          SSHPASS: ${{ secrets.CPANEL_PASSWORD }}
+          SSH_HOST: ${{ secrets.CPANEL_HOST }}
+          SSH_USER: ${{ secrets.CPANEL_USER }}
+          SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          ENV_CONTENT: ${{ secrets.UAT_ENV_CONTENT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ENV_CONTENT:-}" ]; then
+            echo "UAT_ENV_CONTENT is not set: skipping the .env bootstrap, the file must already exist on the server."
+            exit 0
+          fi
+          sudo apt-get install -y -qq sshpass
+
+          ENV_B64="$(printf '%s' "$ENV_CONTENT" | tr -d '\r' | base64 -w0)"
+
+          SCRIPT=$(cat <<'EOS'
+          set -eu
+          cd "__REMOTE_DIR__"
+          if [ -s .env ]; then
+            echo ".env already exists ($(wc -l < .env) lines) - leaving it untouched."
+            exit 0
+          fi
+          umask 077
+          printf '%s' "__ENV_B64__" | base64 -d > .env
+          if [ -n "$(tail -c 1 .env)" ]; then printf '\n' >> .env; fi
+          chmod 600 .env
+          echo "Wrote $(wc -l < .env) lines to $(pwd)/.env"
+          if grep -q '^APP_KEY=base64:' .env; then
+            echo "APP_KEY present: $(awk '/^APP_KEY=/{ sub(/^APP_KEY=/,""); print length($0) }' .env) characters (a generated key is 51)."
+          else
+            echo "WARNING: .env has no APP_KEY - run: php artisan key:generate --force" >&2
+          fi
+          grep -q '^SEED_DEMO_ACCOUNTS=true' .env || echo "NOTE: SEED_DEMO_ACCOUNTS=true is not set, so demo logins will not be created."
+          EOS
+          )
+          SCRIPT="${SCRIPT/__REMOTE_DIR__/${REMOTE_DIR%/}}"
+          SCRIPT="${SCRIPT/__ENV_B64__/$ENV_B64}"
+          SCRIPT_B64="$(printf '%s' "$SCRIPT" | base64 -w0)"
+
+          set +e
+          sshpass -e ssh -p "$SSH_PORT" \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=25 \
+            "$SSH_USER@$SSH_HOST" "echo $SCRIPT_B64 | base64 -d | bash -s" 2>&1 | tee env.out
+          rc=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$rc" -eq 255 ]; then
+            echo "::warning title=.env bootstrap skipped::No SSH command execution, so .env was not written. Create it by hand (DEPLOYMENT.md section 2.2)."
+          elif [ "$rc" -ne 0 ]; then
+            echo "::error title=.env bootstrap failed (exit $rc)::see the log above"
+            exit 1
+          fi
+
       # The upload only needs SFTP. The commands below need a shell, which this
       # cPanel account has (cPanel > Terminal). When SSH command execution is not
       # allowed the step only warns: the files are live and the same commands can be
@@ -274,6 +346,16 @@ jobs:
             exit 3
           fi
           echo "PHP $("$PHP" -r 'echo PHP_VERSION;') at $PHP"
+          if [ ! -f .env ]; then
+            echo "No .env in $(pwd)." >&2
+            echo "Laravel is therefore using the 'forge'/'localhost' defaults from config/database.php, which is why migrate reports:" >&2
+            echo "  SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost'" >&2
+            echo "Fix: create .env in this folder (DEPLOYMENT.md section 2.2), or set the UAT_ENV_CONTENT secret and re-run this workflow." >&2
+            exit 5
+          fi
+          grep -q '^APP_KEY=base64:' .env || echo "WARNING: APP_KEY is missing from .env - run: $PHP artisan key:generate --force" >&2
+          echo "Clearing cached config so artisan uses the current .env"
+          "$PHP" artisan config:clear >/dev/null 2>&1 || true
           "$PHP" artisan migrate --force --seed
           "$PHP" artisan storage:link || true
           if [ ! -e public/storage ]; then
@@ -300,6 +382,9 @@ jobs:
             echo "Post-deploy commands finished."
           elif [ "$rc" -eq 255 ]; then
             echo "::warning title=No SSH command execution::Files were deployed, but the artisan post-deploy steps could not run over SSH (exit 255). Run them once in cPanel > Terminal inside ${REMOTE_DIR%/}: php artisan migrate --force --seed && php artisan storage:link && php artisan config:cache && php artisan view:cache && php artisan esh:health"
+          elif [ "$rc" -eq 5 ]; then
+            echo "::error title=No .env on the server::The code is live, but ${REMOTE_DIR%/} has no .env, so Laravel used the 'forge'@'localhost' defaults and migrate could not connect. Create the file (DEPLOYMENT.md section 2.2) or set the UAT_ENV_CONTENT secret, then re-run this workflow."
+            exit 1
           else
             echo "::error title=Post-deploy commands failed (exit $rc)::see the log above - the code is deployed but the database or caches may be stale"
             exit 1

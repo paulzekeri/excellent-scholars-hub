@@ -135,8 +135,11 @@ class DeploymentToolingTest extends TestCase
 
         $workflow = file_get_contents($root.'/.github/workflows/deploy-cpanel.yml');
         $this->assertStringContainsString("--exclude='.env'", $workflow, 'The pipeline must never overwrite the server .env.');
+        $this->assertStringContainsString('Bootstrap server .env', $workflow, 'A first deploy needs a way to create .env on the server.');
+        $this->assertStringContainsString('secrets.UAT_ENV_CONTENT', $workflow);
         $this->assertStringContainsString('artisan storage:link', $workflow);
         $this->assertStringContainsString('artisan esh:health', $workflow);
+        $this->assertStringContainsString('artisan config:clear', $workflow, 'A cached config would hide edits to .env.');
         $this->assertStringNotContainsString('route:cache', $workflow, 'routes/web.php uses closures, so route caching is impossible.');
         $this->assertStringNotContainsString('artisan optimize', $workflow);
     }

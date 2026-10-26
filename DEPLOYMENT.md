@@ -63,6 +63,7 @@ has to be installed on the account and no SSH session is opened by hand.
 | Secret | `CPANEL_HOST` | `147.124.220.162` (or `ftp.lit-grp.com`) |
 | Secret | `CPANEL_USER` | `litgrpco` |
 | Secret | `CPANEL_PASSWORD` | the cPanel/SSH password |
+| Secret (optional) | `UAT_ENV_CONTENT` | the complete server `.env` as text — written once, only when `.env` is missing (CRLF stripped, `chmod 600`) |
 | Variable (optional) | `CPANEL_SSH_PORT` | `22` (the default) |
 | Variable (optional) | `CPANEL_REMOTE_DIR` | `uat-esh.lit-grp.com/` (the default) |
 
@@ -72,17 +73,50 @@ has to be installed on the account and no SSH session is opened by hand.
 2. `rsync` a staged tree, then `lftp` mirrors it to `~/uat-esh.lit-grp.com/` over SFTP. Never
    uploaded: `.env`, `storage/` uploads, `public/storage`, `bootstrap/cache/*.php`, `.well-known`.
 3. Prunes exactly the files `git rm` removed since the last successful run.
-4. Over SSH (the same shell *cPanel → Terminal* uses): `migrate --force --seed`, `storage:link`,
-   `config:cache`, `view:cache`, `esh:health`. If the account refuses shell commands the step only
-   warns and prints the commands to paste into *cPanel → Terminal*.
-5. Writes a summary table to the workflow run page.
+4. If `~/uat-esh.lit-grp.com/.env` is missing **and** the optional `UAT_ENV_CONTENT` secret is set,
+   writes it once from that secret (`chmod 600`, Windows CRLF stripped). An existing `.env` is never
+   modified; without the secret the step prints a note and moves on.
+5. Over SSH (the same shell *cPanel → Terminal* uses): `config:clear`, `migrate --force --seed`,
+   `storage:link`, `config:cache`, `view:cache`, `esh:health`. If the account refuses shell commands
+   the step only warns and prints the commands to paste into *cPanel → Terminal*. A missing `.env`
+   stops the step with `::error title=No .env on the server` before touching the database.
+6. Writes a summary table to the workflow run page.
 
-### 2.3 First-time server state (already prepared on UAT)
+### 2.3 Server `.env` — created once, never deployed
 
-`~/uat-esh.lit-grp.com/.env` is created once and never overwritten by a deploy. It needs at least:
-`APP_KEY` (51 characters, `base64:…`), `APP_ENV=production`, `APP_DEBUG=false`,
-`APP_URL=https://uat-esh.lit-grp.com`, the `DB_*` block, `MAIL_MAILER=log`,
-`SESSION_SECURE_COOKIE=true` and `SEED_DEMO_ACCOUNTS=true` (UAT demo logins).
+Every deploy deliberately skips `.env`, so the file has to exist on the server before the first
+`migrate`. When it is missing, Laravel silently falls back to the defaults in `config/database.php`
+and the run fails with:
+
+```text
+SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost' (using password: NO)
+```
+
+That message means **"there is no `.env` in `~/uat-esh.lit-grp.com`"** — it is not a wrong database
+password. Create the file once, with either:
+
+* **Automated:** add the repository secret `UAT_ENV_CONTENT`, paste the whole `.env` body (same keys
+  as `.env.uat.example`) and re-run the workflow. The *Bootstrap server .env* step writes it, strips
+  CRLF and sets `chmod 600`; later runs leave it untouched.
+* **Manual:** *cPanel → File Manager* → `uat-esh.lit-grp.com` → **+ File** → name it `.env` → paste
+  the body (the template is `.env.uat.example` in the repository; it is intentionally **not**
+  uploaded to the server) → then, if `APP_KEY` is empty, run
+  `php artisan key:generate --force` in *cPanel → Terminal*.
+
+Values that matter on UAT:
+
+| Key | Value |
+|---|---|
+| `APP_ENV` / `APP_DEBUG` | `production` / `false` |
+| `APP_URL` | `https://uat-esh.lit-grp.com` |
+| `APP_KEY` | 51 characters: `base64:` + 44. A trailing CR on this line makes every request fail. |
+| `DB_DATABASE` / `DB_USERNAME` | `litgrpco_esh_uat` (create it in *MySQL® Databases*) |
+| `DB_PASSWORD` | that database user's password |
+| `MAIL_MAILER` | `log` (UAT sends no mail) |
+| `SESSION_SECURE_COOKIE` | `true` |
+| `SEED_DEMO_ACCOUNTS` | `true` — creates `ceo@`/`admin@`/`tutor@`/`learner@`/`parent@esh.com`, password `password` |
+
+After editing `.env` by hand run `php artisan config:clear` (each deploy does this for you).
 
 ### 2.4 Manual fallback: deploy over SSH
 
