@@ -256,6 +256,62 @@ jobs:
           fi
           echo "Pruned $(wc -l < "$RUNNER_TEMP/prune.txt") path(s) from ${REMOTE_DIR%/}"
 
+      # Read-only diagnostic: prints where the files landed, which folders look
+      # like a document root for this domain and what cPanel reports as the
+      # documentroot, so a wrong CPANEL_REMOTE_DIR shows up in the log instead of
+      # as a site that only serves an "Index of /" listing. Never fails the job.
+      - name: Report remote layout
+        env:
+          SSHPASS: ${{ secrets.CPANEL_PASSWORD }}
+          SSH_HOST: ${{ secrets.CPANEL_HOST }}
+          SSH_USER: ${{ secrets.CPANEL_USER }}
+          SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq sshpass
+
+          SCRIPT=$(cat <<'EOS'
+          set -u
+          echo "user=$(id -un) home=$HOME"
+          echo "upload target $HOME/__REMOTE_DIR__:"
+          ls -A "$HOME/__REMOTE_DIR__" 2>&1 | head -10 | sed 's/^/    /'
+          echo "--- candidate document roots ---"
+          for d in public_html uat-esh.lit-grp.com public_html/uat-esh.lit-grp.com uat-esh.lit-grp.com/public_html; do
+            if [ -d "$HOME/$d" ]; then
+              echo "  $d -> $(ls -A "$HOME/$d" | wc -l) entries: $(ls -A "$HOME/$d" | head -6 | tr '\n' ' ')"
+            else
+              echo "  $d -> missing"
+            fi
+          done
+          echo "--- uapi DomainInfo ---"
+          uapi --user="$(id -un)" DomainInfo list_domains --output=json 2>/dev/null \
+            | tr ',' '\n' \
+            | grep -E '"(domain|documentroot)"' \
+            | grep -i -B1 -A2 'uat-esh' \
+            | head -20 || echo "  (uapi unavailable)"
+          echo "--- index files under the docroot candidates ---"
+          for d in public_html uat-esh.lit-grp.com public_html/uat-esh.lit-grp.com; do
+            [ -f "$HOME/$d/index.php" ] && echo "  $d/index.php exists"
+            [ -f "$HOME/$d/public/index.php" ] && echo "  $d/public/index.php exists"
+          done
+          true
+          EOS
+          )
+          SCRIPT="${SCRIPT//__REMOTE_DIR__/${REMOTE_DIR%/}}"
+          SCRIPT_B64="$(printf '%s' "$SCRIPT" | base64 -w0)"
+
+          set +e
+          sshpass -e ssh -p "$SSH_PORT" \
+            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            -o ConnectTimeout=25 \
+            "$SSH_USER@$SSH_HOST" "echo $SCRIPT_B64 | base64 -d | bash -s" 2>&1 | tee layout.out
+          rc=${PIPESTATUS[0]}
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning title=Layout probe could not run::ssh exit $rc - this step is diagnostic only"
+          fi
+
       # The repository never ships .env, so a fresh server has none and Laravel
       # silently falls back to the "forge"/"localhost" defaults in
       # config/database.php - which is what `Access denied for user

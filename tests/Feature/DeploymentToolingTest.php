@@ -137,6 +137,7 @@ class DeploymentToolingTest extends TestCase
         $this->assertStringContainsString("--exclude='.env'", $workflow, 'The pipeline must never overwrite the server .env.');
         $this->assertStringContainsString('Bootstrap server .env', $workflow, 'A first deploy needs a way to create .env on the server.');
         $this->assertStringContainsString('secrets.UAT_ENV_CONTENT', $workflow);
+        $this->assertStringContainsString('Report remote layout', $workflow, 'A wrong remote directory must be visible in the log.');
         $this->assertStringContainsString('artisan storage:link', $workflow);
         $this->assertStringContainsString('artisan esh:health', $workflow);
         $this->assertStringContainsString('artisan config:clear', $workflow, 'A cached config would hide edits to .env.');
