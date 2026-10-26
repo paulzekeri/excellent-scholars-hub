@@ -43,6 +43,27 @@ class DashboardController extends Controller
 
     public function joinClass(ClassSchedule $schedule)
     {
-        return redirect($schedule->meeting_link);
+        $learner = auth()->user()->learner;
+
+        // Visibility in the dashboard is already scoped to the learner's classes,
+        // but this URL is guessable by id, so re-check enrolment here.
+        $isEnrolled = $learner !== null
+            && $learner->classes()->where('classes.id', $schedule->class_id)->exists();
+
+        abort_unless($isEnrolled, 403, 'You are not enrolled in this class.');
+
+        if ($schedule->status === 'cancelled') {
+            return redirect()->route('learner.dashboard')->with('error', 'This session has been cancelled.');
+        }
+
+        if ($schedule->status === 'completed') {
+            return redirect()->route('learner.dashboard')->with('error', 'This session has already ended.');
+        }
+
+        if (! $schedule->meeting_link) {
+            return redirect()->route('learner.dashboard')->with('error', 'No meeting link is available for this session.');
+        }
+
+        return redirect()->away($schedule->meeting_link);
     }
 }
