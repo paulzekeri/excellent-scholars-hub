@@ -17,7 +17,7 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-2">
                         <h3 class="font-semibold text-lg text-gray-800">{{ $material->title }}</h3>
-                        <span class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">{{ strtoupper($material->file_type) }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700">{{ strtoupper($material->file_type) }}</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">{{ $material->class->name }}</p>
                     @if($material->description)
@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <a href="{{ asset('storage/' . $material->file_path) }}" target="_blank" 
-                    class="ml-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition inline-flex items-center">
+                    class="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-flex items-center">
                     <i class="fas fa-download mr-1"></i> Download
                 </a>
             </div>

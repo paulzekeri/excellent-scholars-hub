@@ -8,6 +8,8 @@ use App\Models\Attendance;
 use App\Models\ClassSchedule;
 use App\Models\Learner;
 use App\Models\LearningMaterial;
+use App\Models\LearningGoal;
+use App\Models\Payment;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -24,6 +26,7 @@ class DashboardController extends Controller
         'completed' => 'Completed Assignments',
         'materials' => 'Materials Shared',
         'attendance' => 'Attendance',
+        'goals' => 'Learning Goals',
     ];
 
     public function index()
@@ -112,6 +115,12 @@ class DashboardController extends Controller
                     ->withQueryString();
                 break;
 
+            case 'goals':
+                $data['goals'] = $this->sharedGoals($learner, $classIds)
+                    ->paginate(10)
+                    ->withQueryString();
+                break;
+
             default:
                 $data['upcomingClasses'] = $this->upcomingSessions($classIds)->take(5)->get();
                 $data['pendingAssignments'] = $this->pendingAssignments($learner, $classIds)->take(5)->get();
@@ -159,7 +168,30 @@ class DashboardController extends Controller
             'attendanceAttended' => $attended,
             'attendanceRate' => $recorded > 0 ? (int) round($attended / $recorded * 100) : null,
             'enrolledClasses' => $classIds->count(),
+            'goals' => $this->sharedGoals($learner, $classIds)->count(),
+            // Verified vs pending fees for the fee summary line on the dashboard.
+            'fees' => Payment::totalsForLearner($learner->id),
         ];
+    }
+
+    /**
+     * Goals the school chose to share with the parent: those written for this
+     * learner plus class goals for any class the learner belongs to.
+     */
+    private function sharedGoals(Learner $learner, ?Collection $classIds = null)
+    {
+        $classIds = $classIds ?? $learner->classes()->pluck('classes.id');
+
+        return LearningGoal::with(['tutor.user', 'schoolClass'])
+            ->where('shared_with_parent', true)
+            ->where(function ($query) use ($learner, $classIds) {
+                $query->where('learner_id', $learner->id)
+                    ->orWhere(function ($inner) use ($classIds) {
+                        $inner->whereNull('learner_id')->whereIn('class_id', $classIds);
+                    });
+            })
+            ->latest('shared_at')
+            ->latest();
     }
 
     /**

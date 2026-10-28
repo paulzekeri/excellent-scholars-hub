@@ -65,7 +65,7 @@
 ## Phase 8: Frontend UI
 - [x] Tailwind CSS layouts
 - [x] Responsive mobile-first design
-- [x] Navigation menus (hover dropdowns on desktop, accordion on mobile, unread badges)
+- [x] Navigation menu in a school-coloured left sidebar: grouped sections, active-page highlight, unread badges, collapsible icon rail on desktop and an off-canvas drawer on mobile
 - [x] Dashboard components
 - [x] In-app user guide (`/help/user-guide`)
 
@@ -95,4 +95,57 @@
 - [x] `php artisan esh:create-admin` first-production-login command
 - [x] `DatabaseSeeder` guard: demo accounts skipped in production unless `SEED_DEMO_ACCOUNTS=true`
 - [x] `tests/Feature/DeploymentToolingTest.php` (7 tests)
+
+## Phase 11: Client Meeting of 26 October 2026
+- [x] **Payments fine-tuned with part payments** — one row per installment, `total_fee`, `term`, `class_id`,
+      receipt upload/download, filters, summary tiles and the missing payment detail page
+- [x] **Receipt upload** — `pdf|jpg|jpeg|png|webp`, 5 MB, stored on the `public` disk and downloadable only inside
+      the CEO area
+- [x] **Pay per term / per class** — `Payment::summaryFor()` groups installments by learner + term + class
+- [x] **Classes: `max_students` optional** — nullable column (driver-aware `ALTER`, no `doctrine/dbal`),
+      `Classes::hasCapacity()`, "leave blank for no limit" on the forms
+- [x] **Assignment pictures** — `assignments.images` JSON, up to six 2 MB images, thumbnails for learners, tutors
+      and admin oversight
+- [x] **Learner dashboard: live/nearest class panel** — live session wins, otherwise the nearest upcoming one,
+      with Join and a countdown
+- [x] **Monthly classes per tutor** — month picker, ranked bars and a six-month trend on the admin **and** CEO dashboard
+- [x] **Learning goals** — tutors upload (per learner/class, optional file); `role:admin,ceo` screen shares with
+      parent and/or tutor; parent child screen gains a Learning Goals tab; tutors see goals shared with them
+- [x] **Categorised messaging** — broadcasts to parents / tutors / students / everyone / one class, fan-out
+      `messages` + notifications, broadcast report, inbox for every role, category filters for administrators
+- [x] **Blue / white / orange branding** — indigo removed from all 38 affected views, orange accents, red kept for
+      "today" and errors
+- [x] **Affirmation of the day** — rotation card on all four dashboards
+- [x] **Public landing page** — hero slider, live programmes, how-it-works, testimonials, about/contact and
+      register CTA at `/` for guests (signed-in users still redirect to their dashboard)
+- [x] **Grouped left sidebar navigation** — role menus split into Overview / People / Academics / Finance (CEO) /
+      Communication / Learning / Support, school-coloured shell, collapsible icon rail on desktop, off-canvas drawer
+      on mobile, remembered group + rail state, and a feature test per role
+- [x] **Responsive headers & top menu** — the phone-size headers no longer overflow: the landing brand truncates
+      instead of using `shrink-0`/`whitespace-nowrap`, section links collapse into a `<details>` menu below `lg`,
+      the app wordmark hides below `sm` while quick actions stay pinned, and the sticky-header offsets were
+      retuned; guarded by `tests/Feature/TopBarResponsiveTest.php` + `LandingPageTest` (47 feature tests)
+- [x] **Parents record payments, the CEO verifies them** — `Record Payment` left the CEO screen and now lives at
+      `/parent/payments` (children linked to the parent only, installments saved as `pending`, receipt upload,
+      CEO notification). The CEO queue verifies (`completed`, fee marked complete) or rejects with a reason, and
+      `payments.verified_at` / `verified_by` record who confirmed the money; parent dashboard gains a per-child fee
+      line and the sidebar a Finance group. Covered by `tests/Feature/ParentPaymentsTest.php` (9 tests)
+- [x] **Payment methods & school bank accounts** — the parent form offers **bank transfer**, **cash** and **card**.
+      A transfer shows only the switched-on school accounts (copy button + "which account did you pay into?") and
+      saves a `paid_into` snapshot; cash needs no account and tells the CEO to check the cash book; card is
+      disabled as "coming soon". The CEO's new `/admin/payment-accounts` screen adds, edits, switches off and
+      deletes accounts, and shows whether Paystack is connected; `App\Services\PaystackService` holds the future
+      initialise/verify calls. Covered by `tests/Feature/PaymentMethodsTest.php` (8 tests)
+- [x] **Role-aware user guide** — the in-app Help page now renders only the sections (and FAQ entries) for the
+      signed-in role: administrators see the admin guide without finance, the CEO also sees payments/bank accounts,
+      tutors, learners and parents each get their own section, and the TOC matches. Covered by
+      `tests/Feature/UserGuideRolesTest.php` (6 tests)
+- [x] **Self-service password reset** — `Forgot your password?` on the login page emails a one-time link
+      (60 minutes, single use) and signs the user in after they choose a new password. When mail is not
+      configured (UAT uses `log`), administrators generate the same link from **Admin → Users → Reset password**
+      and hand it over privately; inactive accounts are refused and only the CEO can reset a CEO. Covered by
+      `tests/Feature/PasswordResetTest.php` (11 tests)
+- [x] **Documentation** — in-app user guide (What's New, Payments, Learning Goals, Broadcasts, Dashboard extras,
+      FAQ), `README.md`, `PLAN_CLIENT_ADDITIONS.md`
+- [x] `tests/Feature/ClientAdditionsTest.php` — tests covering the items above
 

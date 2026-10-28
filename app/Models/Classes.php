@@ -15,7 +15,10 @@ class Classes extends Model
         'name', 'code', 'description', 'tutor_id', 'grade_level', 'subject', 'max_students', 'is_active',
     ];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = [
+        'is_active' => 'boolean',
+        'max_students' => 'integer',
+    ];
 
     public function tutor()
     {
@@ -42,4 +45,30 @@ class Classes extends Model
         return $this->hasMany(LearningMaterial::class, 'class_id');
     }
 
+    public function learningGoals()
+    {
+        return $this->hasMany(LearningGoal::class, 'class_id');
+    }
+
+    /**
+     * A class without a maximum is unlimited, so enrolment is always allowed.
+     */
+    public function hasCapacity(): bool
+    {
+        if ($this->max_students === null) {
+            return true;
+        }
+
+        return $this->learners()->count() < $this->max_students;
+    }
+
+    /** "18 / 30" or "18 enrolled · no limit". */
+    public function capacityLabel(): string
+    {
+        $enrolled = $this->learners()->count();
+
+        return $this->max_students === null
+            ? $enrolled . ' enrolled · no limit'
+            : $enrolled . ' / ' . $this->max_students;
+    }
 }

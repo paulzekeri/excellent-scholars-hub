@@ -9,24 +9,44 @@ The full end-user documentation lives inside the app at **Help → User Guide** 
 
 | Role | Slug | Area | Key permissions |
 |------|------|------|-----------------|
-| CEO | `ceo` | Admin area | Everything an administrator can do **plus exclusive access to Payments** |
+| CEO | `ceo` | Admin area | Everything an administrator can do **plus exclusive access to Payments and the school bank accounts** |
 | Administrator | `admin` | Admin area | Users, classes, schedules, oversight, notifications, messages |
-| Tutor | `tutor` | Tutor area | Own classes only: schedules, attendance, assignments & grading, materials |
-| Learner | `learner` | Learner area | Enrolled classes, assignment submission, materials, schedules |
-| Parent/Guardian | `parent` | Parent area | Per-child stats & details (schedule, assignments, materials), attendance & missed classes, grades, messaging the school |
+| Tutor | `tutor` | Tutor area | Own classes only: schedules, attendance, assignments & grading, materials, learning goals; messages the school and own learners |
+| Learner | `learner` | Learner area | Enrolled classes, assignment submission, materials, schedules; live/next class panel; messages the school and own tutors |
+| Parent/Guardian | `parent` | Parent area | Per-child stats & details (schedule, assignments, materials, learning goals), attendance & missed classes, grades, **own fee payments** (record, receipt, verified balance), messaging the school |
 
 Implemented guards:
 
-- **Payments are CEO-only.** The payments routes are grouped behind the `role:ceo` middleware and
-  `Admin\PaymentController` re-checks `canManagePayments()` in its constructor, so administrators/tutors who hit
-  the URL directly receive **403 Forbidden**. The Payments link and dashboard stat card are hidden for non-CEO users.
+- **Parents record payments; the CEO verifies them.** `/parent/payments` (list + `create`/`store`/`receipt`) is open
+  to parents only, restricted to the children linked to their own account, and every submission is stored as
+  `pending`. The CEO's `/admin/payments` screen no longer records payments — it is a verification queue with
+  *Payment received* (`admin.payments.verify`) and *Cannot match it* (`admin.payments.reject`) actions.
+- **Fees are paid by transfer or cash (card is stubbed for Paystack).** A transfer must name the school account it
+  went into, so `/admin/payment-accounts` lets only the CEO add, correct, switch off or delete the bank accounts.
+  Active accounts appear on the parent form with a copy button; a switched-off account disappears without losing the
+  payments already recorded (`payments.paid_into` keeps the snapshot). Cash needs no account and is checked against
+  the cash book. Card shows as *coming soon* until `PAYSTACK_PUBLIC_KEY` / `PAYSTACK_SECRET_KEY` are set — see
+  `App\Services\PaystackService` for the two-call flow (initialise → verify).
+- **Passwords reset themselves.** `Forgot your password?` on `/login` emails a one-time link (`password.request`,
+  `password.email`, `password.reset`, `password.update`), valid for 60 minutes and usable once; the new password
+  signs the user straight in. When mail is not configured (UAT uses the `log` driver) the CEO/administrators can
+  generate the same link from **Admin → Users → Reset password** and pass it on privately. Links are never shown
+  to other roles, only the CEO can reset a CEO account, and inactive accounts are refused.
+- **Payments remain CEO-only for the school.** The `/admin/payments*` routes sit behind `role:ceo`, and
+  `Admin\PaymentController` re-checks `canManagePayments()` in its constructor, so administrators/tutors/parents who
+  hit the URL directly receive **403 Forbidden**. The Payments link and dashboard stat card are hidden for non-CEO users.
 - **Administrators and the CEO can review submissions.** `/admin/assignments` → *Review & Grade Submissions*
   (`admin.oversight.assignments.submissions`, `admin.oversight.submissions.grade`) lets them download a learner's
   file, set a score (validated against the assignment's total points) and add feedback. Tutors are restricted to
   assignments they own — anything else returns **403**.
 - **In-app messaging is parents ↔ CEO/administrators.** `/messages` lists contacts per role, stores messages in the
   `messages` table, files a `Notification` for the recipient, and marks incoming messages as read when a thread is
-  opened. Tutors and learners receive **403**.
+  opened. Every role has an inbox: parents reach the school, learners reach the school and their own tutors, tutors
+  reach the school and the learners in their classes, and administrators/CEO can message parents, tutors, learners
+  and each other. Administrators can also broadcast one message to a whole category (parents, tutors, students,
+  everyone or a single class); each recipient gets their own `messages` row (tagged with `audience`, `class_id` and a
+  shared `batch`) plus a notification, and the broadcast report counts recipients and reads. `MessageController::canMessage()`
+  is the single source of truth for the permission matrix; anyone outside it gets **403**.
 
 ## Default seeded accounts
 
@@ -114,6 +134,41 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Parents record fees, the CEO only verifies (follow-up to the 26 October 2026 meeting)
+
+The CEO was entering every family's payment by hand; a parent paying for two or three children can do it in one
+sitting, then the school only confirms the money arrived.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Parent fees | New **Fees & Payments** screen: per-child fee cards (term · class), verified vs pending amounts, progress bars, "Payment complete" badges and a submission history with receipt downloads | `Parent\PaymentController`, `parent/payments/*`, sidebar `Finance` group |
+| Record payment | Moved from the CEO to the parent: the form picks only the parent's own children and their classes, forces `status = pending`, and notifies every CEO that money is waiting | `parent.payments.create/store`, `Payment::STATUS_PENDING` |
+| Payment methods | **Bank transfer**, **cash** or **card**. A transfer must pick the school account it went into and keeps a `paid_into` snapshot; cash needs no account and points the CEO at the cash book; card is disabled with "coming soon" | `Payment::METHOD_*`, `parent/payments/create.blade.php` |
+| School bank accounts | CEO-only `/admin/payment-accounts`: add, edit, switch off (hides it from parents) and delete accounts. Active ones appear on the parent fee screens with a copy-number button; deleting keeps the historical `paid_into` | `Admin\PaymentAccountController`, `payment_accounts`, `admin/payment-accounts/*` |
+| Card (future) | Paystack seam with `initializeTransaction()` / `verifyTransaction()`, config keys and a status panel on the bank-accounts screen; the card radio stays disabled until the flow is wired | `App\Services\PaystackService`, `config/services.php`, `PAYSTACK_*` |
+| Role-aware guide | The in-app **User Guide** now shows only the sections for the signed-in role: administrators get the admin guide without finance, the CEO also gets payments/bank accounts, and tutor/learner/parent content (plus role-specific FAQs) is hidden from everyone else | `resources/views/help/user-guide.blade.php` |
+| Password reset | **Forgot your password?** emails a one-time reset link (60 minutes, single use) and signs the user in after choosing a new password; CEO/administrators can generate the link from **Users → Reset password** when mail is not configured | `ForgotPasswordController`, `ResetPasswordController`, `auth/passwords/*`, `admin.users.password-reset` |
+| CEO verification | `/admin/payments` is now a verification queue. **Payment received** marks the installment `completed` (clearing the fee), **Cannot match it** rejects it with a reason; both notify the parent | `admin.payments.verify`, `admin.payments.reject`, `Payment::markVerified()` / `markRejected()` |
+| Audit trail | `payments.verified_at` / `payments.verified_by` record who confirmed the money and when | `AddVerificationColumnsToPaymentsTable` |
+| Balances | Only verified (`completed`) installments count, so a pending submission never reduces a balance; `Payment::totalsForLearner()` sums every fee for a child | `Payment::feeGroupsForLearner()`, `Payment::totalsForLearner()` |
+| Tests | `ParentPaymentsTest` (9) covers submission, ownership, verification, rejection, receipts and the removed CEO button; `PaymentMethodsTest` (8) covers the CEO's bank-account CRUD, transfer/cash/card rules, the method filter and deleted-account history; `UserGuideRolesTest` (6) proves each role only sees its own guide sections; `PasswordResetTest` (11) covers the email link, token expiry/replay, admin-generated links and finance guards | `tests/Feature/ParentPaymentsTest.php`, `tests/Feature/PaymentMethodsTest.php`, `tests/Feature/UserGuideRolesTest.php`, `tests/Feature/PasswordResetTest.php` |
+
+### Client meeting of 26 October 2026 — payments, categorised messaging, learning goals, dashboards & landing page
+
+| Area | Change | Where |
+|------|--------|-------|
+| Payments | Part payments (one `payments` row per installment), `total_fee`/`term`/`class_id` allocation, receipt upload + download, filters, totals and a payment detail page (recording later moved to the parent area — see the entry above) | `Admin\PaymentController`, `admin/payments/*`, `admin.payments.receipt` |
+| Classes | `max_students` is nullable — blank means "no limit" and capacity checks are skipped | `MakeMaxStudentsNullableOnClassesTable`, `Classes::hasCapacity()` |
+| Assignments | Tutors attach up to six pictures; thumbnails appear for learners, tutors and oversight | `assignments.images`, `Tutor\AssignmentController` |
+| Learner panel | "Live now / Up next" session card with Join and countdown at the top of the dashboard | `Learner\DashboardController`, `learner/dashboard.blade.php` |
+| Dashboards | Monthly classes-per-tutor ranking with a month picker + six-month trend; "affirmation of the day" card on all dashboards | `Admin\DashboardController`, `partials/affirmation` |
+| Learning goals | Tutors upload goals (optionally with a file); admins/CEO share them with parent and/or tutor; parents get a Learning Goals tab | `learning_goals`, `Tutor\LearningGoalController`, `Admin\LearningGoalController` |
+| Messaging | Categorised broadcasts, inbox for every role, administrator category filters | `Admin\MessageController`, `MessageController` |
+| Branding | Blue / white / orange palette (indigo removed, orange accents, red kept for "today" and errors) | all Blade views |
+| Website | Public landing page with hero slider, live programmes, how-it-works, testimonials, about/contact and registration CTA | `routes/web.php` (`/`), `landing.blade.php` |
+| Docs & tests | In-app user guide updated for every change; `tests/Feature/ClientAdditionsTest.php` | `help/user-guide.blade.php`, `PLAN_CLIENT_ADDITIONS.md` |
+
+
 ### UAT deployment kit (`uat-esh.lit-grp.com`)
 - **`.github/workflows/deploy-cpanel.yml`** — push-to-`main` pipeline: Composer install with `--no-dev`, SFTP
   mirror (`lftp`) to `~/uat-esh.lit-grp.com/`, pruning of files removed from the repo, then `migrate --force
@@ -162,7 +217,7 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 ### CEO-only payments
 - New `ceo` role (migration + seeder) and helpers on `User`: `isCeo()`, `isAdministrator()`, `canManagePayments()`.
 - `/admin/payments*` routes moved behind `role:ceo`; `Admin\PaymentController` constructor aborts with 403 otherwise.
-- Navigation Payments dropdown entry and dashboard payments stat card are rendered only for the CEO.
+- Navigation Payments entry (Finance group) and dashboard payments stat card are rendered only for the CEO.
 - Login redirect and the admin UI treat the CEO as an administrator, so no separate CEO screens are needed.
 - `Admin\UserController` hides the `ceo` role from non-CEO administrators and refuses to edit/assign it.
 
@@ -175,8 +230,36 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 ### Parent ↔ CEO/administrator messaging
 - `messages` table + `Message` model (`between()` scope), `MessageController` (`index`, `show`, `store`) with
   role-based contact lists and 2,000-character limit.
-- Each message files an in-app `Notification` for the recipient; the navigation shows unread badges (desktop + mobile).
+- Each message files an in-app `Notification` for the recipient; the sidebar menu and top bar show unread badges.
 - Parents get a "Message the School" button and unread badge on their dashboard.
+
+### Grouped left-sidebar navigation
+- `resources/views/layouts/sidebar.blade.php` builds the menu from one `$navSections` array per role, so the
+  CEO's ~15 links sit in labelled groups (Overview, People, Academics, Finance, Communication, Learning, Support)
+  and a future screen is a single array line.
+- School-coloured shell: navy gradient (`#0a2550`–`#0d3070`) with orange accents, orange bar on the active page,
+  unread badges, and the signed-in user + logout pinned at the bottom.
+- `resources/views/layouts/navigation.blade.php` is now a slim blue top bar (toggle, role badge, messages,
+  notifications, help, logout). `layouts/app.blade.php` provides the shell CSS/JS.
+- Desktop: the toggle collapses the sidebar to a 4.75rem icon rail; mobile/tablet (< 1024px): off-canvas drawer with
+  overlay, close button and Escape support. Group and rail state persist in `localStorage`.
+- Covered by `ClientAdditionsTest::test_the_sidebar_groups_the_menu_for_each_role`.
+
+### Responsive headers (phones → desktop)
+- **Landing page** (`resources/views/landing.blade.php`): the brand used `shrink-0` + `whitespace-nowrap`, which
+  pushed the *Register* button ~90px past the viewport on 320–390px phones (`scrollWidth` 410 on a 320px screen).
+  The wordmark now lives in a `min-w-0` flex child with `truncate`, the auth buttons stay `shrink-0`, and below
+  `lg` the section links collapse into a `<details>` menu button (positioned under the header, closes on link tap
+  or outside click) instead of a clipped horizontal strip. *Log in* moves into that panel below `sm`, and
+  `section[id] { scroll-margin-top }` is 5rem on phones / 6rem from `sm` (4rem / 5rem sticky header + 1rem).
+- **App shell** (`resources/views/layouts/navigation.blade.php`): quick actions are pinned with `shrink-0`, the
+  wordmark hides below `sm` (logo only) so it can never squeeze the actions, the help icon hides below `sm` and
+  the signed-in name below `md`, *Logout* collapses to its icon, icon-only buttons keep `aria-label`s, and the
+  drawer toggle stays the only navigation entry point below `lg`.
+- Verified with headless Edge at 320 / 360 / 390 / 414 / 640 / 768 / 1024 / 1440px: `scrollWidth` equals the
+  viewport on both headers (only the clipped hero decorations sit outside, inside `overflow-hidden`).
+- Guarded by `tests/Feature/TopBarResponsiveTest.php` (3 tests) and
+  `LandingPageTest::test_header_collapses_into_a_menu_on_small_screens`.
 
 ---
 

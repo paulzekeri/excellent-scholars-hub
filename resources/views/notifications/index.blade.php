@@ -6,13 +6,13 @@
         <h1 class="text-3xl font-bold text-gray-800">Notifications</h1>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ route('notifications.index') }}"
-               class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border {{ $type === null ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
+               class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border {{ $type === null ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
                 <i class="fas fa-layer-group mr-1"></i>All
             </a>
             @foreach(\App\Models\Notification::COMPOSABLE_TYPES as $filterType)
                 @php $filterMeta = \App\Models\Notification::metaFor($filterType); @endphp
                 <a href="{{ route('notifications.index', ['type' => $filterType]) }}"
-                   class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border {{ $type === $filterType ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
+                   class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border {{ $type === $filterType ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
                     <i class="fas {{ $filterMeta['icon'] }} mr-1"></i>{{ $filterMeta['label'] }}
                 </a>
             @endforeach
@@ -29,7 +29,7 @@
                             <i class="fas {{ $meta['icon'] }} mr-1"></i>{{ $meta['label'] }}
                         </span>
                         @if(!$notification->is_read)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-600 text-white">New</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">New</span>
                         @endif
                     </div>
                     <h3 class="font-semibold text-gray-800 mt-2">{{ $notification->title }}</h3>
@@ -38,7 +38,7 @@
                 </div>
                 @if(!$notification->is_read)
                 <form action="{{ route('notifications.read', $notification) }}" method="POST">@csrf
-                    <button type="submit" class="text-xs text-indigo-600 hover:text-indigo-800 whitespace-nowrap"><i class="fas fa-check"></i> Mark read</button>
+                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap"><i class="fas fa-check"></i> Mark read</button>
                 </form>
                 @endif
             </div>
@@ -50,7 +50,7 @@
     <div class="mt-6">{{ $notifications->links() }}</div>
     @if($notifications->count() > 0)
     <form action="{{ route('notifications.readAll') }}" method="POST" class="mt-4">@csrf
-        <button type="submit" class="text-indigo-600 hover:text-indigo-800 text-sm"><i class="fas fa-check-double mr-1"></i> Mark all as read</button>
+        <button type="submit" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-check-double mr-1"></i> Mark all as read</button>
     </form>
     @endif
 </div>

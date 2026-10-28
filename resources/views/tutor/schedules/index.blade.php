@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
         <div><h1 class="text-3xl font-bold text-gray-800">My Schedules</h1><p class="text-gray-600 mt-1">Your class schedules</p></div>
-        <a href="{{ route('tutor.schedules.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-plus mr-1"></i> New Schedule</a>
+        <a href="{{ route('tutor.schedules.create') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-plus mr-1"></i> New Schedule</a>
     </div>
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
@@ -22,7 +22,7 @@
                         <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-yellow-100 text-yellow-800 @endif">{{ ucfirst($schedule->status) }}</span></td>
                         <td class="px-6 py-4 text-sm space-x-2">
-                            <a href="{{ route('tutor.attendance.index', $schedule) }}" class="text-indigo-600 hover:text-indigo-800"><i class="fas fa-check-circle"></i> Attendance</a>
+                            <a href="{{ route('tutor.attendance.index', $schedule) }}" class="text-blue-600 hover:text-blue-800"><i class="fas fa-check-circle"></i> Attendance</a>
                             @if($schedule->status != 'completed')
                             <form action="{{ route('tutor.schedules.complete', $schedule) }}" method="POST" class="inline" onsubmit="return confirmComplete(this, '{{ $schedule->end_time }}')">@csrf<button type="submit" class="text-green-600 hover:text-green-800"><i class="fas fa-check"></i> Complete</button></form>
                             @endif

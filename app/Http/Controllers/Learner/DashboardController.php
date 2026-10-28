@@ -18,6 +18,21 @@ class DashboardController extends Controller
 
         $data = [
             'myClasses' => $learner->classes()->with('tutor.user')->get(),
+            // "The ongoing or nearest class should be on the panel": a session
+            // that is live right now wins, otherwise the closest future one.
+            'liveSession' => ClassSchedule::whereIn('class_id', $classIds)
+                ->where('status', 'scheduled')
+                ->where('start_time', '<=', now())
+                ->where('end_time', '>=', now())
+                ->with('class', 'tutor.user')
+                ->orderBy('start_time')
+                ->first(),
+            'nextSession' => ClassSchedule::whereIn('class_id', $classIds)
+                ->where('status', 'scheduled')
+                ->where('start_time', '>', now())
+                ->with('class', 'tutor.user')
+                ->orderBy('start_time')
+                ->first(),
             'upcomingClasses' => ClassSchedule::whereIn('class_id', $classIds)
                 ->where('start_time', '>', now())
                 ->with('class', 'tutor.user')

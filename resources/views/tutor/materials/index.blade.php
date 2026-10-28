@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
         <div><h1 class="text-3xl font-bold text-gray-800">Learning Materials</h1><p class="text-gray-600 mt-1">Uploaded materials for your classes</p></div>
-        <a href="{{ route('tutor.materials.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-upload mr-1"></i> Upload Material</a>
+        <a href="{{ route('tutor.materials.create') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-upload mr-1"></i> Upload Material</a>
     </div>
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">

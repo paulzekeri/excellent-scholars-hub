@@ -2,7 +2,7 @@
 @section('title', 'Class Details - ' . $class->name)
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <a href="{{ route('admin.classes.index') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back to Classes</a>
+    <a href="{{ route('admin.classes.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back to Classes</a>
 
     @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">{{ session('success') }}</div>
@@ -22,7 +22,7 @@
                 <p class="text-gray-500 text-sm mt-2">{{ $class->description }}</p>
             </div>
             <div class="text-right">
-                <p class="text-3xl font-bold text-indigo-600">{{ $class->learners->count() }} / {{ $class->max_students }}</p>
+                <p class="text-3xl font-bold text-blue-600">{{ $class->learners->count() }} / {{ $class->max_students ?? 'No limit' }}</p>
                 <p class="text-sm text-gray-500">Students Enrolled</p>
             </div>
         </div>
@@ -73,12 +73,12 @@
         <div>
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Enroll a Learner</h2>
-                @if($class->learners->count() < $class->max_students)
+                @if($class->max_students === null || $class->learners->count() < $class->max_students)
                 <form action="{{ route('admin.classes.enroll', $class) }}" method="POST" class="space-y-4">
                     @csrf
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Select Learner</label>
-                        <select name="learner_id" required class="block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                        <select name="learner_id" required class="block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Choose a learner --</option>
                             @foreach($learners as $learner)
                                 @unless($class->learners->contains('id', $learner->id))
@@ -87,7 +87,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-user-plus mr-1"></i> Enroll Learner</button>
+                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-user-plus mr-1"></i> Enroll Learner</button>
                 </form>
                 @else
                 <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">

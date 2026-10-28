@@ -16,7 +16,7 @@
     $isUpcomingOrLive = in_array($schedule->status, ['scheduled', 'ongoing']);
 @endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <a href="{{ route('admin.schedules.index') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back to Schedules</a>
+    <a href="{{ route('admin.schedules.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back to Schedules</a>
 
     <!-- Session Summary -->
     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
@@ -37,7 +37,7 @@
                 <h1 class="text-3xl font-bold text-gray-800">{{ $schedule->title }}</h1>
                 <p class="text-gray-600 mt-2">
                     @if($class)
-                        <a href="{{ route('admin.classes.show', $class) }}" class="text-indigo-600 hover:text-indigo-800">{{ $class->name }}</a>
+                        <a href="{{ route('admin.classes.show', $class) }}" class="text-blue-600 hover:text-blue-800">{{ $class->name }}</a>
                         <span class="text-gray-400 mx-1">|</span> Code: <strong>{{ $class->code }}</strong>
                     @else
                         <span class="text-gray-500">Class no longer available</span>
@@ -59,7 +59,7 @@
             <div class="lg:text-right shrink-0">
                 @if($isUpcomingOrLive && $schedule->meeting_link)
                     <a href="{{ $schedule->meeting_link }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">
+                        class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
                         <i class="fas fa-video mr-2"></i> Join Class
                     </a>
                     <p class="text-xs text-gray-500 mt-2">Opens the meeting in a new tab</p>
@@ -69,7 +69,7 @@
                     </div>
                 @elseif($schedule->status == 'completed' && $schedule->recording_url)
                     <a href="{{ $schedule->recording_url }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">
+                        class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
                         <i class="fas fa-play-circle mr-2"></i> View Recording
                     </a>
                     <p class="text-xs text-gray-500 mt-2">Opens in a new tab</p>
@@ -80,7 +80,7 @@
                 @endif
 
                 <div class="mt-3">
-                    <a href="{{ route('admin.schedules.edit', $schedule) }}" class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800">
+                    <a href="{{ route('admin.schedules.edit', $schedule) }}" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
                         <i class="fas fa-edit mr-1"></i> Edit schedule
                     </a>
                 </div>
@@ -152,7 +152,7 @@
                     </table>
                 </div>
                 <div class="px-6 py-3 border-t bg-gray-50">
-                    <a href="{{ route('admin.oversight.attendance') }}" class="text-sm text-indigo-600 hover:text-indigo-800">
+                    <a href="{{ route('admin.oversight.attendance') }}" class="text-sm text-blue-600 hover:text-blue-800">
                         <i class="fas fa-clipboard-check mr-1"></i> View all attendance records
                     </a>
                 </div>
@@ -177,7 +177,7 @@
                         <dd class="mt-1">
                             @if($schedule->meeting_link)
                                 <input id="meeting-link" type="text" readonly value="{{ $schedule->meeting_link }}" class="block w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 bg-gray-50">
-                                <button type="button" id="copy-meeting-link" class="mt-2 inline-flex items-center text-xs text-indigo-600 hover:text-indigo-800">
+                                <button type="button" id="copy-meeting-link" class="mt-2 inline-flex items-center text-xs text-blue-600 hover:text-blue-800">
                                     <i class="fas fa-copy mr-1"></i> Copy link
                                 </button>
                             @else
@@ -189,7 +189,7 @@
                         <dt class="text-gray-500">Recording</dt>
                         <dd class="mt-1">
                             @if($schedule->recording_url)
-                                <a href="{{ $schedule->recording_url }}" target="_blank" rel="noopener" class="text-indigo-600 hover:text-indigo-800"><i class="fas fa-play-circle mr-1"></i> Watch recording</a>
+                                <a href="{{ $schedule->recording_url }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-800"><i class="fas fa-play-circle mr-1"></i> Watch recording</a>
                             @else
                                 <span class="text-gray-500">Not available</span>
                             @endif
@@ -207,25 +207,25 @@
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Class Records</h2>
                 <ul class="space-y-3 text-sm">
                     <li>
-                        <a href="{{ route('admin.oversight.assignments.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-indigo-600">
+                        <a href="{{ route('admin.oversight.assignments.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
                             <span><i class="fas fa-clipboard-list mr-2 text-green-600 w-4"></i> Assignments</span>
                             <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">{{ $assignmentCount }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.oversight.materials.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-indigo-600">
+                        <a href="{{ route('admin.oversight.materials.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
                             <span><i class="fas fa-folder-open mr-2 text-blue-600 w-4"></i> Materials</span>
                             <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">{{ $materialCount }}</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.oversight.attendance.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-indigo-600">
+                        <a href="{{ route('admin.oversight.attendance.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
                             <span><i class="fas fa-user-check mr-2 text-purple-600 w-4"></i> Class attendance</span>
                             <i class="fas fa-chevron-right text-xs text-gray-400"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.classes.show', $class) }}" class="flex items-center justify-between text-gray-700 hover:text-indigo-600">
+                        <a href="{{ route('admin.classes.show', $class) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
                             <span><i class="fas fa-chalkboard mr-2 text-yellow-600 w-4"></i> Class &amp; enrolled learners</span>
                             <i class="fas fa-chevron-right text-xs text-gray-400"></i>
                         </a>

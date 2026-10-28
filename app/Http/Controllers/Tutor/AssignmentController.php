@@ -8,6 +8,7 @@ use App\Models\Classes;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class AssignmentController extends Controller
 {
@@ -31,16 +32,34 @@ class AssignmentController extends Controller
     public function store(Request $request)
     {
         $tutor = auth()->user()->tutor;
-        
-        $request->validate([
-            'class_id' => 'required|exists:classes,id',
+
+        $validated = $request->validate([
+            'class_id' => [
+                'required',
+                Rule::exists('classes', 'id')->where(function ($query) use ($tutor) {
+                    $query->where('tutor_id', $tutor->id);
+                }),
+            ],
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
             'total_points' => 'integer|min:1',
+            'images' => 'nullable|array|max:6',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        Assignment::create(array_merge($request->all(), ['tutor_id' => $tutor->id]));
+        // Pictures are optional; each is stored on the public disk.
+        $images = [];
+        foreach ($request->file('images', []) as $image) {
+            $images[] = $image->store('assignments', 'public');
+        }
+
+        unset($validated['images']);
+
+        Assignment::create(array_merge($validated, [
+            'tutor_id' => $tutor->id,
+            'images' => $images !== [] ? $images : null,
+        ]));
 
         return redirect()->route('tutor.assignments.index')->with('success', 'Assignment created successfully.');
     }

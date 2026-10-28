@@ -112,8 +112,9 @@ Values that matter on UAT:
 | `APP_KEY` | 51 characters: `base64:` + 44. A trailing CR on this line makes every request fail. |
 | `DB_DATABASE` / `DB_USERNAME` | `litgrpco_esh_uat` (create it in *MySQL® Databases*) |
 | `DB_PASSWORD` | that database user's password |
-| `MAIL_MAILER` | `log` (UAT sends no mail) |
+| `MAIL_MAILER` | `log` (UAT sends no mail). Password-reset emails need a working mailer; while this is `log`, the CEO/administrator generates a one-time reset link from **Admin → Users → Reset password**. |
 | `SESSION_SECURE_COOKIE` | `true` |
+| `PAYSTACK_PUBLIC_KEY` / `PAYSTACK_SECRET_KEY` | optional — leave blank until card payments are switched on; the parent form shows card as "coming soon". |
 | `SEED_DEMO_ACCOUNTS` | `true` — creates `ceo@`/`admin@`/`tutor@`/`learner@`/`parent@esh.com`, password `password` |
 
 After editing `.env` by hand run `php artisan config:clear` (each deploy does this for you).

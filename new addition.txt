@@ -1,0 +1,24 @@
+dev DB: `Member` 371, `Worker` 73, `Admin` 20, `Lead` 3, `TIU Guest` 
+1. __No `Super User` row in dev.__ Code also tests `'Admins'` and `'Workers'` 
+(plural), which no row uses any more
+
+
+ASdtJc3Jp}tEGt_?
+
+payment need to be fine tuned
+allow part payment records
+allow receipt upload / alow them to chose payment per term or class etc 
+
+categorised sending of message by Parent / tutors / students / per class
+
+https://uat-esh.lit-grp.com/learner/dashboard the ongoing or nearest class should be on the panel
+
+teachers to be able to upload pictures with assignment 
+the max number of students should not be mandatory
+
+ add a monthly view/count of classes per tutor on the admin and ceo dashboard. 
+ add coloration - blue white orange 
+ learning goals uploads by tutors and should visble to admin and ceo. the admin can send/share with parent / tutor
+  
+  a card of afirmation reminder
+  landing page with sliders, testimonials , about us , register for clases

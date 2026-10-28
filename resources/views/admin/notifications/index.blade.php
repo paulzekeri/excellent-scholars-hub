@@ -4,7 +4,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex justify-between items-center mb-6">
         <div><h1 class="text-3xl font-bold text-gray-800">Notifications</h1><p class="text-gray-600 mt-1">Send and manage platform notifications</p></div>
-        <a href="{{ route('admin.notifications.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-bell mr-1"></i> Send Notification</a>
+        <a href="{{ route('admin.notifications.create') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-bell mr-1"></i> Send Notification</a>
     </div>
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
@@ -28,7 +28,7 @@
                         <td class="px-6 py-4 text-sm">
                             <div class="flex items-center gap-4">
                                 <button type="button"
-                                    class="notification-read-btn text-indigo-600 hover:text-indigo-800"
+                                    class="notification-read-btn text-blue-600 hover:text-blue-800"
                                     title="Read notification"
                                     data-title="{{ $notification->title }}"
                                     data-type="{{ $typeMeta['label'] }}"
@@ -61,12 +61,12 @@
 <div id="notification-modal" class="fixed inset-0 z-50 hidden overflow-y-auto px-4 py-10" role="dialog" aria-modal="true" aria-labelledby="notification-modal-title">
     <div class="absolute inset-0 bg-black bg-opacity-50" data-modal-close></div>
     <div class="relative max-w-lg mx-auto bg-white rounded-xl shadow-xl overflow-hidden">
-        <div class="px-6 py-4 bg-indigo-600 flex items-start justify-between gap-4">
+        <div class="px-6 py-4 bg-blue-600 flex items-start justify-between gap-4">
             <div>
-                <p class="text-xs uppercase tracking-wide text-indigo-200">Notification</p>
+                <p class="text-xs uppercase tracking-wide text-blue-200">Notification</p>
                 <h2 id="notification-modal-title" class="text-lg font-semibold text-white"></h2>
             </div>
-            <button type="button" data-modal-close class="text-indigo-200 hover:text-white" aria-label="Close">
+            <button type="button" data-modal-close class="text-blue-200 hover:text-white" aria-label="Close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -95,7 +95,7 @@
             </div>
         </div>
         <div class="px-6 py-4 bg-gray-50 border-t flex justify-end">
-            <button type="button" data-modal-close class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">Close</button>
+            <button type="button" data-modal-close class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition text-sm">Close</button>
         </div>
     </div>
 </div>

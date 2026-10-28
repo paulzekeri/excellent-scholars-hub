@@ -14,12 +14,38 @@
     @livewireStyles
 </head>
 <body class="bg-gray-50 font-sans antialiased">
-    <div class="min-h-screen">
+    <style>
+        /* App shell: blue sidebar + slim top bar (school colours) */
+        .esh-shell { transition: padding-left .2s ease; }
+        .esh-sidebar { transition: width .2s ease, transform .2s ease; }
+        .esh-group > summary { list-style: none; }
+        .esh-group > summary::-webkit-details-marker { display: none; }
+        .esh-chevron { transition: transform .2s ease; }
+        .esh-group[open] > summary .esh-chevron { transform: rotate(180deg); }
+
+        @media (min-width: 1024px) {
+            .esh-shell { padding-left: 16rem; }
+            body.esh-collapsed .esh-shell { padding-left: 4.75rem; }
+            body.esh-collapsed .esh-sidebar { width: 4.75rem; }
+            body.esh-collapsed .esh-sidebar .esh-label { display: none; }
+            body.esh-collapsed .esh-sidebar .esh-badge { display: none; }
+            body.esh-collapsed .esh-sidebar .esh-item { justify-content: center; padding-left: .5rem; padding-right: .5rem; }
+            body.esh-collapsed .esh-sidebar summary { justify-content: center; padding-left: 0; padding-right: 0; }
+            body.esh-collapsed .esh-sidebar .esh-group > .esh-group-body { display: block !important; }
+            body.esh-collapsed .esh-sidebar .esh-item { margin-top: .25rem; }
+        }
+    </style>
+
+    @if(auth()->check())
+        @include('layouts.sidebar')
+    @endif
+
+    <div class="{{ auth()->check() ? 'esh-shell' : '' }} flex min-h-screen flex-col">
         @if(auth()->check())
             @include('layouts.navigation')
         @endif
 
-        <main>
+        <main class="min-w-0 flex-1">
             @if(session('success'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded" role="alert">
@@ -55,15 +81,71 @@
 
     @livewireScripts
     <script>
-        // Mobile menu toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (menuButton && mobileMenu) {
-                menuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            const body = document.body;
+            const sidebar = document.getElementById('esh-sidebar');
+            const overlay = document.getElementById('esh-sidebar-overlay');
+            const drawerToggle = document.getElementById('esh-drawer-toggle');
+            const railToggle = document.getElementById('esh-sidebar-toggle');
+            const groups = Array.prototype.slice.call(document.querySelectorAll('.esh-group'));
+
+            // Mobile off-canvas drawer.
+            function openDrawer() {
+                if (!sidebar) return;
+                sidebar.classList.remove('-translate-x-full');
+                overlay && overlay.classList.remove('hidden');
+                body.classList.add('overflow-hidden');
+                drawerToggle && drawerToggle.setAttribute('aria-expanded', 'true');
             }
+
+            function closeDrawer() {
+                if (!sidebar) return;
+                sidebar.classList.add('-translate-x-full');
+                overlay && overlay.classList.add('hidden');
+                body.classList.remove('overflow-hidden');
+                drawerToggle && drawerToggle.setAttribute('aria-expanded', 'false');
+            }
+
+            drawerToggle && drawerToggle.addEventListener('click', openDrawer);
+            overlay && overlay.addEventListener('click', closeDrawer);
+            document.querySelectorAll('.esh-drawer-close').forEach(function (button) {
+                button.addEventListener('click', closeDrawer);
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeDrawer();
+            });
+
+            // Desktop: collapse the sidebar to an icon rail, remembered per browser.
+            if (localStorage.getItem('esh.nav.collapsed') === '1') {
+                body.classList.add('esh-collapsed');
+                groups.forEach(function (group) { group.open = true; });
+            }
+
+            railToggle && railToggle.addEventListener('click', function () {
+                const collapsed = body.classList.toggle('esh-collapsed');
+                localStorage.setItem('esh.nav.collapsed', collapsed ? '1' : '0');
+                if (collapsed) groups.forEach(function (group) { group.open = true; });
+            });
+
+            // Remember which groups a user folded away.
+            let savedGroups = {};
+            try {
+                savedGroups = JSON.parse(localStorage.getItem('esh.nav.groups') || '{}');
+            } catch (error) {
+                savedGroups = {};
+            }
+
+            groups.forEach(function (group) {
+                const key = group.getAttribute('data-group');
+                if (key && Object.prototype.hasOwnProperty.call(savedGroups, key)) {
+                    group.open = savedGroups[key];
+                }
+                group.addEventListener('toggle', function () {
+                    if (body.classList.contains('esh-collapsed') || !key) return;
+                    savedGroups[key] = group.open;
+                    localStorage.setItem('esh.nav.groups', JSON.stringify(savedGroups));
+                });
+            });
         });
     </script>
     @stack('scripts')

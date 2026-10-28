@@ -30,7 +30,7 @@ class ClassController extends Controller
             'tutor_id' => 'required|exists:tutors,id',
             'grade_level' => 'nullable|string',
             'subject' => 'nullable|string',
-            'max_students' => 'integer|min:1',
+            'max_students' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
         ]);
 
@@ -60,7 +60,7 @@ class ClassController extends Controller
             'tutor_id' => 'required|exists:tutors,id',
             'grade_level' => 'nullable|string',
             'subject' => 'nullable|string',
-            'max_students' => 'integer|min:1',
+            'max_students' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
         ]);
 
@@ -86,8 +86,8 @@ class ClassController extends Controller
             return back()->with('error', 'Learner is already enrolled in this class.');
         }
 
-        // Check max students
-        if ($class->learners()->count() >= $class->max_students) {
+        // Check max students — a class without a maximum is unlimited.
+        if ($class->max_students !== null && $class->learners()->count() >= $class->max_students) {
             return back()->with('error', 'Class has reached maximum capacity.');
         }
 

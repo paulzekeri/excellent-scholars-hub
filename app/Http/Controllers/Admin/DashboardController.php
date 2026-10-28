@@ -9,13 +9,40 @@ use App\Models\ClassSchedule;
 use App\Models\Learner;
 use App\Models\Tutor;
 use App\Models\Payment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+
+        // "A monthly view/count of classes per tutor" — the month is selectable.
+        $month = $request->query('month');
+        try {
+            $monthStart = $month ? Carbon::createFromFormat('Y-m', $month)->startOfMonth() : Carbon::now()->startOfMonth();
+        } catch (\Exception $exception) {
+            $monthStart = Carbon::now()->startOfMonth();
+        }
+        $monthEnd = $monthStart->copy()->endOfMonth();
+
+        $tutorMonthly = Tutor::with('user')
+            ->withCount(['schedules as month_sessions' => function ($query) use ($monthStart, $monthEnd) {
+                $query->whereBetween('start_time', [$monthStart, $monthEnd]);
+            }])
+            ->get()
+            ->sortByDesc('month_sessions')
+            ->values();
+
+        $monthlyTrend = collect(range(5, 0))->map(function ($monthsAgo) {
+            $start = Carbon::now()->startOfMonth()->subMonths($monthsAgo);
+
+            return [
+                'label' => $start->format('M'),
+                'count' => ClassSchedule::whereBetween('start_time', [$start, $start->copy()->endOfMonth()])->count(),
+            ];
+        });
 
         $data = [
             'totalUsers' => User::count(),
@@ -32,6 +59,11 @@ class DashboardController extends Controller
                 ->orderBy('start_time')
                 ->take(5)
                 ->get(),
+            'tutorMonthly' => $tutorMonthly,
+            'monthStart' => $monthStart,
+            'monthSessions' => (int) $tutorMonthly->sum('month_sessions'),
+            'maxMonthSessions' => max(1, (int) $tutorMonthly->max('month_sessions')),
+            'monthlyTrend' => $monthlyTrend,
         ];
 
         return view('admin.dashboard', $data);

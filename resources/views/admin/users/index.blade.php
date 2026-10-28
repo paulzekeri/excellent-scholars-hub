@@ -9,10 +9,22 @@
             <h1 class="text-3xl font-bold text-gray-800">Manage Users</h1>
             <p class="text-gray-600 mt-1">All registered platform users</p>
         </div>
-        <a href="{{ route('admin.users.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+        <a href="{{ route('admin.users.create') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
             <i class="fas fa-plus mr-1"></i> New User
         </a>
     </div>
+
+    @if(session('password_reset_link'))
+        <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
+            <p class="font-semibold text-gray-800"><i class="fas fa-key text-orange-500 mr-1"></i> One-time reset link for {{ session('password_reset_user') }}</p>
+            <p class="text-sm text-gray-600 mt-1">Send this to the user privately. It works once and expires in 60 minutes, so do not post it in a group chat.</p>
+            <div class="mt-3 flex flex-col sm:flex-row gap-2">
+                <input id="password-reset-link" type="text" readonly value="{{ session('password_reset_link') }}" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-xs font-mono bg-gray-50">
+                <button type="button" id="copy-reset-link" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition"><i class="fas fa-copy mr-1"></i> Copy</button>
+                <a href="{{ session('password_reset_link') }}" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition"><i class="fas fa-arrow-up-right-from-square mr-1"></i> Open</a>
+            </div>
+        </div>
+    @endif
 
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
@@ -68,9 +80,13 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-sm">
-                                <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-800 mr-3">
+                                <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:text-blue-800 mr-3">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
+                                <form action="{{ route('admin.users.password-reset', $user) }}" method="POST" class="inline mr-3" onsubmit="return confirm('Send a one-time password reset link for this user?')">
+                                    @csrf
+                                    <button type="submit" class="text-orange-600 hover:text-orange-800"><i class="fas fa-key"></i> Reset password</button>
+                                </form>
                                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i> Delete</button>
@@ -86,4 +102,30 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const button = document.getElementById('copy-reset-link');
+        const field = document.getElementById('password-reset-link');
+
+        if (!button || !field) return;
+
+        button.addEventListener('click', function () {
+            const done = function () {
+                const original = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check mr-1"></i> Copied';
+                setTimeout(function () { button.innerHTML = original; }, 1500);
+            };
+
+            field.select();
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(field.value).then(done).catch(function () {});
+                return;
+            }
+
+            try { document.execCommand('copy'); done(); } catch (error) {}
+        });
+    });
+</script>
 @endsection

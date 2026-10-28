@@ -5,29 +5,29 @@
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-center justify-between mb-4">
-        <a href="{{ route('messages.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm">
+        <a href="{{ route('messages.index') }}" class="text-blue-600 hover:text-blue-800 text-sm">
             <i class="fas fa-arrow-left mr-1"></i> Back to Messages
         </a>
     </div>
 
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
-        <div class="px-6 py-4 bg-indigo-600 flex items-center justify-between">
+        <div class="px-6 py-4 bg-blue-600 flex items-center justify-between">
             <div>
                 <h1 class="text-lg font-semibold text-white">{{ $user->name }}</h1>
-                <p class="text-indigo-200 text-xs">
+                <p class="text-blue-200 text-xs">
                     {{ ucfirst($user->role->name) }}@if($user->email) &middot; {{ $user->email }}@endif
                 </p>
             </div>
-            <i class="fas fa-user-circle text-3xl text-indigo-200"></i>
+            <i class="fas fa-user-circle text-3xl text-blue-200"></i>
         </div>
 
         <div class="p-6 space-y-4 max-h-[28rem] overflow-y-auto bg-gray-50">
             @forelse($messages as $message)
                 <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                     <div class="max-w-lg rounded-2xl px-4 py-3 text-sm shadow-sm
-                        {{ $message->sender_id === auth()->id() ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-200' }}">
+                        {{ $message->sender_id === auth()->id() ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200' }}">
                         <p class="whitespace-pre-line">{{ $message->body }}</p>
-                        <p class="text-xs mt-1 {{ $message->sender_id === auth()->id() ? 'text-indigo-200' : 'text-gray-400' }}">
+                        <p class="text-xs mt-1 {{ $message->sender_id === auth()->id() ? 'text-blue-200' : 'text-gray-400' }}">
                             {{ $message->created_at->format('M d, Y h:i A') }}
                         </p>
                     </div>
@@ -47,8 +47,8 @@
             @enderror
             <div class="flex items-end gap-3">
                 <textarea name="body" rows="2" required maxlength="2000" placeholder="Type your message..."
-                    class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-indigo-500 focus:border-indigo-500">{{ old('body') }}</textarea>
-                <button type="submit" class="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition text-sm">
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('body') }}</textarea>
+                <button type="submit" class="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition text-sm">
                     <i class="fas fa-paper-plane mr-1"></i> Send
                 </button>
             </div>

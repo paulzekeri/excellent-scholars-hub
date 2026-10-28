@@ -10,6 +10,8 @@ use App\Models\Learner;
 use App\Models\ParentModel;
 use App\Models\Classes;
 use App\Models\ClassSchedule;
+use App\Models\Payment;
+use App\Models\PaymentAccount;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -161,6 +163,89 @@ class DatabaseSeeder extends Seeder
 
         // Enroll learner in class
         $class->learners()->syncWithoutDetaching([$learner->id]);
+
+        // Demo fees: one installment the CEO already verified and one still waiting
+        // for the bank check, so the parent area and the CEO queue both have content.
+        $schoolAccount = PaymentAccount::firstOrCreate(
+            ['account_number' => '0123456789'],
+            [
+                'bank_name' => 'GTBank',
+                'account_name' => 'Excellent Scholars Academy',
+                'instructions' => 'Use your child\'s full name as the transfer narration.',
+                'is_active' => true,
+                'created_by' => $ceoUser->id,
+            ]
+        );
+
+        // Switched off on purpose: shows how the CEO hides an account from parents.
+        PaymentAccount::firstOrCreate(
+            ['account_number' => '1098765432'],
+            [
+                'bank_name' => 'Zenith Bank',
+                'account_name' => 'Excellent Scholars Academy',
+                'instructions' => 'Old account, kept for history only.',
+                'is_active' => false,
+                'created_by' => $ceoUser->id,
+            ]
+        );
+
+        $verifiedPayment = Payment::firstOrCreate(
+            ['reference' => 'DEMO-TUITION-001'],
+            [
+                'user_id' => $parentUser->id,
+                'learner_id' => $learner->id,
+                'payment_type' => 'tuition',
+                'term' => 'First Term',
+                'class_id' => $class->id,
+                'amount' => 40000,
+                'total_fee' => 100000,
+                'currency' => 'NGN',
+                'payment_method' => Payment::METHOD_TRANSFER,
+                'payment_account_id' => $schoolAccount->id,
+                'paid_into' => $schoolAccount->displayLabel(),
+                'reference' => 'DEMO-TUITION-001',
+                'status' => Payment::STATUS_COMPLETED,
+                'payment_date' => now()->subDays(21),
+            ]
+        );
+
+        if ($verifiedPayment->wasRecentlyCreated) {
+            $verifiedPayment->forceFill([
+                'verified_at' => now()->subDays(20),
+                'verified_by' => $ceoUser->id,
+            ])->save();
+        }
+
+        $pendingPayment = Payment::firstOrCreate(
+            ['reference' => 'DEMO-TUITION-002'],
+            [
+                'user_id' => $parentUser->id,
+                'learner_id' => $learner->id,
+                'payment_type' => 'tuition',
+                'term' => 'First Term',
+                'class_id' => $class->id,
+                'amount' => 20000,
+                'total_fee' => 100000,
+                'currency' => 'NGN',
+                'payment_method' => Payment::METHOD_TRANSFER,
+                'payment_account_id' => $schoolAccount->id,
+                'paid_into' => $schoolAccount->displayLabel(),
+                'reference' => 'DEMO-TUITION-002',
+                'status' => Payment::STATUS_PENDING,
+                'payment_date' => now()->subDays(2),
+            ]
+        );
+
+        // Databases seeded before the school accounts existed still get the new
+        // fields without resetting a status the CEO may have changed in the demo.
+        foreach ([$verifiedPayment, $pendingPayment] as $demoPayment) {
+            if (! $demoPayment->payment_account_id) {
+                $demoPayment->forceFill([
+                    'payment_account_id' => $schoolAccount->id,
+                    'paid_into' => $schoolAccount->displayLabel(),
+                ])->save();
+            }
+        }
 
         // Create a schedule with meeting link
         $schedule = ClassSchedule::firstOrCreate(

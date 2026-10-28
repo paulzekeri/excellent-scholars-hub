@@ -11,14 +11,14 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Total Users</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $totalUsers }}</p>
                 </div>
-                <div class="bg-indigo-100 p-3 rounded-full">
-                    <i class="fas fa-users text-indigo-600 text-xl"></i>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-users text-blue-600 text-xl"></i>
                 </div>
             </div>
         </div>
@@ -98,6 +98,50 @@
         </a>
     </div>
 
+    @include('partials.affirmation')
+
+    <!-- Monthly classes per tutor -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">Classes per tutor — {{ $monthStart->format('F Y') }}</h2>
+                <p class="text-sm text-gray-500">{{ $monthSessions }} session(s) scheduled across {{ $tutorMonthly->count() }} tutor(s).</p>
+            </div>
+            <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
+                <input type="month" name="month" value="{{ $monthStart->format('Y-m') }}" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                <button type="submit" class="bg-blue-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-800 transition"><i class="fas fa-calendar-day mr-1"></i> View</button>
+            </form>
+        </div>
+        <div class="space-y-3">
+            @forelse($tutorMonthly as $tutor)
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="font-medium text-gray-800">{{ $tutor->user->name ?? 'Tutor #' . $tutor->id }}</span>
+                        <span class="{{ $tutor->month_sessions > 0 ? 'text-blue-700 font-semibold' : 'text-gray-400' }}">{{ $tutor->month_sessions }} session(s)</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2.5">
+                        <div class="{{ $tutor->month_sessions > 0 ? 'bg-blue-600' : 'bg-gray-200' }} h-2.5 rounded-full" style="width: {{ round($tutor->month_sessions / $maxMonthSessions * 100) }}%"></div>
+                    </div>
+                </div>
+            @empty
+                <p class="text-sm text-gray-500">No tutors yet.</p>
+            @endforelse
+        </div>
+        <div class="mt-6 border-t border-gray-100 pt-4">
+            <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Last 6 months</p>
+            <div class="flex items-end gap-3 h-24">
+                @php $trendMax = max(1, (int) $monthlyTrend->max('count')); @endphp
+                @foreach($monthlyTrend as $point)
+                    <div class="flex-1 flex flex-col items-center justify-end h-full">
+                        <span class="text-xs font-semibold text-gray-700">{{ $point['count'] }}</span>
+                        <div class="w-full bg-orange-400 rounded-t" style="height: {{ $point['count'] > 0 ? max(6, round($point['count'] / $trendMax * 60)) : 2 }}px"></div>
+                        <span class="text-xs text-gray-500 mt-1">{{ $point['label'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Recent Users -->
         <div class="bg-white rounded-xl shadow-md p-6">
@@ -137,14 +181,14 @@
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Upcoming Classes</h2>
             <div class="space-y-4">
                 @forelse($upcomingClasses as $schedule)
-                    <a href="{{ route('admin.schedules.show', $schedule) }}" class="block border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg hover:bg-indigo-100 transition">
+                    <a href="{{ route('admin.schedules.show', $schedule) }}" class="block border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg hover:bg-blue-100 transition">
                         <div class="flex justify-between items-start gap-3">
                             <div>
                                 <p class="font-semibold text-gray-800">{{ $schedule->title }}</p>
                                 <p class="text-sm text-gray-600">{{ $schedule->class->name }} - {{ $schedule->tutor->user->name }}</p>
                                 <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</p>
                             </div>
-                            <i class="fas fa-chevron-right text-indigo-400 mt-1"></i>
+                            <i class="fas fa-chevron-right text-blue-400 mt-1"></i>
                         </div>
                     </a>
                 @empty

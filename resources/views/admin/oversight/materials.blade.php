@@ -11,7 +11,7 @@
     <div class="bg-white rounded-xl shadow-md p-6 mb-6">
         <form method="GET" action="{{ route('admin.oversight.materials') }}" class="flex flex-wrap items-center gap-4">
             <label class="text-sm font-medium text-gray-700">Filter by Class:</label>
-            <select name="class_id" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <select name="class_id" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All Classes</option>
                 @foreach($classes as $class)
                     <option value="{{ $class->id }}" {{ isset($selectedClass) && $selectedClass->id == $class->id ? 'selected' : '' }}>
@@ -20,7 +20,7 @@
                 @endforeach
             </select>
             @if(isset($selectedClass))
-                <a href="{{ route('admin.oversight.materials') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Clear filter</a>
+                <a href="{{ route('admin.oversight.materials') }}" class="text-sm text-blue-600 hover:text-blue-800">Clear filter</a>
             @endif
         </form>
     </div>
@@ -51,14 +51,14 @@
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $material->class->name ?? 'N/A' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-600">{{ $material->tutor->user->name ?? 'N/A' }}</td>
                             <td class="px-4 py-3">
-                                <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800 font-medium">
+                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 font-medium">
                                     {{ strtoupper($material->file_type ?? 'N/A') }}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-500">{{ $material->created_at ? \Carbon\Carbon::parse($material->created_at)->format('M d, Y') : '-' }}</td>
                             <td class="px-4 py-3">
                                 @if($material->file_path)
-                                    <a href="{{ asset('storage/' . $material->file_path) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm">
+                                    <a href="{{ asset('storage/' . $material->file_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
                                         <i class="fas fa-download mr-1"></i> Download
                                     </a>
                                 @else

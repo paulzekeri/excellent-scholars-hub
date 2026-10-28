@@ -11,7 +11,7 @@
     <div class="bg-white rounded-xl shadow-md p-6 mb-6">
         <form method="GET" action="{{ route('admin.oversight.assignments') }}" class="flex flex-wrap items-center gap-4">
             <label class="text-sm font-medium text-gray-700">Filter by Class:</label>
-            <select name="class_id" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <select name="class_id" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All Classes</option>
                 @foreach($classes as $class)
                     <option value="{{ $class->id }}" {{ isset($selectedClass) && $selectedClass->id == $class->id ? 'selected' : '' }}>
@@ -20,7 +20,7 @@
                 @endforeach
             </select>
             @if(isset($selectedClass))
-                <a href="{{ route('admin.oversight.assignments') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Clear filter</a>
+                <a href="{{ route('admin.oversight.assignments') }}" class="text-sm text-blue-600 hover:text-blue-800">Clear filter</a>
             @endif
         </form>
     </div>
@@ -48,11 +48,20 @@
 
                     @if($assignment->description)
                         <p class="text-gray-600 text-sm mb-4">{{ Str::limit($assignment->description, 200) }}</p>
+                @if($assignment->hasImages())
+                    <div class="mb-4 flex flex-wrap gap-2">
+                        @foreach($assignment->imagePaths() as $image)
+                            <a href="{{ Storage::url($image) }}" target="_blank" rel="noopener" title="Open picture">
+                                <img src="{{ Storage::url($image) }}" alt="Assignment picture" class="h-14 w-14 object-cover rounded-lg border border-gray-200">
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
                     @endif
 
                     <div class="flex flex-wrap items-center gap-3 mb-4">
                         <a href="{{ route('admin.oversight.assignments.submissions', $assignment) }}"
-                            class="inline-flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+                            class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">
                             <i class="fas fa-clipboard-check mr-2"></i> Review &amp; Grade Submissions ({{ $assignment->submissions->count() }})
                         </a>
                     </div>

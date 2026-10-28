@@ -9,14 +9,16 @@
         <p class="text-gray-600 mt-1">Welcome back, {{ auth()->user()->name }}!</p>
     </div>
 
+    @include('partials.affirmation')
+
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">My Classes</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $myClasses }}</p>
                 </div>
-                <i class="fas fa-chalkboard text-indigo-600 text-3xl"></i>
+                <i class="fas fa-chalkboard text-blue-600 text-3xl"></i>
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
@@ -42,7 +44,7 @@
     <!-- Quick Actions -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <a href="{{ route('tutor.schedules.create') }}" class="bg-white rounded-xl shadow-md p-4 text-center hover:shadow-lg transition">
-            <i class="fas fa-plus-circle text-indigo-600 text-2xl mb-2"></i>
+            <i class="fas fa-plus-circle text-blue-600 text-2xl mb-2"></i>
             <p class="text-sm font-medium text-gray-700">New Schedule</p>
         </a>
         <a href="{{ route('tutor.assignments.create') }}" class="bg-white rounded-xl shadow-md p-4 text-center hover:shadow-lg transition">
@@ -71,7 +73,7 @@
                         <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</p>
                     </div>
                     <div class="flex space-x-2">
-                        <a href="{{ route('tutor.attendance.index', $schedule) }}" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded text-sm hover:bg-indigo-200">Attendance</a>
+                        <a href="{{ route('tutor.attendance.index', $schedule) }}" class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200">Attendance</a>
                         @if($schedule->meeting_link)
                             <a href="{{ $schedule->meeting_link }}" target="_blank" class="bg-green-100 text-green-700 px-3 py-1 rounded text-sm hover:bg-green-200">Join</a>
                         @endif

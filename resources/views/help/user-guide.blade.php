@@ -3,6 +3,29 @@
 @section('title', 'User Guide & Manual')
 
 @section('content')
+@php
+    $guideUser = auth()->user();
+
+    /*
+    | The guide is role-aware: each account only sees the sections for screens it
+    | can actually open. The CEO shares the admin area but also owns finance.
+    */
+    $guideIsCeo = $guideUser->isCeo();
+    $guideIsAdmin = $guideUser->isAdministrator();   // administrator or CEO
+    $guideIsTutor = $guideUser->isTutor();
+    $guideIsParent = $guideUser->isParent();
+    $guideIsLearner = $guideUser->isLearner();
+
+    $guideRoleLabel = $guideIsCeo
+        ? 'CEO'
+        : ($guideUser->isAdmin()
+            ? 'Administrator'
+            : ($guideIsTutor ? 'Tutor' : ($guideIsParent ? 'Parent / Guardian' : 'Learner')));
+
+    $guideRoleIcon = $guideIsAdmin
+        ? 'fa-user-shield'
+        : ($guideIsTutor ? 'fa-chalkboard-teacher' : ($guideIsParent ? 'fa-users' : 'fa-user-graduate'));
+@endphp
 <style>
     .guide-section {
         scroll-margin-top: 100px;
@@ -58,42 +81,73 @@
     <!-- Header -->
     <div class="text-center mb-12">
         <h1 class="text-4xl font-bold text-gray-800 mb-4">
-            <i class="fas fa-book-open text-indigo-600 mr-3"></i>User Guide & Manual
+            <i class="fas fa-book-open text-blue-600 mr-3"></i>User Guide & Manual
         </h1>
         <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-            Welcome to <strong>Excellent Scholars Hub (ESH)</strong> — your all-in-one Learning Management System. 
-            This guide will walk you through everything you need to know, from getting started to mastering each feature.
+            Welcome to <strong>Excellent Scholars Hub (ESH)</strong> — your all-in-one Learning Management System.
+            This guide walks you through the screens your role can use, from getting started to the day-to-day tasks.
         </p>
+        <div class="mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800">
+            <i class="fas {{ $guideRoleIcon }}"></i>
+            <span>Showing the guide for your role: {{ $guideRoleLabel }}</span>
+        </div>
+        <p class="mt-2 text-xs text-gray-500">Sections for other roles are hidden — the menu only shows what your account can open.</p>
     </div>
 
     <div class="lg:grid lg:grid-cols-4 lg:gap-8">
         <!-- Table of Contents (Sidebar) -->
         <div class="lg:col-span-1">
             <div class="guide-toc bg-white rounded-xl shadow-md p-6 mb-8 lg:mb-0">
-                <h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-list mr-2 text-indigo-600"></i>Quick Navigation</h3>
+                <h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-list mr-2 text-blue-600"></i>Quick Navigation</h3>
                 <nav class="space-y-2 text-sm">
-                    <a href="#getting-started" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    <a href="#getting-started" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-flag mr-2"></i>Getting Started
                     </a>
-                    <a href="#for-admins" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    @if($guideIsAdmin)
+                    <a href="#for-admins" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-user-shield mr-2"></i>For Administrators
                     </a>
-                    <a href="#for-tutors" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    @endif
+                    @if($guideIsTutor)
+                    <a href="#for-tutors" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-chalkboard-teacher mr-2"></i>For Tutors
                     </a>
-                    <a href="#for-learners" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    @endif
+                    @if($guideIsLearner)
+                    <a href="#for-learners" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-user-graduate mr-2"></i>For Learners (Students)
                     </a>
-                    <a href="#for-parents" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    @endif
+                    @if($guideIsParent)
+                    <a href="#for-parents" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-users mr-2"></i>For Parents/Guardians
                     </a>
-                    <a href="#messages" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
-                        <i class="fas fa-comments mr-2"></i>Messages (Parents ↔ CEO/Admin)
+                    @endif
+                    <a href="#messages" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
+                        <i class="fas fa-comments mr-2"></i>Messages
                     </a>
-                    <a href="#notifications" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    <a href="#notifications" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-bell mr-2"></i>Notifications
                     </a>
-                    <a href="#faq" class="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded transition">
+                    <a href="#whats-new" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
+                        <i class="fas fa-star mr-2 text-orange-500"></i>What's New
+                    </a>
+                    @if($guideIsParent || $guideIsCeo)
+                    <a href="#payments" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
+                        <i class="fas fa-file-invoice-dollar mr-2"></i>{{ $guideIsParent ? 'Fees & Payments' : 'Verifying Fees' }}
+                    </a>
+                    @endif
+                    @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
+                    <a href="#learning-goals" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
+                        <i class="fas fa-bullseye mr-2"></i>Learning Goals
+                    </a>
+                    @endif
+                    @if($guideIsAdmin)
+                    <a href="#broadcasts" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
+                        <i class="fas fa-bullhorn mr-2"></i>Broadcasts
+                    </a>
+                    @endif
+                    <a href="#faq" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-question-circle mr-2"></i>FAQ & Troubleshooting
                     </a>
                 </nav>
@@ -106,7 +160,7 @@
             <!-- ========== GETTING STARTED ========== -->
             <section id="getting-started" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-flag text-indigo-600 mr-2"></i>Getting Started
+                    <i class="fas fa-flag text-blue-600 mr-2"></i>Getting Started
                 </h2>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">What is Excellent Scholars Hub?</h3>
@@ -115,7 +169,7 @@
                     <strong>Administrators</strong>, the <strong>CEO</strong>, <strong>Tutors</strong>,
                     <strong>Learners (Students)</strong>, and <strong>Parents/Guardians</strong> in one seamless platform.
                     It enables class management, assignment submissions, attendance tracking, learning material sharing,
-                    payment recording (CEO only), messaging, and progress monitoring.
+                    payment recording (parents record, the CEO verifies), messaging, and progress monitoring.
                 </p>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">How to Create an Account</h3>
@@ -185,50 +239,90 @@
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Navigating the Platform</h3>
                 <p class="text-gray-600 mb-4">
-                    After logging in, you'll see a navigation bar at the top with links to different sections based on your role. 
-                    The main menu includes your <strong>Dashboard</strong> (home page), along with role-specific sections like 
-                    Classes, Assignments, Materials, etc. You can also access <strong>Notifications</strong> and use the 
-                    <strong>Logout</strong> button to sign out. <strong>Parents/Guardians</strong>, <strong>Administrators</strong>
-                    and the <strong>CEO</strong> additionally get a <strong>Messages</strong> link for private in-app conversations.
-                    On mobile devices, use the hamburger menu (☰) to access navigation links.
+                    After logging in, a <strong>blue navigation menu sits on the left</strong> and the top bar carries
+                    your quick actions (Messages <i class="fas fa-comments"></i>, Notifications <i class="fas fa-bell"></i>,
+                    Help <i class="fas fa-question-circle"></i> and <strong>Logout</strong>). The left menu is split into
+                    labelled groups so it stays short and tidy as new screens are added:
                 </p>
+                <ul class="list-disc list-inside text-sm text-gray-600 mb-4 space-y-1">
+                    <li><strong>Overview</strong> — your dashboard</li>
+                    @if($guideIsAdmin)
+                        <li><strong>Academics</strong> — classes, schedules, attendance, assignment review and materials</li>
+                    @elseif($guideIsTutor)
+                        <li><strong>Teaching</strong> — your schedules, assignments, materials and learning goals</li>
+                    @elseif($guideIsLearner)
+                        <li><strong>My Learning</strong> — your classes, assignments and materials</li>
+                    @endif
+                    @if($guideIsAdmin)
+                        <li><strong>People</strong> — user and role management (administrators only)</li>
+                    @endif
+                    @if($guideIsParent)
+                        <li><strong>Finance</strong> — <em>Fees &amp; Payments</em>: record what you paid and track the balance</li>
+                    @elseif($guideIsCeo)
+                        <li><strong>Finance</strong> — <em>Payments</em> (verify what parents recorded) and <em>Bank accounts</em></li>
+                    @endif
+                    <li><strong>Communication</strong> — messages, notifications{{ $guideIsAdmin ? ' and broadcasts' : '' }}</li>
+                    <li><strong>Support</strong> — this user guide</li>
+                </ul>
+                <div class="tip-box">
+                    <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Click a group heading (e.g. <em>Academics</em>) to fold it away — the menu remembers
+                        your choice next time. On a computer you can also tap the <i class="fas fa-bars"></i> button in the top bar to shrink the menu
+                        to an icon rail and give the page more room. On a phone the menu hides behind the same <i class="fas fa-bars"></i> button and
+                        slides out from the left.</p>
+                </div>
             </section>
 
             <!-- ========== FOR ADMINISTRATORS ========== -->
+            @if($guideIsAdmin)
             <section id="for-admins" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-user-shield text-red-500 mr-2"></i>For Administrators
+                    <i class="fas fa-user-shield text-red-500 mr-2"></i>For Administrators{{ $guideIsCeo ? ' & CEO' : '' }}
                 </h2>
-                <p class="text-gray-600 mb-6">
-                    As an <strong>Administrator</strong> you have full control over the platform: you manage users,
-                    classes, schedules, oversight and notifications. The <strong>CEO</strong> works inside the same admin
-                    area but also has exclusive access to the <strong>Payments</strong> module. Your dashboard gives you
-                    an overview of key platform statistics.
-                </p>
+                @if($guideIsCeo)
+                    <p class="text-gray-600 mb-6">
+                        As the <strong>CEO</strong> you have full control over the platform: you manage users, classes,
+                        schedules, oversight and notifications, and you alone can verify <strong>Payments</strong> and
+                        maintain the school <strong>Bank accounts</strong>. Your dashboard gives you an overview of key
+                        platform statistics.
+                    </p>
+                @else
+                    <p class="text-gray-600 mb-6">
+                        As an <strong>Administrator</strong> you have full control over the platform: you manage users,
+                        classes, schedules, oversight and notifications. <strong>Payments</strong> and
+                        <strong>Bank accounts</strong> stay with the CEO, so they are not part of your menu. Your dashboard
+                        gives you an overview of key platform statistics.
+                    </p>
+                @endif
                 <div class="info-box mb-6">
                     <p class="text-sm"><strong><i class="fas fa-map-signs mr-1"></i> Admin Navigation Tip:</strong></p>
-                    <p class="text-sm mt-1">The admin menu uses <strong>hover dropdowns</strong> to keep the bar compact:</p>
+                    <p class="text-sm mt-1">The admin menu lives in the <strong>left sidebar</strong>, grouped by area:</p>
                     <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                        <li><strong>Academics ▼</strong> — Hover to access <em>Classes</em>, <em>Schedules</em>, and <em>Payments</em> (<strong>CEO only</strong>)</li>
-                        <li><strong>Oversight ▼</strong> — Hover to access <em>Attendance</em>, <em>Assignments</em> (including submission review &amp; grading), and <em>Materials</em></li>
+                        <li><strong>Academics</strong> — <em>Classes</em>, <em>Schedules</em>, <em>Attendance</em>, <em>Assignment Review</em> (including submission review &amp; grading) and <em>Materials</em></li>
+                        @if($guideIsCeo)
+                        <li><strong>Finance</strong> — <em>Payments</em> (verify what parents record) and <em>Bank accounts</em></li>
+                        @endif
+                        <li><strong>Communication</strong> — <em>Messages</em>, <em>Broadcasts</em> and <em>Notifications</em></li>
+                        <li><strong>People</strong> — <em>Users &amp; Roles</em>, and <strong>Learning</strong> — <em>Learning Goals</em></li>
                     </ul>
-                    <p class="text-sm mt-2">Standalone links: <strong>Dashboard</strong>, <strong>Users</strong>, <strong>Messages</strong>, <strong>Notifications</strong></p>
+                    <p class="text-sm mt-2">Standalone links: <strong>Dashboard</strong> and <strong>Help &amp; User Guide</strong>. The current page is highlighted in orange.</p>
                 </div>
 
                 <!-- Admin Dashboard -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-tachometer-alt text-indigo-600 mr-2"></i>1. Admin Dashboard
+                        <i class="fas fa-tachometer-alt text-blue-600 mr-2"></i>1. Admin Dashboard
                     </h3>
                     <p class="text-gray-600 mb-2">Your dashboard displays:</p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
                         <li>Total Users, Tutors, Learners, Classes, and Schedules</li>
-                        <li>A <strong>Payments</strong> stat card — <strong>visible to the CEO only</strong></li>
+                        @if($guideIsCeo)
+                        <li>A <strong>Payments</strong> stat card — for what parents have paid and what is waiting</li>
+                        @endif
                         <li>An <strong>Unread Messages</strong> card that links straight to your inbox</li>
                         <li>Recent Users (newest registrations)</li>
                         <li>Upcoming Classes (next scheduled sessions)</li>
                     </ul>
-                    <p class="text-sm text-gray-500">Navigate to: <strong>Dashboard</strong> in the top menu</p>
+                    <p class="text-sm text-gray-500">Navigate to: <strong>Dashboard</strong> in the left menu</p>
                 </div>
 
                 <!-- Manage Users -->
@@ -241,19 +335,19 @@
                     <p class="font-medium text-gray-700 mb-2">To create a new user:</p>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click <strong>"Users"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click the <strong>"New User"</strong> button.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Fill in the user details (name, email, role, password). For a <strong>Learner</strong>, also pick their <strong>Parent / Guardian</strong> from the extra field that appears below the role.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create User"</strong> to save.</span>
                         </li>
                     </ol>
@@ -279,19 +373,19 @@
                     <p class="font-medium text-gray-700 mb-2">To create a class:</p>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Classes"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"New Class"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Subject</strong>, <strong>Grade Level</strong>, assign a <strong>Tutor</strong>, set <strong>Max Students</strong>, and add a <strong>Description</strong> (optional).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create Class"</strong>.</span>
                         </li>
                     </ol>
@@ -303,15 +397,15 @@
                     <p class="font-medium text-gray-700 mb-2">Enrolling Learners in a Class:</p>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click the <strong>Users icon</strong> (👥) next to the class on the Classes list.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">On the class detail page, select a <strong>Learner</strong> from the dropdown and click <strong>"Enroll"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">To remove a learner, click <strong>"Unenroll"</strong> next to their name.</span>
                         </li>
                     </ol>
@@ -325,52 +419,82 @@
                     <p class="text-gray-600 mb-3">Schedule class sessions with dates, times, and optional meeting links.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Schedules"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"New Schedule"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class</strong> and <strong>Tutor</strong>, set <strong>Start/End Time</strong>, and optionally add a <strong>Meeting Link</strong> (e.g., Zoom/Google Meet URL).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create Schedule"</strong>.</span>
                         </li>
                     </ol>
                 </div>
 
-                <!-- Manage Payments -->
+                <!-- Verify Payments -->
+                @if($guideIsCeo)
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-money-bill text-pink-600 mr-2"></i>5. Managing Payments <span class="text-xs font-bold text-pink-600 align-middle">(CEO ONLY)</span>
+                        <i class="fas fa-money-bill text-pink-600 mr-2"></i>5. Verifying Fees <span class="text-xs font-bold text-pink-600 align-middle">(CEO ONLY)</span>
                     </h3>
                     <div class="info-box mb-3">
                         <p class="text-sm text-gray-700">
-                            <strong>🔒 Access:</strong> Payments are restricted to the <strong>CEO</strong> account. Regular
-                            administrators do not see the Payments link at all, and any attempt to open the payment pages
-                            directly is refused with a <strong>"403 Forbidden"</strong> error.
+                            <strong>🔒 Access:</strong> the school-side payment screens are restricted to the <strong>CEO</strong> account.
+                            Regular administrators do not see the Payments link at all, and any attempt to open the payment pages
+                            directly is refused with a <strong>"403 Forbidden"</strong> error. Parents do not record here — they use
+                            their own <strong>Fees &amp; Payments</strong> screen.
                         </p>
                     </div>
-                    <p class="text-gray-600 mb-3">Record and track payments from learners/parents.</p>
+                    <p class="text-gray-600 mb-3">
+                        Parents record every payment (one parent paying for two or three children is quicker than the CEO entering
+                        a hundred). Your job is to check the money reached the bank or the cash book.
+                    </p>
+
+                    <div class="bg-white border border-blue-200 rounded-lg p-4 mb-4">
+                        <p class="text-sm font-semibold text-gray-800"><i class="fas fa-building-columns text-blue-600 mr-1"></i> School bank accounts — add, switch off, delete</p>
+                        <p class="text-sm text-gray-600 mt-1">Parents see these accounts on their payment form, so keep them exactly as the bank has them.</p>
+                        <ol class="mt-2 space-y-1 text-sm text-gray-600 list-decimal list-inside">
+                            <li>Open <strong>Finance → Bank accounts</strong>.</li>
+                            <li>Use <strong>Add an account</strong> for the bank name, account name and number, plus a note for parents (for example <em>"use your child's full name as narration"</em>). Spaces and dashes in the number are removed for you.</li>
+                            <li><strong>Switch off</strong> an account to hide it from parents without losing its history; switch it back on whenever you need it.</li>
+                            <li><strong>Delete</strong> removes an account completely. Payments already recorded keep the account name and number they were saved with.</li>
+                            <li>The same page shows whether <strong>card payments (Paystack)</strong> are connected; until the keys are added, parents see card as <em>coming soon</em>.</li>
+                        </ol>
+                    </div>
+
+                    <p class="text-sm text-gray-600 mb-2"><strong>How the three methods are confirmed</strong></p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 mb-4 space-y-1">
+                        <li><strong>Bank transfer</strong> — the parent picks the school account the money went into; check the statement for that account and reference.</li>
+                        <li><strong>Cash</strong> — check the cash book and the bursar's receipt before verifying.</li>
+                        <li><strong>Card (future)</strong> — Paystack confirms the money itself, so those records arrive already verified.</li>
+                    </ul>
+
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
-                            <span class="text-gray-600">Log in as the <strong>CEO</strong>, then go to <strong>Academics ▼ → Payments</strong> in the navigation menu.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
+                            <span class="text-gray-600">Log in as the <strong>CEO</strong>, then go to <strong>Finance → Payments</strong>. The orange <strong>Awaiting verification</strong> button filters the queue; the <strong>Method</strong> filter narrows it to transfers or cash.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
-                            <span class="text-gray-600">Click <strong>"Record Payment"</strong>.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
+                            <span class="text-gray-600">Compare the amount, date and reference with the bank statement for a transfer — or with the cash book for cash. Open a record to see where the money was paid and the uploaded receipt.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
-                            <span class="text-gray-600">Select the <strong>User</strong> (who made the payment), choose the <strong>Learner</strong> (if applicable), set <strong>Payment Type</strong> (tuition, registration, etc.), <strong>Amount</strong>, <strong>Method</strong>, and <strong>Status</strong>.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
+                            <span class="text-gray-600">Money is there → click <strong>"Payment received"</strong>. The installment becomes <strong>Verified</strong> and the learner's fee is marked complete once the balance reaches zero.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">4.</span>
+                            <span class="text-gray-600">Money is not there → open the record, choose <strong>"Cannot match it in the bank?"</strong>, type the reason and click <strong>"Reject payment"</strong>. The parent is notified and the balance is untouched.</span>
                         </li>
                     </ol>
                 </div>
+                @endif
 
                 <!-- Send Notifications -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6">
@@ -380,15 +504,15 @@
                     <p class="text-gray-600 mb-3">Send notifications to specific users or broadcast to everyone.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to the <strong>Notifications</strong> section (Admin menu).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"Send Notification"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Enter a <strong>Title</strong>, <strong>Message</strong>, select the <strong>Type</strong> (<strong>Information</strong> for general news, <strong>Reminder</strong> for something still to be done, <strong>Alert</strong> for urgent news), and optionally choose a specific <strong>Recipient</strong> (leave blank to send to all users).</span>
                         </li>
                     </ol>
@@ -397,7 +521,7 @@
                 <!-- Admin Oversight -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-eye text-indigo-600 mr-2"></i>7. Admin Oversight — Monitoring Activities
+                        <i class="fas fa-eye text-blue-600 mr-2"></i>7. Admin Oversight — Monitoring Activities
                     </h3>
                     <p class="text-gray-600 mb-3">
                         As an Administrator (and as the CEO), you have full visibility into what's happening across all
@@ -411,15 +535,15 @@
                     </h4>
                     <ol class="space-y-2 mb-4">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click <strong>"Attendance"</strong> in the admin navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">See a complete table of attendance records — <strong>Learner name</strong>, <strong>Class</strong>, <strong>Date/Time</strong>, <strong>Status</strong> (Present, Absent, Late, Excused), and <strong>Notes</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Use the <strong>"Filter by Class"</strong> dropdown to view attendance for a specific class.</span>
                         </li>
                     </ol>
@@ -429,19 +553,19 @@
                     </h4>
                     <ol class="space-y-2 mb-4">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click <strong>"Assignments"</strong> in the admin navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">View a list of all assignments with their <strong>Title</strong>, <strong>Class</strong>, <strong>Tutor</strong>, <strong>Due Date</strong>, and <strong>Status</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Each assignment card expands to show all <strong>learner submissions</strong> — who submitted, when, their <strong>Score</strong>, and whether it's been <strong>Graded</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Use the <strong>"Filter by Class"</strong> dropdown to focus on a particular class.</span>
                         </li>
                     </ol>
@@ -457,19 +581,19 @@
                     <p class="font-medium text-gray-700 mb-2">Reviewing &amp; Grading a Submission:</p>
                     <ol class="space-y-2 mb-4">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click <strong>"Review &amp; Grade Submissions (n)"</strong> on an assignment card.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"Download"</strong> next to a learner to open their submitted file.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Enter the <strong>Score</strong> (out of the assignment's total points) and optional <strong>Feedback</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Save Grade"</strong> — the submission status changes to <span class="text-green-600 font-medium">Graded</span> and the learner (and their parent) sees the score immediately.</span>
                         </li>
                     </ol>
@@ -479,19 +603,19 @@
                     </h4>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click <strong>"Materials"</strong> in the admin navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Browse all uploaded materials across classes — <strong>Title</strong>, <strong>Class</strong>, <strong>Uploaded By</strong> (tutor name), <strong>File Type</strong>, and <strong>Date</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Click <strong>"Download"</strong> to view any file directly.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Use the <strong>"Filter by Class"</strong> dropdown to see materials for a specific class.</span>
                         </li>
                     </ol>
@@ -501,8 +625,10 @@
                     </div>
                 </div>
             </section>
+            @endif
 
             <!-- ========== FOR TUTORS ========== -->
+            @if($guideIsTutor)
             <section id="for-tutors" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-chalkboard-teacher text-green-600 mr-2"></i>For Tutors
@@ -515,7 +641,7 @@
                 <!-- Tutor Dashboard -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-tachometer-alt text-indigo-600 mr-2"></i>1. Tutor Dashboard
+                        <i class="fas fa-tachometer-alt text-blue-600 mr-2"></i>1. Tutor Dashboard
                     </h3>
                     <p class="text-gray-600 mb-2">Your dashboard shows:</p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
@@ -535,19 +661,19 @@
                     <p class="text-gray-600 mb-3">Create and manage your class sessions.</p>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Schedules"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"New Schedule"</strong> to create a new class session.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Choose the <strong>Class</strong>, set the <strong>Title</strong>, <strong>Start/End Time</strong>, and optionally add a <strong>Meeting Link</strong> (for virtual classes).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">After a session is done, click <strong>"Mark as Completed"</strong> to update its status.</span>
                         </li>
                     </ol>
@@ -564,11 +690,11 @@
                     <p class="text-gray-600 mb-3">Record student attendance for your class sessions.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">On your dashboard or schedules page, click the <strong>"Attendance"</strong> button next to a scheduled session.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">For each enrolled learner, select their attendance status:</span>
                         </li>
                     </ol>
@@ -580,11 +706,11 @@
                     </ul>
                     <ol class="space-y-2" start="3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Optionally add <strong>Notes</strong> for each learner.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Save Attendance"</strong> to submit.</span>
                         </li>
                     </ol>
@@ -599,19 +725,19 @@
                     <p class="font-medium text-gray-700 mb-2">To create an assignment:</p>
                     <ol class="space-y-2 mb-4">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Assignments"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"New Assignment"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Fill in: <strong>Title</strong>, <strong>Description</strong>, select the <strong>Class</strong>, set <strong>Due Date</strong>, and <strong>Total Points</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create Assignment"</strong>.</span>
                         </li>
                     </ol>
@@ -619,11 +745,11 @@
                     <p class="font-medium text-gray-700 mb-2">To grade submissions:</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">On the Assignments list, click <strong>"View (number)"</strong> under Submissions to see all submitted work.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">The submissions table now includes:</span>
                         </li>
                     </ol>
@@ -634,11 +760,11 @@
                     </ul>
                     <ol class="space-y-2" start="3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Review the learner's uploaded file and notes, then enter a <strong>Score</strong> (out of total points) and optionally provide <strong>Feedback</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Grade"</strong> to save the grade. The status will update from "submitted" to "graded".</span>
                         </li>
                     </ol>
@@ -653,24 +779,24 @@
                 <!-- Materials -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-folder-open text-indigo-600 mr-2"></i>5. Uploading Learning Materials
+                        <i class="fas fa-folder-open text-blue-600 mr-2"></i>5. Uploading Learning Materials
                     </h3>
                     <p class="text-gray-600 mb-3">Share documents, presentations, and other resources with your learners.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Materials"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Click <strong>"Upload Material"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Select the <strong>Class</strong>, enter a <strong>Title</strong> and optional <strong>Description</strong>, then upload the <strong>File</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Upload"</strong> to make it available to learners.</span>
                         </li>
                     </ol>
@@ -679,8 +805,10 @@
                     </div>
                 </div>
             </section>
+            @endif
 
             <!-- ========== FOR LEARNERS ========== -->
+            @if($guideIsLearner)
             <section id="for-learners" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-user-graduate text-blue-600 mr-2"></i>For Learners (Students)
@@ -693,7 +821,7 @@
                 <!-- Learner Dashboard -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-tachometer-alt text-indigo-600 mr-2"></i>1. Learner Dashboard
+                        <i class="fas fa-tachometer-alt text-blue-600 mr-2"></i>1. Learner Dashboard
                     </h3>
                     <p class="text-gray-600 mb-2">Your dashboard shows an overview of:</p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
@@ -717,15 +845,15 @@
                     <p class="text-gray-600 mb-3">View your enrolled classes and their schedules.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"My Classes"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">You'll see each class with its subject, grade level, and description.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Under each class, view the <strong>Upcoming Schedules</strong> with dates, times, and a <strong>"Join Class"</strong> button if the session has a meeting link.</span>
                         </li>
                     </ol>
@@ -741,23 +869,23 @@
                     <p class="font-medium text-gray-700 mb-2">To submit an assignment:</p>
                     <ol class="space-y-2 mb-4">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Assignments"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">You'll see a list of assignments. Each card shows the <strong>Title</strong>, <strong>Class</strong>, <strong>Due Date</strong>, and <strong>Points</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">For unsubmitted assignments, click <strong>"Submit Assignment"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Upload your <strong>file</strong> and optionally add <strong>Notes</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">5.</span>
+                            <span class="text-blue-600 font-bold">5.</span>
                             <span class="text-gray-600">Click <strong>"Submit"</strong> to send your work to the tutor.</span>
                         </li>
                     </ol>
@@ -778,15 +906,15 @@
                     <p class="text-gray-600 mb-3">Download and review materials shared by your tutors.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to <strong>"Materials"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Browse through the available materials. Each entry shows the <strong>Title</strong>, <strong>File Type</strong> (PDF, DOC, etc.), <strong>Class</strong>, <strong>Description</strong>, <strong>File Size</strong>, and upload date.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Click the <strong>"Download"</strong> button to open or save the file.</span>
                         </li>
                     </ol>
@@ -800,15 +928,15 @@
                     <p class="text-gray-600 mb-3">When a tutor schedules a class with a meeting link:</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Go to your <strong>Dashboard</strong> or <strong>My Classes</strong> page.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Find the upcoming session with a green <strong>"Join"</strong> button.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Click <strong>"Join"</strong> or <strong>"Join Class"</strong> — the meeting link will open in a new tab.</span>
                         </li>
                     </ol>
@@ -817,16 +945,19 @@
                     </div>
                 </div>
             </section>
+            @endif
 
             <!-- ========== FOR PARENTS ========== -->
+            @if($guideIsParent)
             <section id="for-parents" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-users text-yellow-600 mr-2"></i>For Parents / Guardians
                 </h2>
                 <p class="text-gray-600 mb-6">
                     As a <strong>Parent or Guardian</strong>, you can monitor your child's academic progress, view their
-                    attendance records, check assignment scores, see upcoming class schedules, and send a private message
-                    to the school's CEO or an administrator — all from your dashboard.
+                    attendance records, check assignment scores, see upcoming class schedules, <strong>record the fees you
+                    have paid</strong> (the school verifies them with the bank) and send a private message to the school's
+                    CEO or an administrator — all from your dashboard.
                 </p>
 
                 <div class="info-box mb-6">
@@ -840,7 +971,7 @@
                 <!-- Parent Dashboard -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-tachometer-alt text-indigo-600 mr-2"></i>1. Parent Dashboard
+                        <i class="fas fa-tachometer-alt text-blue-600 mr-2"></i>1. Parent Dashboard
                     </h3>
                     <p class="text-gray-600 mb-3">
                         When you log in, your dashboard displays cards for each child linked to your account. 
@@ -851,6 +982,7 @@
                         <li>Four clickable counters: <strong>Class Schedule</strong> (upcoming sessions), <strong>Assignments Pending</strong>,
                             <strong>Assignments Completed</strong> and <strong>Materials Shared</strong></li>
                         <li>An <strong>attendance rate</strong> with the number of sessions attended</li>
+                        <li>A <strong>fees line</strong> — verified amount, outstanding balance and any pending submissions — that opens <strong>Fees &amp; Payments</strong></li>
                         <li>A red <strong>"N missed"</strong> badge whenever a tutor has marked your child absent</li>
                         <li>A <strong>"View Full Details"</strong> button that opens the child's report</li>
                         <li>A <strong>"Message the School"</strong> button (with a red badge when the school has replied unread)</li>
@@ -898,7 +1030,7 @@
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                                <i class="fas fa-folder-open text-indigo-500 mr-2"></i>Materials
+                                <i class="fas fa-folder-open text-blue-500 mr-2"></i>Materials
                             </h4>
                             <p class="text-sm text-gray-600">Every material shared with your child's classes — title, class,
                                 tutor, size and date — with a <strong>Download</strong> button.</p>
@@ -918,10 +1050,50 @@
                     </div>
                 </div>
 
+                <!-- Parent Fees & Payments -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-file-invoice-dollar text-orange-500 mr-2"></i>3. Fees &amp; Payments
+                    </h3>
+                    <p class="text-gray-600 mb-3">
+                        You record the payments you have made; the school checks the bank and confirms them. A parent paying
+                        for two or three children can do it all from one screen.
+                    </p>
+                    <ol class="space-y-2 mb-3">
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">1.</span>
+                            <span class="text-gray-600">Open <strong>Finance → Fees &amp; Payments</strong> (or the fee line on your child's dashboard card) and click <strong>"Record a payment"</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">2.</span>
+                            <span class="text-gray-600">Choose the <strong>child</strong>, the <strong>term</strong> and — if it applies — the <strong>class</strong>. Only your own children and their classes are offered.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">3.</span>
+                            <span class="text-gray-600">
+                                Choose <strong>how you paid</strong>:
+                                <span class="mt-1 block text-xs text-gray-600">
+                                    <span class="block"><strong>Bank transfer</strong> — the school accounts are listed with a <strong>Copy</strong> button. Transfer the exact amount, then pick the account you used (this is required).</span>
+                                    <span class="block"><strong>Cash</strong> — pay at the school office, keep the bursar's receipt and upload a photo of it.</span>
+                                    <span class="block"><strong>Card</strong> — Paystack is coming soon; please use transfer or cash for now.</span>
+                                </span>
+                                Then enter the <strong>total fee</strong> (if you know it), the <strong>amount paid now</strong>, the <strong>reference</strong> (transfer narration or bursar's receipt number), attach the receipt (PDF or image, 5 MB) and click <strong>"Submit for verification"</strong>.
+                            </span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">4.</span>
+                            <span class="text-gray-600">The payment shows as <strong>Pending verification</strong> — the CEO checks transfers against the bank statement and cash against the cash book. Verified money reduces the balance, and a fee whose balance reaches zero is marked <strong>Payment complete</strong>.</span>
+                        </li>
+                    </ol>
+                    <div class="tip-box">
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If the school cannot match a payment with the bank or cash book, it is marked <strong>Rejected</strong> and the reason is shown next to it — correct the details and submit it again. Receipts stay private: only you and the school can download them. The <strong>Finance → Fees &amp; Payments</strong> page also lists the school's active bank accounts, so you can pay before you start a record.</p>
+                    </div>
+                </div>
+
                 <!-- Parent Messaging -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mt-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-comments text-indigo-600 mr-2"></i>3. Messaging the School
+                        <i class="fas fa-comments text-blue-600 mr-2"></i>4. Messaging the School
                     </h3>
                     <p class="text-gray-600 mb-3">
                         You can contact the school directly from inside the app — no external email needed. Messages are
@@ -929,19 +1101,19 @@
                     </p>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">1.</span>
+                            <span class="text-blue-600 font-bold">1.</span>
                             <span class="text-gray-600">Click <strong>"Message the School"</strong> on your dashboard, or <strong>"Messages"</strong> in the navigation menu.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">2.</span>
+                            <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">Under <strong>"School Administration"</strong>, pick the <strong>CEO</strong> or an <strong>administrator</strong> from the list.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">3.</span>
+                            <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Type your message (up to <strong>2,000 characters</strong>) and click <strong>"Send"</strong>.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
-                            <span class="text-indigo-600 font-bold">4.</span>
+                            <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Replies appear in the same conversation thread. A red <strong>"n new"</strong> badge shows unread replies, and the school also receives a notification in their bell menu.</span>
                         </li>
                     </ol>
@@ -950,32 +1122,39 @@
                     </div>
                 </div>
             </section>
+            @endif
 
             <!-- ========== MESSAGES ========== -->
             <section id="messages" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-comments text-indigo-600 mr-2"></i>Messages — Parents ↔ CEO / Admin
+                    <i class="fas fa-comments text-blue-600 mr-2"></i>Messages — everyone connected to the school
                 </h2>
                 <p class="text-gray-600 mb-4">
-                    The <strong>Messages</strong> feature gives parents/guardians and the school leadership a private,
-                    in-app channel. Messages stay inside Excellent Scholars Hub, so there is a clear record of every
-                    conversation for both sides.
+                    The <strong>Messages</strong> feature gives every role a private, in-app channel. Messages stay inside
+                    Excellent Scholars Hub, so there is a clear record of every conversation for both sides. Administrators
+                    can also send one message to a whole category — see <a href="#broadcasts" class="text-blue-700 underline">Broadcasts</a>.
                 </p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="bg-gray-50 border rounded-lg p-4">
                         <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                            <i class="fas fa-users text-yellow-600 mr-2"></i> Who can message
+                            <i class="fas fa-users text-orange-600 mr-2"></i> Who can message
                         </h4>
                         <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                            @if($guideIsParent)
                             <li><strong>Parents/Guardians</strong> can message the <strong>CEO</strong> and every <strong>administrator</strong>.</li>
-                            <li><strong>CEO</strong> and <strong>administrators</strong> can reply to any <strong>parent/guardian</strong>.</li>
-                            <li><strong>Tutors</strong> and <strong>learners</strong> do not have access to Messages.</li>
+                            @elseif($guideIsLearner)
+                            <li><strong>Learners</strong> can message the school and their own <strong>tutors</strong>.</li>
+                            @elseif($guideIsTutor)
+                            <li><strong>Tutors</strong> can message the school and the <strong>learners in their classes</strong>.</li>
+                            @elseif($guideIsAdmin)
+                            <li><strong>CEO</strong> and <strong>administrators</strong> can message parents, tutors, learners and each other.</li>
+                            @endif
                         </ul>
                     </div>
                     <div class="bg-gray-50 border rounded-lg p-4">
                         <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                            <i class="fas fa-bell text-indigo-600 mr-2"></i> Notifications built in
+                            <i class="fas fa-bell text-blue-600 mr-2"></i> Notifications built in
                         </h4>
                         <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>Every message creates a notification for the recipient.</li>
@@ -985,38 +1164,59 @@
                     </div>
                 </div>
 
+                @if($guideIsParent)
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">For Parents — Starting a Conversation</h3>
                 <ol class="space-y-2 mb-6">
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">1.</span>
+                        <span class="text-blue-600 font-bold">1.</span>
                         <span class="text-gray-600">Click <strong>"Message the School"</strong> on your dashboard or <strong>"Messages"</strong> in the menu.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">2.</span>
+                        <span class="text-blue-600 font-bold">2.</span>
                         <span class="text-gray-600">Choose the <strong>CEO</strong> (purple badge) or an <strong>administrator</strong> (red badge) from <strong>"School Administration"</strong>.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">3.</span>
+                        <span class="text-blue-600 font-bold">3.</span>
                         <span class="text-gray-600">Write your question or update and click <strong>"Send"</strong>. Your message history stays on this page for reference.</span>
                     </li>
                 </ol>
+                @endif
 
+                @if($guideIsTutor || $guideIsLearner)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Starting a conversation</h3>
+                <ol class="space-y-2 mb-6">
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-blue-600 font-bold">1.</span>
+                        <span class="text-gray-600">Click <strong>"Messages"</strong> in the menu — the red badge shows unread replies.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-blue-600 font-bold">2.</span>
+                        <span class="text-gray-600">Pick a contact: {{ $guideIsLearner ? 'the school, or one of your own tutors' : 'the school, or a learner in one of your classes' }}.</span>
+                    </li>
+                    <li class="flex items-start gap-2 text-sm">
+                        <span class="text-blue-600 font-bold">3.</span>
+                        <span class="text-gray-600">Write the message and click <strong>"Send"</strong>. Opening a thread marks it as read; replies stay in the same conversation.</span>
+                    </li>
+                </ol>
+                @endif
+
+                @if($guideIsAdmin)
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">For the CEO / Administrators — Replying to Parents</h3>
                 <ol class="space-y-2 mb-4">
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">1.</span>
+                        <span class="text-blue-600 font-bold">1.</span>
                         <span class="text-gray-600">Click <strong>"Messages"</strong> in the admin menu — a red badge shows how many unread parent messages you have.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">2.</span>
+                        <span class="text-blue-600 font-bold">2.</span>
                         <span class="text-gray-600">Under <strong>"Parents &amp; Guardians"</strong>, the list shows each parent's last message preview, when it was sent, and their unread count.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">3.</span>
+                        <span class="text-blue-600 font-bold">3.</span>
                         <span class="text-gray-600">Open a parent to read the full thread (messages are marked read), then reply in the box at the bottom.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
-                        <span class="text-indigo-600 font-bold">4.</span>
+                        <span class="text-blue-600 font-bold">4.</span>
                         <span class="text-gray-600">The admin dashboard also shows an <strong>"Unread Messages"</strong> card linking straight to your inbox.</span>
                     </li>
                 </ol>
@@ -1028,12 +1228,13 @@
                         the contact list, so deactivated users cannot start or receive conversations.
                     </p>
                 </div>
+                @endif
             </section>
 
             <!-- ========== NOTIFICATIONS ========== -->
             <section id="notifications" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-bell text-indigo-600 mr-2"></i>Notifications
+                    <i class="fas fa-bell text-blue-600 mr-2"></i>Notifications
                 </h2>
                 <p class="text-gray-600 mb-4">
                     The notification system keeps everyone informed. Administrators can send information, reminders, 
@@ -1041,7 +1242,7 @@
                 </p>
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Notification Types</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
-                    <li><strong>Information</strong> (<i class="fas fa-info-circle text-indigo-600"></i> indigo badge) &mdash; general news the recipient should know. No action required.</li>
+                    <li><strong>Information</strong> (<i class="fas fa-info-circle text-blue-600"></i> blue badge) &mdash; general news the recipient should know. No action required.</li>
                     <li><strong>Reminder</strong> (<i class="fas fa-clock text-amber-600"></i> amber badge) &mdash; a nudge about something still to be done, usually with a deadline.</li>
                     <li><strong>Alert</strong> (<i class="fas fa-exclamation-triangle text-red-600"></i> red badge) &mdash; urgent or exceptional news that needs immediate attention.</li>
                     <li><strong>Message</strong> (grey badge) &mdash; created automatically when someone sends you a direct message; administrators cannot pick it.</li>
@@ -1057,7 +1258,7 @@
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Managing Your Notifications</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
-                    <li><strong>Unread notifications</strong> are highlighted with a coloured left border that matches the type (indigo, amber or red)</li>
+                    <li><strong>Unread notifications</strong> are highlighted with a coloured left border that matches the type (blue, amber or red)</li>
                     <li>Use the <strong>All</strong>, <strong>Information</strong>, <strong>Reminder</strong> and <strong>Alert</strong> tabs at the top of the page to show only one type</li>
                     <li>Click <strong>"Mark read"</strong> on individual notifications to dismiss them</li>
                     <li>Use <strong>"Mark all as read"</strong> to clear all notifications at once</li>
@@ -1071,80 +1272,520 @@
                 </ul>
             </section>
 
+            <!-- ========== WHAT'S NEW ========== -->
+            <section id="whats-new" class="guide-section bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-star text-orange-500 mr-2"></i>What's new in this release
+                </h2>
+                <p class="text-gray-600 mb-6">
+                    Everything below was added after the last review meeting. Each item links to the detailed section
+                    further down this guide.
+                </p>
+
+                <div class="overflow-x-auto mb-8">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Area</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">What changed</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Who</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @if($guideIsParent || $guideIsCeo)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Fees</td><td class="px-4 py-3 text-gray-600">Parents now record their own payments (installments, receipt upload, per term and per class) and choose <strong>bank transfer</strong>, <strong>cash</strong> or <strong>card</strong>; the CEO checks the bank or cash book and clicks <strong>Payment received</strong> — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">Parents, CEO</td></tr>
+                            @endif
+                            @if($guideIsCeo)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Bank accounts</td><td class="px-4 py-3 text-gray-600">New <strong>Finance → Bank accounts</strong> screen: the CEO adds, edits, switches off or deletes the accounts parents transfer into. Only switched-on accounts appear on the parent form, with a copy-number button — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">CEO</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Messages</td><td class="px-4 py-3 text-gray-600">Categorised sending to parents, tutors, students, one class or everyone — see <a href="#broadcasts" class="text-blue-700 underline">Broadcasts</a>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
+                            @if($guideIsTutor || $guideIsLearner)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Inbox</td><td class="px-4 py-3 text-gray-600">Tutors and learners now have their own inbox and can reply.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners</td></tr>
+                            @endif
+                            @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learning goals</td><td class="px-4 py-3 text-gray-600">Tutors upload goals; the school shares them with parents and tutors — see <a href="#learning-goals" class="text-blue-700 underline">Learning goals</a>.</td><td class="px-4 py-3 text-gray-600">Tutors, Admin, CEO, Parents</td></tr>
+                            @endif
+                            @if($guideIsLearner)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learner panel</td><td class="px-4 py-3 text-gray-600">"Live now / Up next" panel at the top of the dashboard — see <a href="#dashboard-extras" class="text-blue-700 underline">Dashboard extras</a>.</td><td class="px-4 py-3 text-gray-600">Learners</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly count of classes per tutor with a month picker and a six-month trend.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmation</td><td class="px-4 py-3 text-gray-600">A rotating "affirmation of the day" card on every dashboard.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            @if($guideIsAdmin || $guideIsTutor || $guideIsLearner || $guideIsParent)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Assignments</td><td class="px-4 py-3 text-gray-600">Tutors can attach up to six pictures to an assignment.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners, Parents</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Classes</td><td class="px-4 py-3 text-gray-600">Maximum students is now optional (blank = unlimited).</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Website</td><td class="px-4 py-3 text-gray-600">Public landing page with sliders, programmes, testimonials and registration.</td><td class="px-4 py-3 text-gray-600">Visitors</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Branding</td><td class="px-4 py-3 text-gray-600">Blue, white and orange colour scheme across the whole platform.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Passwords</td><td class="px-4 py-3 text-gray-600">Forgot-password reset by email (one-time link, 60 minutes), plus a school-administration fallback that generates the link from <strong>Users</strong> when mail is not configured.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Help</td><td class="px-4 py-3 text-gray-600">This guide is now role-aware: it only shows the sections and FAQ answers for the screens your account can open.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($guideIsTutor || $guideIsAdmin)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Pictures on assignments</h3>
+                <ol class="space-y-2 mb-4">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">As a tutor open <strong>Assignments → New Assignment</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Fill in the title, class, due date and description as usual.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Under <strong>Pictures</strong> select up to six images (JPG, PNG or WebP, 2 MB each), then click <strong>Create Assignment</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Thumbnails appear on the learner's assignment cards, in the tutor's assignment list and in administrator oversight.</span></li>
+                </ol>
+                @endif
+
+                @if($guideIsAdmin)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Classes without a maximum</h3>
+                <p class="text-gray-600 mb-4">
+                    On <strong>Classes → Create / Edit</strong> you can now leave <strong>Max Students</strong> blank. Such a
+                    class shows <strong>No limit</strong> in the list and detail pages, and enrolment is never blocked by capacity.
+                </p>
+                @endif
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Public website</h3>
+                <p class="text-gray-600 mb-6">
+                    Visitors who are not signed in now land on the school's public page: a rotating hero slider, programme
+                    cards built from your active classes, how-it-works steps, testimonials, the about/contact block and a
+                    <strong>Register for classes</strong> button. Signed-in users still go straight to their dashboard.
+                </p>
+
+                @if($guideIsParent || $guideIsCeo)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Parents record fees, the CEO verifies</h3>
+                <p class="text-gray-600 mb-4">
+                    @if($guideIsParent)
+                        You now record your own payments from <strong>Finance → Fees &amp; Payments</strong>, choosing only
+                        your own children and that child's classes. A submission waits as <strong>Pending verification</strong>
+                        until the CEO checks the bank statement (transfer) or the cash book (cash); it then becomes
+                        <strong>Verified</strong> and the fee is marked complete once its balance reaches zero. Each payment
+                        records <strong>how</strong> you paid: a <strong>bank transfer</strong> into one of the school
+                        accounts, <strong>cash</strong> at the office, or <strong>card</strong> (Paystack, coming soon).
+                    @else
+                        The <strong>Record Payment</strong> button has left your screen. Parents now enter what they paid from
+                        <strong>Finance → Fees &amp; Payments</strong>, choosing only their own children and that child's classes;
+                        the submission waits as <strong>Pending verification</strong>. You open
+                        <strong>Finance → Payments</strong>, check the amount and reference against the bank or cash book and
+                        click <strong>Payment received</strong> — the installment becomes <strong>Verified</strong> and the fee
+                        is marked complete once its balance reaches zero. Anything that cannot be matched is rejected with a
+                        reason, which the parent sees on their fee screen. Each payment also records <strong>how</strong> the
+                        money was paid: a <strong>bank transfer</strong> into one of the school accounts, <strong>cash</strong>
+                        at the office, or <strong>card</strong> (Paystack, coming soon). Maintain the transfer accounts under
+                        <strong>Finance → Bank accounts</strong>.
+                    @endif
+                </p>
+                @endif
+            </section>
+
+
+            <!-- ========== PAYMENTS, PART PAYMENTS & RECEIPTS ========== -->
+            @if($guideIsParent || $guideIsCeo)
+            <section id="payments" class="guide-section bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-file-invoice-dollar text-orange-500 mr-2"></i>Payments, part payments &amp; receipts
+                </h2>
+                <div class="warning-box">
+                    @if($guideIsParent)
+                        <strong>You record it, the school confirms it.</strong> Submit what you paid and upload the receipt;
+                        the <strong>CEO</strong> checks the bank statement (transfer) or the cash book (cash) and verifies it.
+                        Only verified installments reduce the balance.
+                    @else
+                        <strong>Two screens, one flow.</strong> Parents record what they paid and upload the receipt; you
+                        check the bank statement (transfer) or the cash book (cash) and verify it. Administrators still
+                        cannot open any payment screen — the menu item and every payment URL stay closed to them.
+                    @endif
+                </div>
+
+                @if($guideIsParent)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Step 1 — record your payment</h3>
+                <ol class="space-y-2 mb-4">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Fees &amp; Payments</strong> and click <strong>Record a payment</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Choose one of <strong>your own children</strong> — other families' children are never listed — and optionally that child's <strong>class</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Enter the <strong>payment type</strong>, the <strong>term</strong>, the <strong>total fee</strong> (if known) and the <strong>amount paid now</strong>. A single installment can never be larger than the total fee.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Choose <strong>how you paid</strong>: bank transfer (the school accounts are listed with a copy button, and you must pick the one you used), cash at the office, or card — which stays disabled as <em>coming soon</em> until Paystack is connected. Then add the reference (transfer narration or bursar's receipt number), the date and the <strong>receipt or teller slip</strong> (PDF or image, up to 5 MB).</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">On submit the record is stored as <strong>Pending verification</strong> — you can never mark your own payment as paid.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">6.</span><span class="text-gray-600">The school is notified: <em>"Payment awaiting verification"</em>, with the amount, child and fee.</span></li>
+                </ol>
+                @endif
+
+                @if($guideIsCeo)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Step 2 — the CEO verifies it against the bank</h3>
+                <ol class="space-y-2 mb-6">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Payments</strong> and click <strong>Awaiting verification</strong> to see the queue.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Compare the amount, date and reference with the bank statement for a transfer (the record shows the account it was paid into) — or with the cash book for cash. The parent's receipt is downloadable from the record.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Money is there → click <strong>Payment received</strong>. The installment becomes <strong>Verified</strong> (status <em>completed</em>), the fee balance drops with it, and a zero balance marks the learner's fee <strong>Payment complete</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Money is not there → open the record, use <strong>Cannot match it in the bank?</strong>, type the reason and click <strong>Reject payment</strong>. The parent is notified, the record turns <strong>Rejected</strong> and the balance is untouched.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">Both actions stamp <strong>who verified or rejected it and when</strong>, shown in the <em>Check</em> column and on the detail page.</span></li>
+                </ol>
+                @endif
+
+                @if($guideIsParent)
+                <p class="text-gray-600 mb-6">
+                    To add another part payment for the same fee, submit again with the same child, term and class.
+                    Every record is one installment; the balance updates automatically once it is verified.
+                </p>
+                @endif
+
+                @if($guideIsCeo)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Reading the CEO payments screen</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-1 mb-6">
+                    <li><strong>Total Recorded</strong> — everything verified (completed), across all fees.</li>
+                    <li><strong>Pending</strong> — money parents reported that is still waiting for the bank check; the tile counts the submissions.</li>
+                    <li><strong>Outstanding</strong> — the remaining balance of every fee, worked out per learner, term and class.</li>
+                    <li><strong>Receipts Uploaded</strong> — how many records have a downloadable receipt.</li>
+                    <li>The <strong>Check</strong> column holds the <strong>Payment received</strong> button for pending rows and, afterwards, who verified or rejected the record and when.</li>
+                    <li>Use the filters (learner, term, class, status, <strong>method</strong>) and click <strong>Filter</strong>; <strong>Reset</strong> clears them.</li>
+                </ul>
+
+                <p class="text-gray-600 mb-6">
+                    <strong>Where the money went.</strong> A transfer shows the school account it was paid into
+                    (for example <em>GTBank · 0123456789</em>); cash shows the school office. Those details are saved
+                    with the payment, so renaming, switching off or deleting an account later never rewrites history.
+                    Maintain the accounts under <strong>Finance → Bank accounts</strong>.
+                </p>
+                @endif
+
+                @if($guideIsParent)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">What the parent sees</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-1 mb-6">
+                    <li>Each child has a card per fee (<em>term · class</em>) with the total fee, the verified amount, the balance and a progress bar.</li>
+                    <li><strong>Pending verification</strong> — submitted, waiting for the CEO; it never reduces the balance yet.</li>
+                    <li><strong>Verified</strong> — confirmed by the school; it counts towards the fee immediately.</li>
+                    <li><strong>Rejected</strong> — the reason is shown next to the record so you can correct and resubmit.</li>
+                    <li><strong>Payment complete</strong> — a green badge appears as soon as the fee's balance reaches zero.</li>
+                </ul>
+                @endif
+
+                @if($guideIsCeo)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">The payment detail page</h3>
+                <p class="text-gray-600 mb-3">
+                    Click any reference number to open it. You get the full record, the pending bank-check panel with the
+                    verify and reject actions, the fee balance with a progress bar, the receipt download, and the
+                    <strong>installment history</strong> for that same fee with the current record highlighted.
+                </p>
+                @endif
+
+                <div class="tip-box">
+                    <strong>Receipts are private.</strong> They are stored outside the public folders.
+                    @if($guideIsParent)
+                        Only you and the school can download the receipts you upload for your own children.
+                    @else
+                        You can download every receipt from the payment screens.
+                    @endif
+                </div>
+            </section>
+            @endif
+
+
+            <!-- ========== LEARNING GOALS ========== -->
+            @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
+            <section id="learning-goals" class="guide-section bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-bullseye text-orange-500 mr-2"></i>Learning goals
+                </h2>
+                <p class="text-gray-600 mb-4">
+                    @if($guideIsParent)
+                        Your child's tutor records what they are working towards. The school decides which goals are
+                        shared with parents — nothing reaches you automatically.
+                    @elseif($guideIsTutor)
+                        You record what each learner is working towards. Administrators and the CEO review those goals and
+                        decide which ones are shared with the parent and/or you — nothing reaches a parent automatically.
+                    @else
+                        Tutors record what each learner is working towards. You review those goals and decide which ones
+                        are shared with the parent and/or the tutor — nothing reaches a parent automatically.
+                    @endif
+                </p>
+
+                @if($guideIsTutor)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">For tutors — uploading a goal</h3>
+                <ol class="space-y-2 mb-6">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Goals</strong> in the menu and click <strong>New goal</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Enter the goal (for example "Read one chapter aloud each week") and, optionally, what success looks like.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Choose the <strong>learner</strong>, the <strong>class</strong>, or both, plus the term.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Attach a PDF, Word document or image if useful (maximum 8 MB) and click <strong>Save goal</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">The sharing column shows <strong>Pending review</strong> until the school shares it.</span></li>
+                </ol>
+                <div class="warning-box">
+                    You can delete a goal you uploaded at any time. Deleting it also removes the attachment and takes it
+                    away from any parent who could already see it.
+                </div>
+                @endif
+
+                @if($guideIsAdmin)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">For administrators and the CEO — sharing</h3>
+                <ol class="space-y-2 mb-6">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Goals</strong> in the admin menu. The tiles show all goals, how many are shared with parents, with tutors, and how many are awaiting review.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Filter by tutor or by sharing status if the list is long.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">In the <strong>Share with</strong> column tick <strong>Parent</strong> and/or <strong>Tutor</strong>, then click <strong>Save</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">The date and the name of the person who shared it are recorded in <strong>Last shared</strong>. Unticking both switches withdraws the goal.</span></li>
+                </ol>
+                @endif
+
+                @if($guideIsParent)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">For parents — where to find them</h3>
+                <p class="text-gray-600 mb-3">
+                    On the parent dashboard open a child and choose the <strong>Learning Goals</strong> tab (the orange
+                    counter). Only goals the school shared with parents appear there, showing the goal, the target, the
+                    tutor, the term and any attachment.
+                </p>
+                @endif
+
+                @if($guideIsTutor)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">For tutors — goals shared with you</h3>
+                <p class="text-gray-600">
+                    The bottom of the <strong>Goals</strong> screen lists goals another tutor wrote and the school shared
+                    with you, including who shared it and when.
+                </p>
+                @endif
+            </section>
+            @endif
+
+
+            <!-- ========== CATEGORISED MESSAGES / BROADCASTS ========== -->
+            @if($guideIsAdmin)
+            <section id="broadcasts" class="guide-section bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-bullhorn text-orange-500 mr-2"></i>Categorised messages (broadcasts)
+                </h2>
+                <p class="text-gray-600 mb-4">
+                    Instead of writing to one parent at a time, administrators and the CEO can send the same message to a
+                    whole category: <strong>Parents</strong>, <strong>Tutors</strong>, <strong>Students</strong>,
+                    <strong>a single class</strong>, or <strong>everyone</strong>. Each recipient gets a private copy in their
+                    inbox plus a notification — and can reply privately.
+                </p>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Sending a categorised message</h3>
+                <ol class="space-y-2 mb-6">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Go to <strong>Messages → Message a category</strong> (or <strong>Broadcasts → New message</strong>).</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Choose the audience. The card shows how many active accounts will receive it.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">For <strong>A single class</strong>, pick the class. The message reaches the learners, their linked parents and the class tutor.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Type the message (maximum 2,000 characters) and click <strong>Send message</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">The confirmation tells you exactly how many recipients were reached.</span></li>
+                </ol>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Tracking what you sent</h3>
+                <ul class="list-disc list-inside text-gray-600 space-y-1 mb-6">
+                    <li><strong>Broadcasts</strong> lists every send with its audience, message preview, recipient count and how many copies have been read.</li>
+                    <li>The three tiles count broadcasts sent, delivered copies and unread copies.</li>
+                    <li>Replies from recipients arrive as normal one-to-one conversations in <strong>Messages</strong>.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Reading a message as a tutor or learner</h3>
+                <p class="text-gray-600 mb-3">
+                    Tutors and learners now have their own <strong>Messages</strong> menu (with an unread badge). Learners can
+                    message the school and their own tutors; tutors can message the school and the learners in their classes.
+                    Anything sent to a category appears in the same inbox.
+                </p>
+
+                <div class="info-box">
+                    <strong>Filtering contacts:</strong> administrators can switch between <strong>Everyone</strong>,
+                    <strong>Parents / Guardians</strong>, <strong>Tutors</strong> and <strong>Students</strong> at the top of the inbox.
+                    A badge shows how many broadcasts you have sent.
+                </div>
+            </section>
+            @endif
+
+
+            <!-- ========== DASHBOARD EXTRAS ========== -->
+            <section id="dashboard-extras" class="guide-section bg-white rounded-xl shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                    <i class="fas fa-sun text-orange-500 mr-2"></i>Dashboard extras
+                </h2>
+
+                @if($guideIsLearner)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Now / Up next panel</h3>
+                <p class="text-gray-600 mb-3">
+                    The very top of the learner dashboard now highlights the class that matters right now:
+                </p>
+                <ul class="list-disc list-inside text-gray-600 space-y-1 mb-6">
+                    <li><strong>Live now</strong> (orange panel) — a session has already started and has not ended yet. Click <strong>Join class</strong> to open the meeting link.</li>
+                    <li><strong>Up next</strong> (blue panel) — no session is running, so the nearest future session is shown with how long until it starts.</li>
+                    <li>If no meeting link has been added yet the panel says so, and the session still appears in <strong>Upcoming Sessions</strong> below.</li>
+                </ul>
+                @endif
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Affirmation of the day</h3>
+                <p class="text-gray-600 mb-3">
+                    Every dashboard (administrator, tutor, learner and parent) carries a short encouragement card with the
+                    date. The message changes automatically each day, so there is nothing to set up.
+                </p>
+
+                @if($guideIsAdmin)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">Monthly classes per tutor</h3>
+                <ol class="space-y-2 mb-4">
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open the <strong>Admin</strong> or <strong>CEO dashboard</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">In the <strong>Classes per tutor</strong> card, pick a month and click <strong>View</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Each tutor gets a bar showing how many sessions they taught in that month; the strip below shows the last six months.</span></li>
+                </ol>
+                <div class="tip-box">
+                    The count is based on scheduled sessions, so a class that was cancelled still counts for the month it was scheduled in.
+                </div>
+                @endif
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Colours</h3>
+                <p class="text-gray-600">
+                    The platform uses the school colours: <strong class="text-blue-700">blue</strong> for navigation and main actions,
+                    <strong>white</strong> for cards and content, and <strong class="text-orange-600">orange</strong> for highlights,
+                    secondary actions and "live now" alerts. Red is reserved for today's classes, warnings and errors.
+                </p>
+            </section>
+
+
             <!-- ========== FAQ & TROUBLESHOOTING ========== -->
             <section id="faq" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-question-circle text-indigo-600 mr-2"></i>FAQ & Troubleshooting
+                    <i class="fas fa-question-circle text-blue-600 mr-2"></i>FAQ & Troubleshooting
                 </h2>
 
                 <div class="space-y-6">
+                    @if($guideIsAdmin || $guideIsParent)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ A parent says they cannot see a learning goal.</h3>
+                        <p class="text-gray-600 text-sm">Goals only reach parents once an administrator or the CEO ticks <strong>Parent</strong> in the <strong>Share with</strong> column on the Learning Goals screen (and clicks <strong>Save</strong>). Unticking it withdraws the goal again.</p>
+                    </div>
+                    @endif
+
+                    @if($guideIsParent || $guideIsCeo)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ I paid but the fee still shows a balance.</h3>
+                        <p class="text-gray-600 text-sm">Only <strong>verified</strong> installments count. A parent submission arrives as <strong>Pending verification</strong>: the CEO has to check the bank statement (transfer) or the cash book (cash) and click <strong>Payment received</strong> on <strong>Finance → Payments</strong> before the balance drops. Also make sure the new installment uses exactly the same child, term and class as the fee you are paying.</p>
+                    </div>
+                    @endif
+
+                    @if($guideIsParent || $guideIsCeo)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ Where did the "Record Payment" button go?</h3>
+                        <p class="text-gray-600 text-sm">It moved to the parent area. Parents open <strong>Finance → Fees &amp; Payments → Record a payment</strong>, because one parent paying for two or three children is quicker than the CEO entering every family. The CEO keeps the verification side: <strong>Finance → Payments → Payment received</strong> (or <strong>Reject</strong> with a reason). Before parents can transfer, add the school's accounts under <strong>Finance → Bank accounts</strong>.</p>
+                    </div>
+                    @endif
+
+                    @if($guideIsCeo)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ Where do I add the bank account parents should pay into?</h3>
+                        <p class="text-gray-600 text-sm">As the CEO, open <strong>Finance → Bank accounts</strong> and use <strong>Add an account</strong> (bank, account name, number and an optional note for parents). Active accounts appear on the parent payment form with a copy button. <strong>Switch off</strong> hides an account without losing its history; <strong>Delete</strong> removes it, but payments already recorded keep the name and number they were saved with. Administrators cannot open this screen.</p>
+                    </div>
+                    @endif
+
+                    @if($guideIsParent || $guideIsCeo)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ Can parents pay by card?</h3>
+                        <p class="text-gray-600 text-sm">Not yet — the <strong>Card</strong> option shows as <em>coming soon</em> and is powered by Paystack. Transfers and cash work today. Once the school's Paystack keys (<code>PAYSTACK_PUBLIC_KEY</code>, <code>PAYSTACK_SECRET_KEY</code>) are added, the card flow can be switched on; the bank-accounts screen shows whether Paystack is connected.</p>
+                    </div>
+                    @endif
+
+                    @if($guideIsParent || $guideIsCeo)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ A parent says their payment is marked rejected.</h3>
+                        <p class="text-gray-600 text-sm">The CEO could not match it with the bank statement (or the cash book for a cash payment). The reason is shown next to the record on the parent's <strong>Fees &amp; Payments</strong> screen and in their notifications. The parent should check the amount, date, account and reference (or upload a clearer receipt) and submit the payment again.</p>
+                    </div>
+                    @endif
+
+                    @if($guideIsTutor || $guideIsAdmin)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ A tutor cannot see the Goals or Messages menu.</h3>
+                        <p class="text-gray-600 text-sm">Those menus need an active tutor profile. If the account was created without one, ask an administrator to update the user's role on the Users screen — the tutor profile is created automatically.</p>
+                    </div>
+                    @endif
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I forgot my password. What should I do?</h3>
-                        <p class="text-gray-600 text-sm">Please contact the system <strong>Administrator</strong> to have your password reset. Password reset via email is currently managed manually.</p>
+                        <p class="text-gray-600 text-sm">Click <strong>Forgot your password?</strong> on the sign-in page, enter your email, and follow the one-time link we send (valid for 60 minutes). Choose a new password and you are signed in straight away. If no email arrives after a few minutes, check your spam folder, then ask the school administrator to generate a reset link for you from <strong>Admin → Users</strong>.</p>
                     </div>
+
+                    @if($guideIsAdmin)
+                    <div class="border-b pb-4">
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ How do I reset another user's password?</h3>
+                        <p class="text-gray-600 text-sm">Open <strong>Admin → Users</strong> and click <strong>Reset password</strong> on the user's row. When email is configured they receive the usual one-time link. If email is not configured (or the mail server is down), the page shows a one-time link you can copy and pass on privately — it expires in 60 minutes and works once. Inactive accounts must be activated first, and only the CEO can reset a CEO account.</p>
+                    </div>
+                    @endif
 
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I registered but can't log in.</h3>
                         <p class="text-gray-600 text-sm">Your account may not have been activated yet. Please contact an <strong>Administrator</strong> to verify and activate your account. Make sure you're using the correct email and password.</p>
                     </div>
 
+                    @if($guideIsParent)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I'm a parent and I haven't received my login details.</h3>
                         <p class="text-gray-600 text-sm">Parent accounts are created automatically when a Learner registers with parent information. Login details are sent to the parent's email. Check your spam/junk folder first. If you still haven't received it, contact an <strong>Administrator</strong>.</p>
                     </div>
+                    @endif
 
+                    @if($guideIsLearner)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ How do I join a virtual class?</h3>
-                        <p class="text-gray-600 text-sm">Log in as a <strong>Learner</strong>, go to your Dashboard or My Classes page, find the upcoming session with a <strong>"Join"</strong> or <strong>"Join Class"</strong> button, and click it. The meeting link will open in a new browser tab. Make sure you have the necessary software (Zoom, Google Meet, etc.) installed if required.</p>
+                        <p class="text-gray-600 text-sm">Go to your Dashboard or My Classes page, find the upcoming session with a <strong>"Join"</strong> or <strong>"Join Class"</strong> button, and click it. The meeting link will open in a new browser tab. Make sure you have the necessary software (Zoom, Google Meet, etc.) installed if required.</p>
                     </div>
 
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I can't submit my assignment.</h3>
                         <p class="text-gray-600 text-sm">Make sure you're uploading a supported file format (PDF, DOC, DOCX, images, etc.). Check that the file isn't too large. If the due date has passed, the assignment may still accept submissions — contact your tutor if you have issues.</p>
                     </div>
+                    @endif
 
+                    @if($guideIsParent)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ How do I see my child's grades?</h3>
-                        <p class="text-gray-600 text-sm">Log in as a <strong>Parent</strong>, go to your Dashboard, and click <strong>"View Full Details"</strong> on your child's card (or tap the <strong>Assignments Completed</strong> counter). The <strong>Completed Assignments</strong> and <strong>Attendance</strong> tabs show scores, feedback and attendance history.</p>
+                        <p class="text-gray-600 text-sm">Go to your Dashboard and click <strong>"View Full Details"</strong> on your child's card (or tap the <strong>Assignments Completed</strong> counter). The <strong>Completed Assignments</strong> and <strong>Attendance</strong> tabs show scores, feedback and attendance history.</p>
                     </div>
+                    @endif
 
+                    @if($guideIsTutor)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I'm a tutor and I can't see my classes.</h3>
                         <p class="text-gray-600 text-sm">Classes need to be assigned to you by an <strong>Administrator</strong>. Please contact the admin to ensure you've been assigned to the appropriate classes.</p>
                     </div>
+                    @endif
 
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ The page looks strange or isn't working properly.</h3>
                         <p class="text-gray-600 text-sm">Try refreshing the page (F5 or Ctrl+R). Clear your browser cache if issues persist. Make sure you're using a modern browser (Chrome, Firefox, Edge, or Safari). If the problem continues, contact support.</p>
                     </div>
 
+                    @if($guideUser->isAdmin())
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I'm an administrator but I can't see the Payments menu.</h3>
                         <p class="text-gray-600 text-sm">Payments are restricted to the <strong>CEO</strong> account only. Administrators do not see the Payments link, and opening the payment pages directly returns a <strong>"403 Forbidden"</strong> error. If you believe you should have this access, ask the CEO about upgrading your role.</p>
                     </div>
+                    @endif
 
+                    @if($guideIsAdmin)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ Can an administrator grade assignments, or only the tutor?</h3>
-                        <p class="text-gray-600 text-sm">Both can. Tutors grade their own assignments, and <strong>Administrators / the CEO</strong> can grade any submission from <strong>Oversight ▼ → Assignments → "Review &amp; Grade Submissions"</strong>. A tutor trying to open another tutor's assignment gets a "403 Forbidden" page.</p>
+                        <p class="text-gray-600 text-sm">Both can. Tutors grade their own assignments, and <strong>Administrators / the CEO</strong> can grade any submission from <strong>Academics → Assignment Review → "Review &amp; Grade Submissions"</strong>. A tutor trying to open another tutor's assignment gets a "403 Forbidden" page.</p>
                     </div>
+                    @endif
 
+                    @if($guideIsParent)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ How do I contact the school as a parent?</h3>
                         <p class="text-gray-600 text-sm">Click <strong>"Message the School"</strong> on your dashboard, or <strong>"Messages"</strong> in the menu, then choose the CEO or an administrator. Your conversation thread keeps the full history, and the school is notified instantly.</p>
                     </div>
+                    @endif
 
                     <div class="border-b pb-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">❓ Why can't a tutor or learner open Messages?</h3>
-                        <p class="text-gray-600 text-sm">Messaging is intentionally limited to <strong>parents/guardians</strong> and <strong>school leadership (CEO and administrators)</strong>. Tutors and learners who open the Messages URL directly receive a "403 Forbidden" page. Learners can still reach their tutor through class sessions, and tutors can raise issues with an administrator.</p>
+                        <h3 class="font-semibold text-gray-800 mb-2">❓ Who can I message?</h3>
+                        <p class="text-gray-600 text-sm">
+                            @if($guideIsParent)
+                                You can message the <strong>CEO</strong> and every <strong>administrator</strong>. Replies stay in the same private thread.
+                            @elseif($guideIsLearner)
+                                You can message the school and <strong>your own tutors</strong>. Replies stay in the same private thread.
+                            @elseif($guideIsTutor)
+                                You can message the school and the <strong>learners in your classes</strong>. Replies stay in the same private thread.
+                            @else
+                                You can message parents, tutors, learners and the other administrators. Anyone outside your allowed contacts gets a "403 Forbidden" page.
+                            @endif
+                        </p>
                     </div>
 
                     <div>
                         <h3 class="font-semibold text-gray-800 mb-2">❓ How do I log out?</h3>
-                        <p class="text-gray-600 text-sm">Click the <strong>"Logout"</strong> button at the top-right corner of any page (in the navigation bar). On mobile, tap the hamburger menu (☰) first, then click Logout.</p>
+                        <p class="text-gray-600 text-sm">Click the orange <strong>"Logout"</strong> button on the right of the blue top bar (there is also a logout icon at the bottom of the left menu). On mobile, tap the menu button <i class="fas fa-bars"></i> first, then use the logout icon at the bottom of the menu.</p>
                     </div>
                 </div>
 
-                <div class="mt-8 p-6 bg-indigo-50 rounded-xl text-center">
+                <div class="mt-8 p-6 bg-blue-50 rounded-xl text-center">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">📞 Still Need Help?</h3>
                     <p class="text-gray-600">If you couldn't find an answer in this guide, please contact the system <strong>Administrator</strong> or the school's support team for further assistance.</p>
                 </div>

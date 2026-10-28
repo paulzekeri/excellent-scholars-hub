@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
-        <a href="{{ route('parent.dashboard') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+        <a href="{{ route('parent.dashboard') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
             <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
         </a>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -57,13 +57,13 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
         @include('parent.partials.stat-card', [
             'href' => route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']),
             'count' => $stats['upcomingClasses'],
             'label' => 'Class Schedule',
             'icon' => 'fa-calendar-alt',
-            'iconClass' => 'text-indigo-500',
+            'iconClass' => 'text-blue-500',
             'active' => $tab === 'schedule',
         ])
         @include('parent.partials.stat-card', [
@@ -98,13 +98,21 @@
             'iconClass' => $stats['missedClasses'] > 0 ? 'text-red-500' : 'text-gray-400',
             'active' => $tab === 'attendance',
         ])
+        @include('parent.partials.stat-card', [
+            'href' => route('parent.child.progress', ['learner' => $learner, 'tab' => 'goals']),
+            'count' => $stats['goals'],
+            'label' => 'Learning Goals',
+            'icon' => 'fa-bullseye',
+            'iconClass' => 'text-orange-500',
+            'active' => $tab === 'goals',
+        ])
     </div>
 
     <div class="border-b border-gray-200 mb-6 overflow-x-auto">
         <nav class="flex space-x-6 min-w-max">
             @foreach($tabs as $key => $label)
                 <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => $key]) }}"
-                   class="pb-3 px-1 border-b-2 text-sm font-medium transition {{ $tab === $key ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                   class="pb-3 px-1 border-b-2 text-sm font-medium transition {{ $tab === $key ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                     {{ $label }}
                 </a>
             @endforeach
@@ -117,15 +125,15 @@
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>Upcoming Classes
+                        <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>Upcoming Classes
                     </h2>
-                    <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']) }}" class="text-sm text-indigo-600 hover:text-indigo-800">
+                    <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']) }}" class="text-sm text-blue-600 hover:text-blue-800">
                         View all <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
                 <div class="space-y-3">
                     @forelse($upcomingClasses as $schedule)
-                        <div class="border-l-4 border-indigo-500 bg-indigo-50 p-4 rounded-r-lg">
+                        <div class="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
                             <p class="font-semibold text-gray-800">{{ $schedule->title }}</p>
                             <p class="text-sm text-gray-600">{{ $schedule->class->name ?? 'Class' }}</p>
                             <p class="text-xs text-gray-500 mt-1">
@@ -148,7 +156,7 @@
                     <h2 class="text-lg font-semibold text-gray-800">
                         <i class="fas fa-hourglass-half text-yellow-500 mr-2"></i>Pending Assignments
                     </h2>
-                    <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'pending']) }}" class="text-sm text-indigo-600 hover:text-indigo-800">
+                    <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'pending']) }}" class="text-sm text-blue-600 hover:text-blue-800">
                         View all <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
@@ -178,7 +186,7 @@
                 <h2 class="text-lg font-semibold text-gray-800">
                     <i class="fas fa-user-check text-green-500 mr-2"></i>Recent Attendance
                 </h2>
-                <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'attendance']) }}" class="text-sm text-indigo-600 hover:text-indigo-800">
+                <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'attendance']) }}" class="text-sm text-blue-600 hover:text-blue-800">
                     View all <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
@@ -214,11 +222,11 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>Class Schedule
+                        <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>Class Schedule
                     </h2>
                     <p class="text-sm text-gray-500">Upcoming sessions for {{ $learner->user->name }}</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm bg-indigo-100 text-indigo-700 font-semibold self-start">
+                <span class="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700 font-semibold self-start">
                     {{ $upcomingClasses->total() }} upcoming
                 </span>
             </div>
@@ -248,7 +256,7 @@
                                         @if($schedule->status === 'ongoing') bg-green-100 text-green-800
                                         @elseif($schedule->status === 'cancelled') bg-red-100 text-red-800
                                         @elseif($schedule->status === 'completed') bg-gray-100 text-gray-700
-                                        @else bg-indigo-100 text-indigo-800 @endif">
+                                        @else bg-blue-100 text-blue-800 @endif">
                                         {{ ucfirst($schedule->status) }}
                                     </span>
                                 </td>
@@ -381,7 +389,7 @@
                                 <td class="px-4 py-3 text-sm max-w-xs">
                                     @if($submission->feedback)
                                         <div class="bg-gray-50 rounded p-2 text-gray-700 text-xs">
-                                            <span class="font-medium text-indigo-600">Tutor:</span> {{ $submission->feedback }}
+                                            <span class="font-medium text-blue-600">Tutor:</span> {{ $submission->feedback }}
                                             @if($submission->graded_at)
                                                 <div class="mt-1 text-gray-400">Graded on {{ $submission->graded_at->format('M d, Y') }}</div>
                                             @endif
@@ -425,7 +433,7 @@
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <h3 class="font-semibold text-gray-800">{{ $material->title }}</h3>
-                                    <span class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700">{{ $ext }}</span>
+                                    <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700">{{ $ext }}</span>
                                 </div>
                                 <p class="text-sm text-gray-500 mt-1">
                                     {{ $material->class->name ?? 'Class' }} · {{ $material->tutor->user->name ?? 'Tutor' }}
@@ -567,6 +575,65 @@
                 </table>
             </div>
             <div class="mt-4">{{ $attendance->links() }}</div>
+        </div>
+    @endif
+
+    @if($tab === 'goals')
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-bullseye text-orange-500 mr-2"></i>Learning Goals shared with you
+                    </h2>
+                    <p class="text-sm text-gray-500">Goals {{ $learner->user->name }}'s tutors set and the school approved for parents</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700 font-semibold self-start">
+                    {{ $goals->total() }} goal(s)
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                @forelse($goals as $goal)
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">{{ $goal->title }}</h3>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    {{ $goal->learner->user->name ?? 'Whole class' }}
+                                    @if($goal->schoolClass) · {{ $goal->schoolClass->name }} @endif
+                                    @if($goal->term) · {{ $goal->term }} @endif
+                                </p>
+                                @if($goal->target)
+                                    <p class="text-sm text-blue-700 mt-2"><i class="fas fa-flag mr-1"></i>Target: {{ $goal->target }}</p>
+                                @endif
+                                @if($goal->description)
+                                    <p class="text-sm text-gray-600 mt-2">{{ $goal->description }}</p>
+                                @endif
+                                <div class="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-400">
+                                    <span><i class="fas fa-chalkboard-teacher mr-1"></i>{{ $goal->tutor->user->name ?? 'Tutor' }}</span>
+                                    @if($goal->shared_at)
+                                        <span><i class="far fa-calendar mr-1"></i>Shared {{ $goal->shared_at->format('M d, Y') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($goal->file_path)
+                                <a href="{{ asset('storage/' . $goal->file_path) }}" target="_blank"
+                                   class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition inline-flex items-center justify-center">
+                                    <i class="fas fa-download mr-1"></i> Attachment
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-10">
+                        <i class="fas fa-bullseye text-5xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No learning goals have been shared yet.</p>
+                        <p class="text-gray-400 text-sm mt-1">Tutors upload goals; the school shares the relevant ones with you.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <div class="mt-4">{{ $goals->links() }}</div>
         </div>
     @endif
 </div>

@@ -23,7 +23,7 @@
                     </div>
                     <div class="text-right">
                         @if($schedule->meeting_link && $schedule->status == 'scheduled')
-                            <a href="{{ $schedule->meeting_link }}" target="_blank" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition inline-flex items-center"><i class="fas fa-video mr-2"></i> Join Class</a>
+                            <a href="{{ $schedule->meeting_link }}" target="_blank" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition inline-flex items-center"><i class="fas fa-video mr-2"></i> Join Class</a>
                         @else
                             <span class="text-gray-400"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
                         @endif

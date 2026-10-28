@@ -9,7 +9,7 @@
     $selectedParentId = old('parent_id', optional($user->learner)->parent_id);
 @endphp
 <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <a href="{{ route('admin.users.index') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block">
+    <a href="{{ route('admin.users.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
         <i class="fas fa-arrow-left mr-1"></i> Back
     </a>
     <div class="bg-white rounded-xl shadow-md p-8">
@@ -19,19 +19,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" name="name" value="{{ $user->name }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" name="name" value="{{ $user->name }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" value="{{ $user->email }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="email" name="email" value="{{ $user->email }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Phone</label>
-                    <input type="text" name="phone" value="{{ $user->phone }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" name="phone" value="{{ $user->phone }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Role</label>
-                    <select id="role_id" name="role_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    <select id="role_id" name="role_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         @foreach($roles as $role)
                             <option value="{{ $role->id }}" data-slug="{{ $role->slug }}" {{ $selectedRoleId == $role->id ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                         @endforeach
@@ -39,7 +39,7 @@
                 </div>
                 <div id="learner-parent-field" class="md:col-span-2 {{ $selectedRoleSlug === 'learner' ? '' : 'hidden' }}">
                     <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent / Guardian (learners only)</label>
-                    <select id="parent_id" name="parent_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    <select id="parent_id" name="parent_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">No parent linked yet</option>
                         @foreach($parents as $parent)
                             <option value="{{ $parent->id }}" {{ (string) $selectedParentId === (string) $parent->id ? 'selected' : '' }}>
@@ -57,13 +57,13 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Status</label>
-                    <select name="is_active" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-indigo-500 focus:border-indigo-500">
+                    <select name="is_active" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         <option value="1" {{ $user->is_active ? 'selected' : '' }}>Active</option>
                         <option value="0" {{ !$user->is_active ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
             </div>
-            <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
                 <i class="fas fa-save mr-1"></i> Update User
             </button>
         </form>
@@ -86,7 +86,7 @@
                                     @endif
                                 </span>
                                 @if($child->user)
-                                    <a href="{{ route('admin.users.edit', $child->user) }}" class="text-indigo-600 hover:text-indigo-800 text-sm">
+                                    <a href="{{ route('admin.users.edit', $child->user) }}" class="text-blue-600 hover:text-blue-800 text-sm">
                                         <i class="fas fa-edit"></i> Manage
                                     </a>
                                 @endif

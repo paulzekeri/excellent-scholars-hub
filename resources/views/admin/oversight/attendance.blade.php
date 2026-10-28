@@ -11,7 +11,7 @@
     <div class="bg-white rounded-xl shadow-md p-6 mb-6">
         <form method="GET" action="{{ route('admin.oversight.attendance') }}" class="flex flex-wrap items-center gap-4">
             <label class="text-sm font-medium text-gray-700">Filter by Class:</label>
-            <select name="class_id" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <select name="class_id" onchange="this.form.submit()" class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All Classes</option>
                 @foreach($classes as $class)
                     <option value="{{ $class->id }}" {{ isset($selectedClass) && $selectedClass->id == $class->id ? 'selected' : '' }}>
@@ -20,7 +20,7 @@
                 @endforeach
             </select>
             @if(isset($selectedClass))
-                <a href="{{ route('admin.oversight.attendance') }}" class="text-sm text-indigo-600 hover:text-indigo-800">Clear filter</a>
+                <a href="{{ route('admin.oversight.attendance') }}" class="text-sm text-blue-600 hover:text-blue-800">Clear filter</a>
             @endif
         </form>
     </div>

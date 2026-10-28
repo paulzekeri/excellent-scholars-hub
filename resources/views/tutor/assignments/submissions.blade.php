@@ -2,7 +2,7 @@
 @section('title', 'Submissions')
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <a href="{{ route('tutor.assignments.index') }}" class="text-indigo-600 hover:text-indigo-800 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back</a>
+    <a href="{{ route('tutor.assignments.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back</a>
     <div class="bg-white rounded-xl shadow-md p-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ $assignment->title }}</h1>
         <p class="text-gray-600 mb-2">{{ $assignment->description }}</p>
@@ -27,7 +27,7 @@
                         <td class="px-4 py-3 text-sm font-medium">{{ $submission->learner->user->name }}</td>
                         <td class="px-4 py-3 text-sm">
                             @if($submission->file_path)
-                                <a href="{{ route('tutor.submissions.download', $submission) }}" class="text-indigo-600 hover:text-indigo-800 inline-flex items-center">
+                                <a href="{{ route('tutor.submissions.download', $submission) }}" class="text-blue-600 hover:text-blue-800 inline-flex items-center">
                                     <i class="fas fa-download mr-1"></i> Download
                                 </a>
                             @else
@@ -54,7 +54,7 @@
                                 @csrf
                                 <input type="number" name="score" min="0" max="{{ $assignment->total_points }}" required class="w-20 border border-gray-300 rounded px-2 py-1 text-sm" placeholder="Score">
                                 <input type="text" name="feedback" class="border border-gray-300 rounded px-2 py-1 text-sm flex-1" placeholder="Feedback">
-                                <button type="submit" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">Grade</button>
+                                <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Grade</button>
                             </form>
                             @else
                             <div class="text-sm">
