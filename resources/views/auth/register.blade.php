@@ -24,13 +24,29 @@
             </div>
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                <label for="username" class="block text-sm font-medium text-gray-700">
+                    Username <span id="username-required-mark" class="text-red-500 {{ old('role_id') && \App\Models\Role::find(old('role_id'))?->slug === 'learner' ? '' : 'hidden' }}">*</span>
+                </label>
+                <input id="username" type="text" name="username" value="{{ old('username') }}"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('username') border-red-500 @enderror"
+                    placeholder="e.g. tolu_okafor">
+                @error('username')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-gray-500 mt-1">Letters, numbers, dashes and underscores. This is what you sign in with — useful when there is no email.</p>
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">
+                    Email address <span id="email-required-mark" class="text-red-500 {{ old('role_id') && \App\Models\Role::find(old('role_id'))?->slug === 'learner' ? 'hidden' : '' }}">*</span>
+                </label>
+                <input id="email" type="email" name="email" value="{{ old('email') }}"
                     class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror"
                     placeholder="Enter your email">
                 @error('email')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
+                <p class="text-xs text-gray-500 mt-1">Optional for a learner with no email — your parent/guardian's email is used instead.</p>
             </div>
 
             <div>
@@ -118,16 +134,21 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const roleSelect = document.getElementById('role_id');
-        const parentDetails = document.getElementById('parent-details');
-        const parentName = document.getElementById('parent_name');
-        const parentEmail = document.getElementById('parent_email');
+                const roleSelect = document.getElementById('role_id');
+                const parentDetails = document.getElementById('parent-details');
+                const parentName = document.getElementById('parent_name');
+                const parentEmail = document.getElementById('parent_email');
+                const usernameInput = document.getElementById('username');
+                const usernameMark = document.getElementById('username-required-mark');
+                const emailInput = document.getElementById('email');
+                const emailMark = document.getElementById('email-required-mark');
 
         function toggleParentFields() {
             const selectedOption = roleSelect.options[roleSelect.selectedIndex];
             const selectedText = selectedOption ? selectedOption.text.toLowerCase() : '';
+            const isLearner = selectedText === 'learner';
 
-            if (selectedText === 'learner') {
+            if (isLearner) {
                 parentDetails.classList.remove('hidden');
                 parentName.setAttribute('required', 'required');
                 parentEmail.setAttribute('required', 'required');
@@ -135,6 +156,20 @@
                 parentDetails.classList.add('hidden');
                 parentName.removeAttribute('required');
                 parentEmail.removeAttribute('required');
+            }
+
+            // A child signs in by username and may have no email at all.
+            if (usernameInput) {
+                usernameInput.required = isLearner;
+            }
+            if (usernameMark) {
+                usernameMark.classList.toggle('hidden', !isLearner);
+            }
+            if (emailInput) {
+                emailInput.required = !isLearner;
+            }
+            if (emailMark) {
+                emailMark.classList.toggle('hidden', isLearner);
             }
         }
 

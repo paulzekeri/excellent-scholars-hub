@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\NotificationController as AdminNotificationContro
 use App\Http\Controllers\Admin\OversightController as AdminOversightController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\Admin\LearningGoalController as AdminLearningGoalController;
+use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
+use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
+use App\Http\Controllers\Tutor\AssessmentController as TutorAssessmentController;
 use App\Http\Controllers\Tutor\LearningGoalController as TutorLearningGoalController;
 use App\Http\Controllers\Tutor\DashboardController as TutorDashboard;
 use App\Http\Controllers\Tutor\ScheduleController as TutorScheduleController;
@@ -24,6 +27,8 @@ use App\Http\Controllers\Learner\ClassController as LearnerClassController;
 use App\Http\Controllers\Learner\AssignmentController as LearnerAssignmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\PublicBookingController;
 use App\Models\Notification;
 
 /*
@@ -59,6 +64,19 @@ Route::get('/', function () {
 
 Auth::routes(['verify' => false, 'reset' => true, 'confirm' => false]);
 
+// Public assessment booking from the landing page (note 13, phase 2): no account
+// is created — the school contacts the guardian and sets up the video call.
+Route::post('/book-assessment', [PublicBookingController::class, 'store'])
+    ->middleware('throttle:5,10')
+    ->name('assessments.request');
+
+// Forced first-login password change for school-provisioned accounts (note 12).
+// The middleware that sends people here is App\Http\Middleware\EnsurePasswordIsChanged.
+Route::middleware('auth')->group(function () {
+    Route::get('/password/change', [ChangePasswordController::class, 'show'])->name('password.change');
+    Route::post('/password/change', [ChangePasswordController::class, 'update'])->name('password.change.update');
+});
+
 // Shared notification routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -81,6 +99,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     
     Route::resource('users', AdminUserController::class);
+    Route::post('/users/{user}/children', [AdminUserController::class, 'addChild'])->name('users.children.store');
     Route::post('/users/{user}/password-reset', [AdminUserController::class, 'sendPasswordReset'])->name('users.password-reset');
     Route::resource('classes', AdminClassController::class);
     Route::post('/classes/{class}/enroll', [AdminClassController::class, 'enroll'])->name('classes.enroll');
@@ -110,6 +129,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::get('/learning-goals', [AdminLearningGoalController::class, 'index'])->name('learning-goals.index');
     Route::post('/learning-goals/{goal}/share', [AdminLearningGoalController::class, 'share'])->name('learning-goals.share');
     Route::get('/learning-goals/{goal}/download', [AdminLearningGoalController::class, 'download'])->name('learning-goals.download');
+
+    // Admissions (note 13, phase 1): enquiries captured before a learner exists.
+    Route::resource('enquiries', AdminEnquiryController::class)->except(['destroy']);
+    Route::post('/enquiries/{enquiry}/status', [AdminEnquiryController::class, 'updateStatus'])->name('enquiries.status');
+    Route::post('/enquiries/{enquiry}/notes', [AdminEnquiryController::class, 'storeNote'])->name('enquiries.notes.store');
+
+    // Assessments (phase 2): the school creates the Meet/Zoom link and invites the tutor.
+    Route::get('/assessments', [AdminAssessmentController::class, 'index'])->name('assessments.index');
+    Route::post('/enquiries/{enquiry}/assessments', [AdminAssessmentController::class, 'store'])->name('enquiries.assessments.store');
+    Route::post('/assessments/{assessment}/cancel', [AdminAssessmentController::class, 'cancel'])->name('assessments.cancel');
 });
 
 // Payments: parents record what they paid, the CEO verifies it against the bank.
@@ -145,6 +174,9 @@ Route::prefix('tutor')->name('tutor.')->middleware(['auth', 'role:tutor'])->grou
     
     Route::resource('materials', TutorMaterialController::class)->only(['index', 'create', 'store', 'destroy']);
 
+    // Assessment calls assigned to this tutor (note 13, phase 2).
+    Route::get('/assessments', [TutorAssessmentController::class, 'index'])->name('assessments.index');
+
     // Learning goals (visible to administrators, then shared with parents)
     Route::get('/learning-goals', [TutorLearningGoalController::class, 'index'])->name('learning-goals.index');
     Route::get('/learning-goals/create', [TutorLearningGoalController::class, 'create'])->name('learning-goals.create');
@@ -163,6 +195,11 @@ Route::prefix('parent')->name('parent.')->middleware(['auth', 'role:parent'])->g
     Route::get('/payments/create', [ParentPaymentController::class, 'create'])->name('payments.create');
     Route::post('/payments', [ParentPaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments/{payment}/receipt', [ParentPaymentController::class, 'receipt'])->name('payments.receipt');
+
+    // Children with no mailbox: the guardian receives the one-time reset link.
+    Route::post('/children/{learner}/password-reset', [ParentDashboard::class, 'sendChildPasswordReset'])
+        ->middleware('throttle:6,1')
+        ->name('children.password-reset');
 });
 
 // Learner Routes

@@ -14,6 +14,27 @@
         </a>
     </div>
 
+    @if(session('provisioned_credentials'))
+        @php $provisioned = session('provisioned_credentials'); @endphp
+        <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
+            <p class="font-semibold text-gray-800"><i class="fas fa-id-card text-orange-500 mr-1"></i> Login details for {{ $provisioned['name'] }}</p>
+            <p class="text-sm text-gray-600 mt-1">
+                Email delivery is not configured on this installation @if($provisioned['sent_to'])(target: {{ $provisioned['sent_to'] }}) @endif
+                so hand these over privately. The owner will be asked to choose their own password at first sign-in.
+            </p>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                    <span class="block text-xs uppercase tracking-wide text-gray-500">Username</span>
+                    <span class="font-mono text-gray-800">{{ $provisioned['username'] }}</span>
+                </div>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                    <span class="block text-xs uppercase tracking-wide text-gray-500">Temporary password</span>
+                    <span class="font-mono text-gray-800">{{ $provisioned['password'] }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if(session('password_reset_link'))
         <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
             <p class="font-semibold text-gray-800"><i class="fas fa-key text-orange-500 mr-1"></i> One-time reset link for {{ session('password_reset_user') }}</p>
@@ -32,6 +53,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
@@ -44,7 +66,28 @@
                     @foreach($users as $user)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $user->name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $user->email }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                @if($user->username)
+                                    <span class="font-mono text-gray-800">{{ $user->username }}</span>
+                                @else
+                                    <span class="text-gray-400">&mdash;</span>
+                                @endif
+                                @if($user->isLearner())
+                                    @php $guardianEmail = optional(optional(optional($user->learner)->parent)->user)->email; @endphp
+                                    @if($guardianEmail)
+                                        <span class="block text-xs text-gray-400">Guardian: {{ $guardianEmail }}</span>
+                                    @else
+                                        <span class="block text-xs text-amber-600">No guardian email</span>
+                                    @endif
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                @if($user->email)
+                                    {{ $user->email }}
+                                @else
+                                    <span class="text-gray-400">No email &mdash; via guardian</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $user->phone ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full 
@@ -78,6 +121,11 @@
                                 <span class="px-2 py-1 text-xs rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $user->is_active ? 'Active' : 'Inactive' }}
                                 </span>
+                                @if($user->must_change_password)
+                                    <span class="mt-1 block px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-800">
+                                        Awaiting first sign-in
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:text-blue-800 mr-3">

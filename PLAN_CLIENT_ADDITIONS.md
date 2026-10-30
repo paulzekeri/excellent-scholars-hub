@@ -7,6 +7,49 @@ Status legend: `[ ]` not started · `[~]` in progress · `[x]` done & verified
 
 ---
 
+## Meeting-note status (reviewed 29 October 2026)
+
+The phases below cover meeting-note items **1–8** plus a set of follow-ups (password reset, role-aware
+guide, sidebar). This is the honest picture of all 14 notes:
+
+| Note | Item | Status |
+|---|---|---|
+| 1 | Parent records payment + receipt, CEO verifies | `[x]` — class is per-installment (one row each), not a literal multi-select |
+| 2 | Categorised messaging | `[x]` |
+| 3 | Learner ongoing/next class panel | `[x]` |
+| 4 | Assignment images + optional max students | `[x]` |
+| 5 | Monthly classes per tutor | `[~]` — report exists (month picker + 6-month trend) but counts **scheduled** sessions; no admin/CEO "class completed" tick yet |
+| 6 | Blue / white / orange branding | `[x]` |
+| 7 | Tutor learning goals, shared by admin/CEO | `[x]` for parent + tutor; sharing with **learners** not built |
+| 8 | Affirmation card | `[~]` — static daily rotation; no admin-authored weekly post |
+| 9 | Landing page (slider, testimonials, about, register) | `[~]` — page + live programmes exist; slides and testimonials are hard-coded |
+| 9-i | Testimonials backend + admin approval | `[ ]` |
+| 9-ii | Admin/CEO-managed slider | `[ ]` |
+| 9-iii | Social media links | `[ ]` |
+| 10 | Profile update (name/email/photo) + testimonial consent, CEO tick | `[ ]` |
+| 11 | Automated payment gateway | **Deferred by the client (29 Oct 2026)** — not in scope; `PaystackService` stays as the stub |
+| 12 | Children without email: username login + reset | `[x]` — username login, provisioning, forced first-login change, guardian-delivered reset, parent-initiated reset and the backfill/audit commands are shipped (Phase 11) |
+| 13 | Prospective-learner video-call assessment workflow | `[ ]` — designed in `PLAN_LOGIN_AND_ADMISSIONS.md` §2 (conversion requires the guardian email from note 12) |
+
+**Client clarifications (29 October 2026):**
+
+- Note 11 (payment gateway) is **deferred** — no gateway work in this scope.
+- Note 12: the **guardian/parent email is mandatory** on every child account; there is no child account
+  without a reachable guardian. Usernames must be **unique** and **linked to that guardian's email**
+  (through `learners.parent_id → parents.user_id → users.email`, never a copied column).
+- The **admin provisions accounts**: a parent gets **username + email + password**, the password is
+  emailed and the parent must change it at first sign-in; a child gets **username + password +
+  optional email**, the details go to the guardian's account, and the child must also change the
+  password at first sign-in.
+- **Delivery rule:** the child's **own email is used when it exists**, otherwise the guardian's — for
+  account details and password resets alike. The child's email stays **optional on the register page**
+  (never removed).
+- Notes 12 and 13 are **design-first on purpose**: they change authentication for every role and add a
+  domain that exists before a user account does. The design, schema, phasing, test plan and the seven
+  open client decisions (D1–D7) live in `PLAN_LOGIN_AND_ADMISSIONS.md`; nothing there is implemented yet.
+
+---
+
 ## Phase 1 — Payments (notes 1–4)
 
 - [x] Migration `add_billing_fields_to_payments_table`: `term`, `class_id`, `total_fee`,
@@ -134,4 +177,75 @@ grouped, school-coloured sidebar.
       (`esh-shell` / `esh-sidebar`) without touching any page view.
 - [x] User guide navigation sections rewritten for the sidebar; feature test
       `test_the_sidebar_groups_the_menu_for_each_role` asserts the right groups per role.
+
+## Phase 11 — Note 12: usernames, guardian email and the first-login password change
+
+Design: `PLAN_LOGIN_AND_ADMISSIONS.md` §1. Built on 29 October 2026; the reset-by-username half is the
+next slice.
+
+- [x] Migration `2026_10_29_000001_add_username_to_users_table`: unique `username`, nullable `email`
+      (raw driver-aware ALTER, no doctrine/dbal), `must_change_password`, `password_changed_at`.
+- [x] Login accepts an **email or a username**: `App\Auth\EmailOrUsernameUserProvider` registered as
+      the `esh-eloquent` provider, `LoginController` (`username()` / `credentials()`), login field
+      renamed to `login`. Deactivated accounts are now refused by the login query itself.
+- [x] Registration: username required for learners, child email **optional** (never removed), guardian
+      name + email mandatory, a staff email cannot be used as the guardian address, and a child's own
+      email cannot equal the guardian's. A guardian account created during registration gets a
+      generated username and is flagged for a password change.
+- [x] Admin provisioning: **Users → New User** creates a parent with username + email + temporary
+      password; **Edit parent → Add child** creates a learner with username + password + optional
+      email. Both email the credentials (`AccountProvisionedMail`) and are flagged.
+- [x] No-mail fallback: when the mailer cannot deliver (`log`/`array`), the credentials are flashed on
+      the Users screen for the administrator to hand over privately.
+- [x] Forced first-login change: `EnsurePasswordIsChanged` (web middleware group),
+      `ChangePasswordController`, full-page interstitial with current/new/confirm,
+      `different:current_password`, flag cleared and `password_changed_at` stamped; logout stays
+      reachable.
+- [x] Users screen: username column with the guardian's email, a "No email — via guardian" fallback and
+      an "Awaiting first sign-in" badge.
+- [x] Tests: `UsernameLoginTest` (12), `AccountProvisioningTest` (11), `GuardianPasswordResetTest` (12)
+      and `MaintenanceCommandsTest` (8); `AdminUserParentLinkTest` rewritten (a learner always needs a
+      guardian and detaching is refused); `PasswordResetTest` updated for the new login field and the
+      neutral reset response. Full suite: **122 passing**.
+- [x] **Forgot password by email or username**: unknown identifiers get a neutral answer; a user with
+      their own email keeps the Laravel broker; a child without email gets a per-user token
+      (`noemail:{id}`, so siblings never collide) emailed to the guardian, and the link resets the
+      password and signs them in.
+- [x] **Parent-initiated reset**: the parent dashboard's "Children & logins" panel lists each child's
+      username and sends the one-time link to the guardian's own address; another family's child
+      returns 403.
+- [x] **Admin fallback**: resetting a child without email from **Users** emails the guardian, or flashes
+      a one-time link to the administrator when the mailer cannot deliver (`log`/`array`).
+- [x] **Operator commands**: `esh:backfill-usernames` (dry-run, `--apply`, `--role`) and
+      `esh:audit-guardian-links` (reports learners with no guardian email; `--learner` checks one child).
+- [x] `DEPLOYMENT.md` documents the one-time backfill + audit run after the migration, and the user
+      guide covers the new login, provisioning and reset flows.
+
+## Phase 12 — Note 13: admissions pipeline
+
+Design: `PLAN_LOGIN_AND_ADMISSIONS.md` §2. Phase 1 shipped on 29 October 2026.
+
+- [x] **P1 — capture, pipeline, timeline**: `enquiries` + `enquiry_notes` migrations, `Enquiry` /
+      `EnquiryNote` models (reference `ENQ-YYYY-0001`, source and status vocabularies, guarded
+      transitions), `Admin\EnquiryController` (index with tabs/search/source, create, store, show,
+      edit, update, status, timeline note), the **People → Admissions** sidebar entry, and the
+      **New Enquiries / Enquiries In Progress** dashboard counters.
+- [x] Status changes write a timeline entry **and** an `activity_logs` row; declining requires a reason;
+      archived is final; assessment/enrolment targets stay closed until those screens exist.
+- [x] Tests: `tests/Feature/AdmissionsTest.php` (12) — permissions, capture without an account,
+      validation, filters, timeline, guarded moves, decline reason, edit, counters, render smoke.
+- [x] **P2 — assessment booking**: public request form on the landing page (`POST /book-assessment`,
+      rate-limited + honeypot) creating an enquiry with `source = website` and notifying every
+      administrator/CEO; school booking from the enquiry screen (tutor, date/time, duration, platform,
+      Meet/Zoom link, guardian email) → `assessment_booked`, in-app tutor invitation, timeline entry,
+      **guardian email with the join link** and a pre-filled WhatsApp message; `/admin/assessments`
+      (Today / Upcoming / Past / All + tutor filter + Join) and `/tutor/assessments` (own calls only);
+      "Today's assessment calls" panels on both dashboards; cancel returns the enquiry to `Contacted`.
+      No learner/parent account is created at any point.
+- [x] Tests: `tests/Feature/AssessmentBookingTest.php` (13) — public booking, honeypot, validation,
+      booking guards, guardian email, tutor isolation, admin list, cancellation, dashboard panels.
+- [ ] **P3** — record the assessment result (outcome, recommended class, notes, optional report file).
+- [ ] **P4** — conversion wizard: parent + learner accounts (reusing note 12's provisioning and the
+      forced first-login change) and class enrolment, idempotent and transactional.
+- [ ] **P5** — optional cron reminders, guardian status page, automatic Meet/Zoom links.
 

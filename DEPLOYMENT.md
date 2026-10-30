@@ -82,6 +82,25 @@ has to be installed on the account and no SSH session is opened by hand.
    stops the step with `::error title=No .env on the server` before touching the database.
 6. Writes a summary table to the workflow run page.
 
+#### One-time data steps after the usernames migration
+
+`2026_10_29_000001_add_username_to_users_table` adds the columns but deliberately does not invent
+credentials. Run these once per environment (UAT and production) in *cPanel → Terminal*:
+
+```bash
+# Preview only — writes nothing
+php artisan esh:backfill-usernames
+
+# Write the usernames, then hand the printed table to the families
+php artisan esh:backfill-usernames --apply
+
+# Children with no guardian email cannot receive a reset link
+php artisan esh:audit-guardian-links
+```
+
+`esh:audit-guardian-links` exits non-zero when it finds a child whose guardian has no email; fix those
+children from **Admin → Users → Edit** before relying on guardian-delivered password resets.
+
 ### 2.3 Server `.env` — created once, never deployed
 
 Every deploy deliberately skips `.env`, so the file has to exist on the server before the first

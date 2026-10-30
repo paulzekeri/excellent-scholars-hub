@@ -41,6 +41,41 @@
         </div>
     </div>
 
+    <!-- Today's assessment calls -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h2 class="text-lg font-semibold text-gray-800"><i class="fas fa-video text-blue-600 mr-2"></i>Today's assessment calls</h2>
+            <a href="{{ route('tutor.assessments.index') }}" class="text-sm text-blue-700 hover:text-blue-900">
+                My assessments <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        @if($todayAssessments->isEmpty())
+            <p class="text-sm text-gray-500">No assessment calls today.</p>
+        @else
+            <ul class="space-y-2">
+                @foreach($todayAssessments as $assessment)
+                    <li class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-50 rounded-lg px-4 py-3">
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">
+                                {{ $assessment->scheduled_at->format('g:i a') }} — {{ optional($assessment->enquiry)->child_name }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                {{ $assessment->platformLabel() }} · {{ optional($assessment->enquiry)->guardian_name }}
+                            </p>
+                        </div>
+                        @if($assessment->joinUrl())
+                            <a href="{{ $assessment->joinUrl() }}" target="_blank" rel="noopener"
+                                class="inline-flex items-center bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700">
+                                <i class="fas fa-video mr-1"></i> Join call
+                            </a>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
+
     <!-- Quick Actions -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <a href="{{ route('tutor.schedules.create') }}" class="bg-white rounded-xl shadow-md p-4 text-center hover:shadow-lg transition">

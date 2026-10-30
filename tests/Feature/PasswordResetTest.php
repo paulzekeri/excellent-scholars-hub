@@ -59,20 +59,20 @@ class PasswordResetTest extends TestCase
 
         $user = $this->makeUser('learner', 'Forgetful Learner');
 
-        $this->post(route('password.email'), ['email' => $user->email])
+        $this->post(route('password.email'), ['login' => $user->email])
             ->assertSessionHas('status');
 
         Notification::assertSentTo($user, ResetPassword::class);
         $this->assertSame(1, DB::table('password_resets')->where('email', $user->email)->count());
     }
 
-    public function test_an_unknown_email_is_reported_without_sending_a_link(): void
+    public function test_an_unknown_identifier_gets_the_same_neutral_response(): void
     {
         Notification::fake();
 
         $this->from(route('password.request'))
-            ->post(route('password.email'), ['email' => 'nobody@example.com'])
-            ->assertSessionHasErrors('email');
+            ->post(route('password.email'), ['login' => 'nobody@example.com'])
+            ->assertSessionHas('status');
 
         Notification::assertNothingSent();
         $this->assertSame(0, DB::table('password_resets')->count());
@@ -112,7 +112,7 @@ class PasswordResetTest extends TestCase
         $this->flushSession();
 
         $this->post(route('login'), [
-            'email' => $user->email,
+            'login' => $user->email,
             'password' => 'brand-new-password',
         ])->assertRedirect(route('learner.dashboard'));
     }

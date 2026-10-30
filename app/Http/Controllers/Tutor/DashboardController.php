@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Classes;
 use App\Models\ClassSchedule;
 use App\Models\Assignment;
+use App\Models\AssessmentSession;
 use App\Models\LearningMaterial;
 use Illuminate\Http\Request;
 
@@ -25,6 +26,12 @@ class DashboardController extends Controller
                 ->get(),
             'totalAssignments' => Assignment::where('tutor_id', $tutor->id)->count(),
             'totalMaterials' => LearningMaterial::where('tutor_id', $tutor->id)->count(),
+            'todayAssessments' => AssessmentSession::with('enquiry')
+                ->where('tutor_id', $tutor->id)
+                ->whereDate('scheduled_at', today())
+                ->where('status', AssessmentSession::STATUS_SCHEDULED)
+                ->orderBy('scheduled_at')
+                ->get(),
         ];
 
         return view('tutor.dashboard', $data);

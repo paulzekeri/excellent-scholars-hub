@@ -20,6 +20,38 @@
 
     @include('partials.affirmation')
 
+    @if($children->isNotEmpty())
+        <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+            <h2 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-id-card text-blue-600 mr-2"></i>Children &amp; logins
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">
+                Each child signs in with their own username. A reset link is emailed to you at
+                <strong>{{ auth()->user()->email }}</strong> — share it with your child privately; it works once and expires in 60 minutes.
+            </p>
+            <ul class="mt-4 space-y-2">
+                @foreach($children as $child)
+                    <li class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-50 rounded-lg px-4 py-3">
+                        <span class="text-sm text-gray-700">
+                            {{ $child->user->name }}
+                            <span class="ml-1 font-mono text-gray-800">{{ $child->user->username ?: 'no username yet' }}</span>
+                            @if($child->user->email)
+                                <span class="text-xs text-gray-400">({{ $child->user->email }})</span>
+                            @endif
+                        </span>
+                        <form action="{{ route('parent.children.password-reset', $child) }}" method="POST"
+                            onsubmit="return confirm('Email a one-time reset link for this child to your address?')">
+                            @csrf
+                            <button type="submit" class="text-sm text-orange-700 hover:text-orange-900">
+                                <i class="fas fa-key mr-1"></i> Send reset link
+                            </button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @if($totalMissedClasses > 0)
         <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 flex items-start">
             <i class="fas fa-exclamation-triangle mt-1 mr-3"></i>

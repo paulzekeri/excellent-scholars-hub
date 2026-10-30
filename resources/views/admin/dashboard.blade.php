@@ -96,9 +96,78 @@
                 </div>
             </div>
         </a>
+
+        <a href="{{ route('admin.enquiries.index', ['status' => 'new']) }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-400 hover:bg-blue-50 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">New Enquiries</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $newEnquiries }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-user-plus text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-amber-400 hover:bg-amber-50 transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Enquiries In Progress</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ $contactedEnquiries }}</p>
+                </div>
+                <div class="bg-amber-100 p-3 rounded-full">
+                    <i class="fas fa-phone text-amber-600 text-xl"></i>
+                </div>
+            </div>
+        </a>
     </div>
 
     @include('partials.affirmation')
+
+    <!-- Today's assessment calls -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800"><i class="fas fa-video text-blue-600 mr-2"></i>Today's assessment calls</h2>
+                <p class="text-sm text-gray-500">{{ $upcomingAssessments }} more scheduled after today.</p>
+            </div>
+            <a href="{{ route('admin.assessments.index') }}" class="text-sm text-blue-700 hover:text-blue-900">
+                All assessments <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        @if($todayAssessments->isEmpty())
+            <p class="text-sm text-gray-500">No assessment calls today. New bookings appear on <a href="{{ route('admin.assessments.index') }}" class="text-blue-700">Assessments</a>.</p>
+        @else
+            <ul class="space-y-2">
+                @foreach($todayAssessments as $assessment)
+                    <li class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-50 rounded-lg px-4 py-3">
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">
+                                {{ $assessment->scheduled_at->format('g:i a') }} — {{ optional($assessment->enquiry)->child_name }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                {{ optional(optional($assessment->tutor)->user)->name }} ·
+                                {{ $assessment->platformLabel() }} ·
+                                <span class="font-mono">{{ optional($assessment->enquiry)->reference }}</span>
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            @if($assessment->enquiry)
+                                <a href="{{ route('admin.enquiries.show', $assessment->enquiry) }}" class="text-xs text-gray-600 hover:text-blue-700">Open enquiry</a>
+                            @endif
+                            @if($assessment->joinUrl())
+                                <a href="{{ $assessment->joinUrl() }}" target="_blank" rel="noopener"
+                                    class="inline-flex items-center bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700">
+                                    <i class="fas fa-video mr-1"></i> Join
+                                </a>
+                            @endif
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
 
     <!-- Monthly classes per tutor -->
     <div class="bg-white rounded-xl shadow-md p-6 mb-8">

@@ -148,4 +148,31 @@
 - [x] **Documentation** — in-app user guide (What's New, Payments, Learning Goals, Broadcasts, Dashboard extras,
       FAQ), `README.md`, `PLAN_CLIENT_ADDITIONS.md`
 - [x] `tests/Feature/ClientAdditionsTest.php` — tests covering the items above
+- [ ] **Note 11 (payment gateway) deferred by the client on 29 October 2026** — the card option stays
+      "coming soon"; `App\Services\PaystackService` remains the prepared stub, no live keys required
+- [x] **Note 12 (complete) — usernames, guardian email, provisioning, resets** — login accepts an email or
+      a unique username; a learner may have no email but must have a guardian; admins provision parents
+      and children and the credentials are emailed; school-set passwords must be replaced at first
+      sign-in; a child resets by username and the one-time link goes to the guardian (or the parent sends
+      it from the dashboard). Usernames can be backfilled and guardians audited with
+      `esh:backfill-usernames` / `esh:audit-guardian-links`. Tests: `UsernameLoginTest` (12),
+      `AccountProvisioningTest` (11), `GuardianPasswordResetTest` (12), `MaintenanceCommandsTest` (8),
+      full suite 122 passing
+- [x] **Note 13 (phase 1) — admissions pipeline** — capture WhatsApp/phone enquiries before any account
+      exists, tabbed pipeline (Open / New / Contacted / Declined / Archived) with search and source
+      filter, a detail screen whose timeline records calls, WhatsApp messages and status changes,
+      guarded status moves (declining needs a reason; archived is final) and New/In-Progress counters on
+      the admin and CEO dashboards. Tests: `AdmissionsTest` (12), full suite 134 passing
+- [x] **Note 13 (phase 2) — assessment booking, public request and the shared call link** — parents can
+      request an assessment from the landing page without an account; the school creates the Meet/Zoom
+      link, assigns the tutor and emails the guardian the join link (WhatsApp message pre-filled too);
+      admin/CEO (`/admin/assessments`), the tutor (`/tutor/assessments`) and the parent all join from the
+      same link; today's calls appear on both dashboards and cancelling returns the enquiry to
+      *Contacted*. Tests: `AssessmentBookingTest` (13), full suite 147 passing
+- [ ] **Note 13 (phases 3–5)** — recording the assessment result, converting an enquiry into parent +
+      learner accounts and enrolment, then optional reminders and a guardian status page. See
+      `PLAN_LOGIN_AND_ADMISSIONS.md` §2 (P3–P5, decisions D1–D5/D7)
+- [ ] Remaining gaps from the meeting note (see `PLAN_CLIENT_ADDITIONS.md`): admin "class completed"
+      tick behind the monthly tutor report (note 5), admin-authored affirmations (note 8), dynamic
+      slider + testimonials backend + social links (notes 9, 10), and the final quotation rewrite (note 14)
 

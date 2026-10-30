@@ -185,14 +185,14 @@
                         <span class="step-number mt-0.5">2</span>
                         <div>
                             <p class="font-medium text-gray-800">Fill in Your Details</p>
-                            <p class="text-sm text-gray-600">Enter your <strong>Full Name</strong>, <strong>Email</strong>, <strong>Phone</strong> (optional), and select your <strong>Role</strong> (Tutor, Learner, or Parent).</p>
+                            <p class="text-sm text-gray-600">Enter your <strong>Full Name</strong>, a unique <strong>Username</strong>, your <strong>Email</strong> (optional for a learner with no email), <strong>Phone</strong> (optional), and select your <strong>Role</strong> (Tutor or Learner).</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3">
                         <span class="step-number mt-0.5">3</span>
                         <div>
                             <p class="font-medium text-gray-800">Parent/Guardian Info (for Learners only)</p>
-                            <p class="text-sm text-gray-600">If you register as a <strong>Learner</strong>, you'll need to provide a parent/guardian's name and email. A parent account will be created automatically and login details sent to their email.</p>
+                            <p class="text-sm text-gray-600">If you register as a <strong>Learner</strong>, you must provide a parent/guardian's name and email. The guardian email is <strong>required</strong> — it is where login details and password resets go when the child has no mailbox. A parent account is created automatically when that email is new and the login details are emailed to it.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3">
@@ -221,7 +221,7 @@
                         <span class="step-number mt-0.5">2</span>
                         <div>
                             <p class="font-medium text-gray-800">Enter Credentials</p>
-                            <p class="text-sm text-gray-600">Enter your <strong>Email</strong> and <strong>Password</strong>.</p>
+                            <p class="text-sm text-gray-600">Enter your <strong>Email or username</strong> and your <strong>Password</strong>.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3">
@@ -344,7 +344,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in the user details (name, email, role, password). For a <strong>Learner</strong>, also pick their <strong>Parent / Guardian</strong> from the extra field that appears below the role.</span>
+                            <span class="text-gray-600">Fill in the user's name, a unique <strong>username</strong> (required for parents and learners — it is how they sign in), <strong>email</strong> (optional for a child with no mailbox), and a <strong>temporary password</strong>. The login details are emailed, and the owner picks their own password at first sign-in. For a <strong>Learner</strong>, a <strong>Parent / Guardian</strong> is required. To add a child to an existing family, open the parent's edit page and use the <strong>Add child</strong> form.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -361,6 +361,26 @@
                         <li>Click the <strong>Edit</strong> (pencil) icon next to a user to modify their details.</li>
                         <li>Click the <strong>Delete</strong> (trash) icon to remove a user (requires confirmation).</li>
                     </ul>
+                </div>
+
+                <!-- Admissions -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-user-plus text-blue-600 mr-2"></i>Enquiries &amp; admissions
+                    </h3>
+                    <p class="text-gray-600 mb-3">
+                        A prospective learner has no account yet. Capture the WhatsApp message or call under
+                        <strong>People &rarr; Admissions &rarr; Capture enquiry</strong>: the child's name, the guardian's
+                        name and phone, where they came from, and any notes.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1 mb-3">
+                        <li>The tabs show <strong>Open</strong>, <strong>All</strong>, <strong>New</strong>, <strong>Contacted</strong>, <strong>Declined</strong> and <strong>Archived</strong>; search by child, guardian, phone, email or reference, and filter by source.</li>
+                        <li>Open an enquiry for the guardian's phone and email, a ready-to-send <strong>WhatsApp</strong> button, the status form and the <strong>timeline</strong> where every call, message and status change is logged.</li>
+                        <li>Declining needs a reason; <strong>Archived</strong> is final. The assessment and enrolment steps arrive in the next release, so those moves are deliberately closed today.</li>
+                        <li>Requests made through the <strong>“Book a video-call assessment”</strong> form on the public website arrive here as <strong>New</strong> (source <em>Website</em>) and every administrator/CEO is notified.</li>
+                        <li>Once an enquiry is <strong>Contacted</strong>, use the <strong>Assessment calls</strong> card to book the call: pick the tutor, date/time, platform and paste the Google Meet/Zoom link. The guardian is emailed the join link (the WhatsApp button sends the same message), and you, the CEO and the tutor all join from it.</li>
+                    </ul>
+                    <p class="text-sm text-gray-600">The dashboard shows <strong>New Enquiries</strong> and <strong>Enquiries In Progress</strong> so nothing gets forgotten.</p>
                 </div>
 
                 <!-- Manage Classes -->
@@ -650,6 +670,23 @@
                         <li><strong>Materials</strong> — total learning materials uploaded</li>
                         <li><strong>Quick Actions</strong> — buttons to quickly create schedules, assignments, or upload materials</li>
                         <li><strong>Upcoming Classes</strong> — your upcoming scheduled sessions with attendance and join buttons</li>
+                    </ul>
+                </div>
+
+                <!-- Assessment calls -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-video text-blue-600 mr-2"></i>Assessment calls
+                    </h3>
+                    <p class="text-gray-600 mb-2">
+                        The school books a short video call with a prospective learner and assigns it to you. The child
+                        may not have an account yet — that is normal for an assessment.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li><strong>Today's assessment calls</strong> on your dashboard show the time, child and guardian, with a <strong>Join call</strong> button.</li>
+                        <li><strong>Teaching &rarr; Assessments</strong> lists today, upcoming and past calls (yours only) with the same link, the guardian's phone number and the enquiry reference.</li>
+                        <li>Everyone joins from the same Meet/Zoom link: the parent receives it by email/WhatsApp and the school sees it too.</li>
+                        <li>If a parent cannot join, call the guardian's number on the card. Recording the outcome arrives in the next release.</li>
                     </ul>
                 </div>
 
@@ -1310,6 +1347,12 @@
                             @if($guideIsLearner)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Learner panel</td><td class="px-4 py-3 text-gray-600">"Live now / Up next" panel at the top of the dashboard — see <a href="#dashboard-extras" class="text-blue-700 underline">Dashboard extras</a>.</td><td class="px-4 py-3 text-gray-600">Learners</td></tr>
                             @endif
+                            @if($guideIsAdmin || $guideIsTutor)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Assessment calls</td><td class="px-4 py-3 text-gray-600">Parents can request an assessment on the website; the school books the Meet/Zoom call, invites the tutor and emails/WhatsApps the guardian the join link. Today's calls appear on the dashboard.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Admissions</td><td class="px-4 py-3 text-gray-600">Capture WhatsApp/phone enquiries before an account exists, track them on the pipeline and log every call on the timeline &mdash; <strong>People &rarr; Admissions</strong>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
                             @if($guideIsAdmin)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly count of classes per tutor with a month picker and a six-month trend.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
@@ -1322,7 +1365,8 @@
                             @endif
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Website</td><td class="px-4 py-3 text-gray-600">Public landing page with sliders, programmes, testimonials and registration.</td><td class="px-4 py-3 text-gray-600">Visitors</td></tr>
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Branding</td><td class="px-4 py-3 text-gray-600">Blue, white and orange colour scheme across the whole platform.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Passwords</td><td class="px-4 py-3 text-gray-600">Forgot-password reset by email (one-time link, 60 minutes), plus a school-administration fallback that generates the link from <strong>Users</strong> when mail is not configured.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Usernames</td><td class="px-4 py-3 text-gray-600">Sign in with an email <strong>or</strong> a unique username. A child with no email still needs a guardian email, which receives their login details and password-reset links.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Passwords</td><td class="px-4 py-3 text-gray-600">Forgot-password reset by email (one-time link, 60 minutes), plus a school-administration fallback that generates the link from <strong>Users</strong> when mail is not configured. Accounts created by the school must choose their own password at first sign-in.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Help</td><td class="px-4 py-3 text-gray-600">This guide is now role-aware: it only shows the sections and FAQ answers for the screens your account can open.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
                         </tbody>
                     </table>
@@ -1690,7 +1734,7 @@
                     @endif
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I forgot my password. What should I do?</h3>
-                        <p class="text-gray-600 text-sm">Click <strong>Forgot your password?</strong> on the sign-in page, enter your email, and follow the one-time link we send (valid for 60 minutes). Choose a new password and you are signed in straight away. If no email arrives after a few minutes, check your spam folder, then ask the school administrator to generate a reset link for you from <strong>Admin → Users</strong>.</p>
+                        <p class="text-gray-600 text-sm">Click <strong>Forgot your password?</strong> on the sign-in page, enter your <strong>email or username</strong>, and follow the one-time link we send (valid for 60 minutes). Choose a new password and you are signed in straight away. For a child with no email, the link is emailed to their parent/guardian instead — a parent can also send it from the <strong>Children &amp; logins</strong> panel on their dashboard. If no email arrives after a few minutes, check your spam folder, then ask the school administrator to generate a reset link for you from <strong>Admin → Users</strong>.</p>
                     </div>
 
                     @if($guideIsAdmin)
@@ -1702,13 +1746,13 @@
 
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I registered but can't log in.</h3>
-                        <p class="text-gray-600 text-sm">Your account may not have been activated yet. Please contact an <strong>Administrator</strong> to verify and activate your account. Make sure you're using the correct email and password.</p>
+                        <p class="text-gray-600 text-sm">Your account may not have been activated yet. Please contact an <strong>Administrator</strong> to verify and activate your account. Make sure you're using the correct email or username and password. Accounts created by the school sign in with the username on their welcome email.</p>
                     </div>
 
                     @if($guideIsParent)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ I'm a parent and I haven't received my login details.</h3>
-                        <p class="text-gray-600 text-sm">Parent accounts are created automatically when a Learner registers with parent information. Login details are sent to the parent's email. Check your spam/junk folder first. If you still haven't received it, contact an <strong>Administrator</strong>.</p>
+                        <p class="text-gray-600 text-sm">Parent accounts are created automatically when a Learner registers with parent information, or by the school from <strong>Admin → Users</strong> (and <strong>Add child</strong> on a parent's page). Login details are sent to the parent's email. The <strong>Children &amp; logins</strong> panel on your dashboard shows every child's username and lets you send a one-time reset link to your own address. Check your spam/junk folder first; if you still haven't received anything, contact an <strong>Administrator</strong>.</p>
                     </div>
                     @endif
 

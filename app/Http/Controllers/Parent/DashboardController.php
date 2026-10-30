@@ -11,6 +11,7 @@ use App\Models\LearningMaterial;
 use App\Models\LearningGoal;
 use App\Models\Payment;
 use App\Models\Submission;
+use App\Services\LearnerPasswordResetService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -50,6 +51,34 @@ class DashboardController extends Controller
             'totalChildren' => $children->count(),
             'totalMissedClasses' => $childStats->sum('missedClasses'),
         ]);
+    }
+
+    /**
+     * Email a one-time password-reset link for one of this parent's children to
+     * the parent's own address (note 12). The parent is already signed in, so
+     * ownership is the only check that matters.
+     */
+    public function sendChildPasswordReset(Learner $learner, LearnerPasswordResetService $learners)
+    {
+        $this->authorizeChild($learner);
+
+        $childUser = $learner->user;
+
+        if (! $childUser) {
+            return back()->with('error', 'This child does not have an account yet.');
+        }
+
+        $guardianEmail = auth()->user()->email;
+
+        if (! $guardianEmail) {
+            return back()->with('error', 'Add an email address to your account before requesting a reset.');
+        }
+
+        $sent = $learners->send($childUser, $guardianEmail);
+
+        return $sent
+            ? back()->with('success', 'A one-time reset link for ' . $childUser->name . ' was emailed to ' . $guardianEmail . '.')
+            : back()->with('error', 'We could not send the reset email right now. Please ask the school administrator.');
     }
 
     public function childProgress(Request $request, Learner $learner)

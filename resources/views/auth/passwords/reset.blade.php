@@ -33,14 +33,21 @@
             @csrf
             <input type="hidden" name="token" value="{{ $token }}">
 
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-                <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required autocomplete="email" readonly
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
-                @error('email')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+            @isset($uid)
+                <input type="hidden" name="uid" value="{{ $uid }}">
+                <div class="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3 text-sm text-blue-900">
+                    Resetting the password for <strong>{{ $identifier }}</strong>
+                </div>
+            @else
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                    <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required autocomplete="email" readonly
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
+                    @error('email')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            @endisset
 
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">New password</label>

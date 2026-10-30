@@ -61,7 +61,10 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            // App\Auth\EmailOrUsernameUserProvider — accepts an email address or
+            // a username in the same credential field (registered in
+            // AuthServiceProvider).
+            'driver' => 'esh-eloquent',
             'model' => App\Models\User::class,
         ],
 

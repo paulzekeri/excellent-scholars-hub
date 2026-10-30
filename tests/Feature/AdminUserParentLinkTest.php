@@ -14,14 +14,14 @@ class AdminUserParentLinkTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private function makeUser($roleSlug, $name)
+    private function makeUser($roleSlug, $name, array $attributes = [])
     {
-        return User::create([
+        return User::create(array_merge([
             'name' => $name,
             'email' => strtolower(str_replace(' ', '.', $name)) . '.' . uniqid() . '@example.com',
             'password' => Hash::make('password123'),
             'role_id' => Role::where('slug', $roleSlug)->firstOrFail()->id,
-        ]);
+        ], $attributes));
     }
 
     private function makeParent($name)
@@ -38,6 +38,7 @@ class AdminUserParentLinkTest extends TestCase
 
         $response = $this->actingAs($admin)->post(route('admin.users.store'), [
             'name' => 'Test Learner One',
+            'username' => 'test_learner_one',
             'email' => 'test.learner.one.' . uniqid() . '@example.com',
             'password' => 'password123',
             'role_id' => Role::where('slug', 'learner')->firstOrFail()->id,
@@ -52,33 +53,33 @@ class AdminUserParentLinkTest extends TestCase
 
         $this->assertSame($parent->id, $learner->parent_id);
         $this->assertSame(1, $parent->children()->count());
+        // A school-provisioned child must choose their own password first.
+        $this->assertTrue($learner->user->must_change_password);
     }
 
-    public function test_admin_can_create_a_learner_without_a_parent()
+    public function test_a_learner_cannot_be_created_without_a_guardian()
     {
         $admin = $this->makeUser('admin', 'Test Admin No Parent');
+        $email = 'test.learner.two.' . uniqid() . '@example.com';
 
-        $this->actingAs($admin)->post(route('admin.users.store'), [
+        $this->from(route('admin.users.create'))->actingAs($admin)->post(route('admin.users.store'), [
             'name' => 'Test Learner Two',
-            'email' => 'test.learner.two.' . uniqid() . '@example.com',
+            'username' => 'test_learner_two',
+            'email' => $email,
             'password' => 'password123',
             'role_id' => Role::where('slug', 'learner')->firstOrFail()->id,
-        ])->assertRedirect(route('admin.users.index'));
+        ])->assertSessionHasErrors('parent_id');
 
-        $learner = Learner::whereHas('user', function ($query) {
-            $query->where('name', 'Test Learner Two');
-        })->firstOrFail();
-
-        $this->assertNull($learner->parent_id);
+        $this->assertDatabaseMissing('users', ['email' => $email]);
     }
 
-    public function test_admin_can_reassign_and_remove_a_learners_parent()
+    public function test_admin_can_reassign_a_learners_parent_but_cannot_detach_them()
     {
         $admin = $this->makeUser('admin', 'Test Admin Reassign');
         $firstParent = $this->makeParent('Test Parent Two');
         $secondParent = $this->makeParent('Test Parent Three');
 
-        $learnerUser = $this->makeUser('learner', 'Test Learner Three');
+        $learnerUser = $this->makeUser('learner', 'Test Learner Three', ['username' => 'test_learner_three']);
         $learner = Learner::create([
             'user_id' => $learnerUser->id,
             'parent_id' => $firstParent->id,
@@ -86,6 +87,7 @@ class AdminUserParentLinkTest extends TestCase
 
         $payload = [
             'name' => $learnerUser->name,
+            'username' => 'test_learner_three',
             'email' => $learnerUser->email,
             'role_id' => Role::where('slug', 'learner')->firstOrFail()->id,
             'is_active' => 1,
@@ -97,11 +99,13 @@ class AdminUserParentLinkTest extends TestCase
 
         $this->assertSame($secondParent->id, $learner->fresh()->parent_id);
 
-        $this->actingAs($admin)
+        // Every child keeps a reachable guardian (note 12).
+        $this->from(route('admin.users.edit', $learnerUser))
+            ->actingAs($admin)
             ->put(route('admin.users.update', $learnerUser), $payload + ['parent_id' => ''])
-            ->assertRedirect(route('admin.users.index'));
+            ->assertSessionHasErrors('parent_id');
 
-        $this->assertNull($learner->fresh()->parent_id);
+        $this->assertSame($secondParent->id, $learner->fresh()->parent_id);
     }
 
     public function test_parent_id_must_exist_in_the_parents_table()
@@ -111,6 +115,7 @@ class AdminUserParentLinkTest extends TestCase
 
         $this->actingAs($admin)->post(route('admin.users.store'), [
             'name' => 'Test Learner Invalid',
+            'username' => 'test_learner_invalid',
             'email' => $email,
             'password' => 'password123',
             'role_id' => Role::where('slug', 'learner')->firstOrFail()->id,

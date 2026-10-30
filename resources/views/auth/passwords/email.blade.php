@@ -9,7 +9,7 @@
             <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="mx-auto h-20 w-auto">
             <p class="text-gray-500 mt-2">Excellent Scholars Hub</p>
             <h2 class="text-xl font-semibold text-gray-700 mt-4">Forgot your password?</h2>
-            <p class="text-sm text-gray-500 mt-2">Enter the email address on your account and we will send you a one-time link to choose a new password.</p>
+            <p class="text-sm text-gray-500 mt-2">Enter your email address or username and we will send a one-time link to choose a new password. For a child with no email, the link goes to their parent/guardian.</p>
         </div>
 
         @if(session('status'))
@@ -33,11 +33,11 @@
             @csrf
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror"
-                    placeholder="Enter your email">
-                @error('email')
+                <label for="login" class="block text-sm font-medium text-gray-700">Email or username</label>
+                <input id="login" type="text" name="login" value="{{ old('login') }}" required autocomplete="username" autofocus
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('login') border-red-500 @enderror"
+                    placeholder="Email address or username">
+                @error('login')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>

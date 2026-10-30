@@ -15,11 +15,11 @@
             @csrf
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror"
-                    placeholder="Enter your email">
-                @error('email')
+                <label for="login" class="block text-sm font-medium text-gray-700">Email or username</label>
+                <input id="login" type="text" name="login" value="{{ old('login') }}" required autocomplete="username" autofocus
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('login') border-red-500 @enderror"
+                    placeholder="Email address or username">
+                @error('login')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>

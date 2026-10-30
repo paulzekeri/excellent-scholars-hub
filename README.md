@@ -134,6 +134,54 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Assessment booking (note 13, phase 2, 30 October 2026)
+
+A parent can now book the assessment from the public landing page — before any account exists — and the
+school turns that request into a scheduled video call that the administrator/CEO, the tutor and the
+parent all join from the same link.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Public booking | "Book a video-call assessment" section on `/` with child, guardian name/phone/email, preferred slot and notes; rate-limited and honeypot-protected; creates an enquiry (`source = website`) and alerts every administrator/CEO. **No account is created** | `PublicBookingController`, `landing.blade.php` |
+| School booking | On the enquiry page (after *Contacted*): tutor, date/time, duration, platform, Meet/Zoom link and guardian email → enquiry moves to **Assessment booked**, timeline entry, in-app tutor invitation | `Admin\AssessmentController@store`, `admin/enquiries/show.blade.php` |
+| Guardian invite | Email to the guardian with the date, tutor and **Join** button (`AssessmentScheduledMail`), plus a pre-filled WhatsApp message with the same link on the enquiry page | `AssessmentScheduledMail`, `EnquiryController@show` |
+| Everyone can join | `/admin/assessments` (today/upcoming/past + tutor filter + Join), `/tutor/assessments` (own calls only), "Today's assessment calls" panels on both dashboards | `Admin\AssessmentController`, `Tutor\AssessmentController`, dashboards |
+| Cancellation | Cancel a scheduled call; the enquiry returns to *Contacted* and the timeline records it | `AssessmentController@cancel` |
+| Data | New `assessment_sessions` table (per call, so a child can be assessed many times) + `enquiries.preferred_at` | `2026_10_30_000001_create_assessment_sessions_table` |
+| Tests | `tests/Feature/AssessmentBookingTest.php` (13) — public booking, honeypot, validation, booking guards, guardian email, tutor isolation, admin list, cancellation, dashboard panels | `tests/Feature` |
+
+### Admissions pipeline (note 13, phase 1, 29 October 2026)
+
+A prospective learner used to live only in a WhatsApp thread. The school can now capture the enquiry
+before any account exists, see the pipeline at a glance, and keep every call on the record.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Capture | A one-minute form for the child, guardian (name + phone + optional email), source and notes; **no user/learner account is created** | `Admin\EnquiryController@store`, `admin/enquiries/create.blade.php` |
+| Pipeline | Tabs for **Open / All / New / Contacted / Declined / Archived** with counts, search (child, guardian, phone, email, reference) and a source filter; references are `ENQ-YYYY-0001` | `Admin\EnquiryController@index`, `Enquiry` |
+| Detail | Guardian phone/email links, a ready-to-send **WhatsApp** button, child details, owner, notes, and a timeline of calls, messages and status changes | `admin/enquiries/show.blade.php`, `EnquiryNote` |
+| Guarded moves | Only `Enquiry::STATUS_FLOW` transitions are accepted; declining requires a reason; archived is final; assessment/enrolment targets stay closed until those screens exist. Every move writes a timeline entry **and** an `activity_logs` row | `Admin\EnquiryController@updateStatus` |
+| Dashboard | **New Enquiries** and **Enquiries In Progress** cards linking into the filtered pipeline | `Admin\DashboardController`, `admin/dashboard.blade.php` |
+| Navigation | **People → Admissions** in the sidebar | `layouts/sidebar.blade.php` |
+| Tests | `tests/Feature/AdmissionsTest.php` (12) — permissions, capture, validation, filters, timeline, moves, decline reason, edit, counters, render smoke | `tests/Feature` |
+
+### Children sign in with a username (note 12, 29 October 2026)
+
+Some learners have no email address, so the login field now accepts either an email or a unique
+username, and every child account must have a reachable guardian email.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Login | One field accepts an **email or a username**; deactivated accounts are refused by the login query | `App\Auth\EmailOrUsernameUserProvider`, `LoginController`, `auth/login.blade.php` |
+| Registration | Learners choose a username; their email is **optional**; the guardian email is required, a staff email is refused as a guardian, and a child's email cannot equal the guardian's | `RegisterController`, `auth/register.blade.php` |
+| Provisioning | Admins create a **parent** (username + email + temporary password) and add **children** from the parent's edit screen (username + password + optional email); credentials are emailed once | `Admin\UserController@store/addChild`, `AccountProvisionedMail` |
+| First sign-in | A school-set password must be replaced before the app opens; the full-page interstitial cannot be skipped, and logout stays reachable | `EnsurePasswordIsChanged`, `ChangePasswordController`, `auth/passwords/change.blade.php` |
+| Password resets | "Forgot your password?" accepts an **email or username**. A child with no mailbox gets a per-user one-time link emailed to the **guardian**; the parent dashboard can send it too, and the admin fallback still works when mail is off | `ForgotPasswordController`, `ResetPasswordController`, `LearnerPasswordResetService`, `LearnerPasswordResetMail` |
+| Operations | After deploying the migration: backfill usernames for existing accounts and audit learners whose guardian has no email | `esh:backfill-usernames`, `esh:audit-guardian-links` |
+| No-mail installs | When the mailer cannot deliver (`log`/`array`, as on UAT), the credentials are shown once to the administrator to hand over privately | `Admin\UserController::sendProvisioningMail()` |
+| Data | Unique `users.username`, nullable `users.email`, `must_change_password`, `password_changed_at` | `2026_10_29_000001_add_username_to_users_table` |
+| Tests | `UsernameLoginTest` (12), `AccountProvisioningTest` (11), `GuardianPasswordResetTest` (12) and `MaintenanceCommandsTest` (8); `AdminUserParentLinkTest` rewritten for the mandatory guardian | `tests/Feature` |
+
 ### Parents record fees, the CEO only verifies (follow-up to the 26 October 2026 meeting)
 
 The CEO was entering every family's payment by hand; a parent paying for two or three children can do it in one

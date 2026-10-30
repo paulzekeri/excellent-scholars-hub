@@ -9,6 +9,8 @@ use App\Models\ClassSchedule;
 use App\Models\Learner;
 use App\Models\Tutor;
 use App\Models\Payment;
+use App\Models\Enquiry;
+use App\Models\AssessmentSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -64,6 +66,17 @@ class DashboardController extends Controller
             'monthSessions' => (int) $tutorMonthly->sum('month_sessions'),
             'maxMonthSessions' => max(1, (int) $tutorMonthly->max('month_sessions')),
             'monthlyTrend' => $monthlyTrend,
+            // Admissions (note 13) — enquiries captured before a learner exists.
+            'newEnquiries' => Enquiry::where('status', Enquiry::STATUS_NEW)->count(),
+            'contactedEnquiries' => Enquiry::where('status', Enquiry::STATUS_CONTACTED)->count(),
+            'todayAssessments' => AssessmentSession::with(['enquiry', 'tutor.user'])
+                ->whereDate('scheduled_at', today())
+                ->where('status', AssessmentSession::STATUS_SCHEDULED)
+                ->orderBy('scheduled_at')
+                ->get(),
+            'upcomingAssessments' => AssessmentSession::where('scheduled_at', '>', now()->endOfDay())
+                ->where('status', AssessmentSession::STATUS_SCHEDULED)
+                ->count(),
         ];
 
         return view('admin.dashboard', $data);

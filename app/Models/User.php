@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -13,7 +14,8 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'phone', 'is_active',
+        'name', 'username', 'email', 'password', 'must_change_password', 'password_changed_at',
+        'role_id', 'phone', 'is_active',
     ];
 
     protected $hidden = [
@@ -22,8 +24,66 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password_changed_at' => 'datetime',
         'is_active' => 'boolean',
+        'must_change_password' => 'boolean',
     ];
+
+    /**
+     * Usernames that would be confusing, or could impersonate the school.
+     * Shared by the validators and the backfill command.
+     */
+    public const RESERVED_USERNAMES = [
+        'admin', 'administrator', 'ceo', 'owner', 'support', 'help', 'info',
+        'school', 'esh', 'root', 'system', 'login', 'logout', 'api', 'staff',
+        'tutor', 'teacher', 'learner', 'student', 'parent',
+    ];
+
+    /**
+     * Where account details and password resets should be delivered: the user's
+     * own address when they have one, otherwise their guardian's.
+     *
+     * This is the single implementation of the client's "own email first,
+     * parent/guardian otherwise" rule.
+     */
+    public function deliveryEmail(): ?string
+    {
+        if ($this->email) {
+            return $this->email;
+        }
+
+        return optional(optional(optional($this->learner)->parent)->user)->email;
+    }
+
+    /** True when the school set a temporary password for this account. */
+    public function needsPasswordChange(): bool
+    {
+        return (bool) $this->must_change_password;
+    }
+
+    /**
+     * Build a free username from a display name ("Tolu Okafor" → "tolu_okafor",
+     * then tolu_okafor_2, …), skipping reserved words.
+     */
+    public static function suggestUsername(string $name): string
+    {
+        // Some imported accounts store an email address in the name field.
+        $source = Str::contains($name, '@') ? Str::before($name, '@') : $name;
+
+        $base = trim(preg_replace('/[^a-z0-9]+/', '_', strtolower($source)), '_');
+        $base = substr($base ?: 'user', 0, 25);
+
+        $candidate = $base;
+        $suffix = 1;
+
+        while (static::where('username', $candidate)->exists()
+            || in_array($candidate, self::RESERVED_USERNAMES, true)) {
+            $suffix++;
+            $candidate = $base . '_' . $suffix;
+        }
+
+        return $candidate;
+    }
 
     public function role()
     {

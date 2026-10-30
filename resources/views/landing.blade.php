@@ -50,6 +50,7 @@
                 <a href="#about" class="hover:text-brand">About us</a>
                 <a href="#programmes" class="hover:text-brand">Programmes</a>
                 <a href="#how" class="hover:text-brand">How it works</a>
+                <a href="#book-assessment" class="hover:text-brand font-semibold text-brand">Book assessment</a>
                 <a href="#testimonials" class="hover:text-brand">Testimonials</a>
                 <a href="#contact" class="hover:text-brand">Contact</a>
             </nav>
@@ -69,6 +70,7 @@
                         <a href="#about" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">About us</a>
                         <a href="#programmes" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">Programmes</a>
                         <a href="#how" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">How it works</a>
+                        <a href="#book-assessment" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">Book assessment</a>
                         <a href="#testimonials" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">Testimonials</a>
                         <a href="#contact" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">Contact</a>
                         <a href="{{ route('login') }}" class="mt-1 block rounded-lg border border-brand-light px-3 py-2 text-center text-sm font-semibold text-brand hover:bg-brand-light sm:hidden">Log in</a>
@@ -78,6 +80,14 @@
         </div>
     </div>
 </header>
+
+@if(session('success') || session('error'))
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="rounded-xl border-l-4 p-4 {{ session('success') ? 'border-green-500 bg-green-50 text-green-800' : 'border-red-500 bg-red-50 text-red-800' }}" role="alert">
+            {{ session('success') ?: session('error') }}
+        </div>
+    </div>
+@endif
 
 
 @php
@@ -119,6 +129,9 @@
                         <h1 class="mt-4 text-4xl sm:text-5xl font-extrabold leading-tight">{{ $slide['title'] }}</h1>
                         <p class="mt-4 text-lg text-blue-50 max-w-xl">{{ $slide['text'] }}</p>
                         <div class="mt-8 flex flex-wrap gap-3">
+                            <a href="#book-assessment" class="bg-white text-brand-dark hover:bg-brand-light font-semibold px-6 py-3 rounded-lg transition shadow-lg">
+                                <i class="fas fa-video mr-2"></i>Book a free assessment
+                            </a>
                             <a href="{{ route('register') }}" class="bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition shadow-lg">
                                 <i class="fas fa-arrow-right mr-2"></i>Register for classes
                             </a>
@@ -252,6 +265,94 @@
                     </figcaption>
                 </figure>
             @endforeach
+        </div>
+    </div>
+</section>
+
+<!-- Book an assessment (public, no account needed) -->
+<section id="book-assessment" class="py-16 bg-brand-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-start">
+        <div>
+            <p class="text-sm uppercase tracking-widest text-accent font-bold">Free assessment</p>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900">Book a video-call assessment</h2>
+            <p class="mt-4 text-gray-700">
+                Before we place a child in a class, a tutor meets them on a short video call to understand
+                their level and what they need. Request a slot below — <strong>no account is needed</strong>
+                and the child does not have to be registered with us yet.
+            </p>
+            <ul class="mt-6 space-y-3 text-sm text-gray-700">
+                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>The school emails or WhatsApps you the Google Meet / Zoom link.</li>
+                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>About 30 minutes with the tutor who will teach the class.</li>
+                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Join from any phone, tablet or computer — no app to install.</li>
+                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>No payment and no obligation.</li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+            <h3 class="text-lg font-semibold text-gray-800">Request an assessment</h3>
+            <p class="text-sm text-gray-500 mt-1">We reply within one working day to agree the time.</p>
+
+            @if($errors->any())
+                <div class="mt-4 rounded-lg border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-800" role="alert">
+                    <ul class="list-disc list-inside">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('assessments.request') }}" class="mt-5 space-y-4">
+                @csrf
+                <div class="hidden" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input id="website" type="text" name="website" tabindex="-1" autocomplete="off">
+                </div>
+
+                <div>
+                    <label for="child_name" class="block text-sm font-medium text-gray-700">Child's name</label>
+                    <input id="child_name" type="text" name="child_name" value="{{ old('child_name') }}" required
+                        class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="guardian_name" class="block text-sm font-medium text-gray-700">Parent / guardian name</label>
+                        <input id="guardian_name" type="text" name="guardian_name" value="{{ old('guardian_name') }}" required
+                            class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
+                    </div>
+                    <div>
+                        <label for="guardian_phone" class="block text-sm font-medium text-gray-700">Phone / WhatsApp</label>
+                        <input id="guardian_phone" type="text" name="guardian_phone" value="{{ old('guardian_phone') }}" required
+                            class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="guardian_email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input id="guardian_email" type="email" name="guardian_email" value="{{ old('guardian_email') }}" required
+                        class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
+                    <p class="text-xs text-gray-500 mt-1">The call link is sent here (and by WhatsApp if you prefer).</p>
+                </div>
+
+                <div>
+                    <label for="preferred_at" class="block text-sm font-medium text-gray-700">Preferred day and time (optional)</label>
+                    <input id="preferred_at" type="datetime-local" name="preferred_at" value="{{ old('preferred_at') }}"
+                        class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
+                </div>
+
+                <div>
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Anything we should know? (optional)</label>
+                    <textarea id="notes" name="notes" rows="3"
+                        class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent"
+                        placeholder="e.g. Year 5, needs help with maths">{{ old('notes') }}</textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition shadow">
+                    <i class="fas fa-video mr-2"></i>Request assessment
+                </button>
+                <p class="text-xs text-gray-500">By requesting a slot you agree to be contacted about your child's assessment.</p>
+            </form>
         </div>
     </div>
 </section>

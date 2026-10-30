@@ -38,6 +38,7 @@
             'icon' => 'fa-users',
             'items' => [
                 ['label' => 'Users & Roles', 'icon' => 'fa-user-friends', 'route' => 'admin.users.index'],
+                ['label' => 'Admissions', 'icon' => 'fa-user-plus', 'route' => 'admin.enquiries.index', 'match' => 'admin.enquiries.*'],
             ],
         ];
 
@@ -98,6 +99,7 @@
                 ['label' => 'Assignments', 'icon' => 'fa-tasks', 'route' => 'tutor.assignments.index'],
                 ['label' => 'Materials', 'icon' => 'fa-folder-open', 'route' => 'tutor.materials.index'],
                 ['label' => 'Learning Goals', 'icon' => 'fa-bullseye', 'route' => 'tutor.learning-goals.index'],
+                ['label' => 'Assessments', 'icon' => 'fa-video', 'route' => 'tutor.assessments.index', 'match' => 'tutor.assessments.*'],
             ],
         ];
         $navSections[] = [
