@@ -1,5 +1,7 @@
 @php
-    // The affirmation is stable for the whole day and rotates automatically.
+    $currentAffirmation = \App\Models\Affirmation::current();
+
+    // The built-in rotation is the fallback when the school has not posted one.
     $affirmations = [
         'I am capable, focused and ready to learn.',
         'Small steps every day add up to big results.',
@@ -23,18 +25,30 @@
         'I show up, I try, and I improve.',
     ];
 
-    $affirmation = $affirmations[now()->dayOfYear % count($affirmations)];
+    $affirmation = $currentAffirmation
+        ? $currentAffirmation->body
+        : $affirmations[now()->dayOfYear % count($affirmations)];
+
+    $affirmationLabel = $currentAffirmation ? 'Affirmation of the week' : 'Affirmation of the day';
+
+    $affirmationMeta = $currentAffirmation
+        ? trim(($currentAffirmation->author ? 'From ' . $currentAffirmation->author->name : 'From the school')
+            . ($currentAffirmation->published_at ? ' · ' . $currentAffirmation->published_at->format('M j, Y') : ''))
+        : now()->format('l, F j, Y');
 @endphp
 
-<div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-    <div class="flex items-start gap-4">
-        <div class="bg-orange-100 text-orange-600 rounded-full p-3 shrink-0">
+<div class="relative overflow-hidden rounded-xl shadow-md p-6 text-white bg-gradient-to-r from-orange-500 via-orange-400 to-blue-600">
+    <div class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10"></div>
+    <div class="pointer-events-none absolute -bottom-8 -left-4 h-20 w-20 rounded-full bg-white/10"></div>
+
+    <div class="relative flex items-start gap-4">
+        <div class="shrink-0 rounded-full bg-white/20 p-3">
             <i class="fas fa-sun text-lg"></i>
         </div>
         <div>
-            <p class="text-xs uppercase tracking-wide text-orange-600 font-semibold">Affirmation of the day</p>
-            <p class="text-gray-800 font-medium mt-1">&ldquo;{{ $affirmation }}&rdquo;</p>
-            <p class="text-xs text-gray-500 mt-2">{{ now()->format('l, F j, Y') }}</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-white/80">{{ $affirmationLabel }}</p>
+            <p class="mt-1 text-lg font-semibold text-white">&ldquo;{{ $affirmation }}&rdquo;</p>
+            <p class="mt-2 text-xs text-white/80">{{ $affirmationMeta }}</p>
         </div>
     </div>
 </div>

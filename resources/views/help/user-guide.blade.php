@@ -270,6 +270,15 @@
                         to an icon rail and give the page more room. On a phone the menu hides behind the same <i class="fas fa-bars"></i> button and
                         slides out from the left.</p>
                 </div>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">My profile &amp; testimonials</h3>
+                <p class="text-gray-600 mb-3">The <strong>person icon</strong> in the top bar opens <strong>My profile</strong> for every role.</p>
+                <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                    <li>Update your <strong>name</strong>, <strong>email</strong> and <strong>profile photo</strong> (JPG/PNG/WebP, up to 4 MB; replace or remove it at any time).</li>
+                    <li>Your <strong>username</strong> is shown read-only — an administrator can change it.</li>
+                    <li>Write a <strong>testimonial</strong> (up to 1,000 characters) and tick <em>“Publish my profile photo with this testimonial”</em> if you want your photo beside it. That needs a photo on your profile first.</li>
+                    <li>The CEO reviews every testimonial. Its status (<em>Waiting</em>, <em>Approved</em>, <em>Rejected</em>) and any CEO note appear on <strong>My profile</strong>. Editing an approved testimonial sends it back for approval.</li>
+                </ul>
             </section>
 
             <!-- ========== FOR ADMINISTRATORS ========== -->
@@ -653,6 +662,38 @@
                         <p class="text-sm text-gray-700"><strong>📌 Note:</strong> <strong>Attendance</strong> and <strong>Learning Materials</strong> oversight pages are <strong>read-only</strong> — they let you monitor activity without interfering with tutors' work. <strong>Assignment submissions</strong> are the exception: admins and the CEO can grade them. Tutors, in turn, can only open and grade assignments that belong to them, so a tutor can never edit another tutor's grades.</p>
                     </div>
                 </div>
+
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-sun text-orange-500 mr-2"></i>Affirmations
+                    </h3>
+                    <p class="text-gray-600 mb-2">
+                        Open <strong>Communication &rarr; Affirmations</strong> to publish the weekly motivation (up to 500 characters).
+                        The newest active post replaces the card on every dashboard immediately.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li>Older posts stay in the history with their author and date.</li>
+                        <li><strong>Switch off</strong> a post to fall back to the previous active one (or the built-in daily rotation); <strong>Switch on</strong> restores it.</li>
+                        <li><strong>Delete</strong> removes it from the history.</li>
+                    </ul>
+                </div>
+
+                @if($guideIsCeo)
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-star text-orange-500 mr-2"></i>Testimonials <span class="text-xs font-bold text-pink-600 align-middle">(CEO ONLY)</span>
+                    </h3>
+                    <p class="text-gray-600 mb-2">
+                        Members write testimonials from <strong>My profile</strong>. Review them in <strong>Communication &rarr; Testimonials</strong>
+                        (tabs: Waiting / Approved / Rejected / All).
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li><strong>Approve for the website</strong> — the testimonial appears on the public landing page, with the member's photo only if they allowed it.</li>
+                        <li><strong>Reject</strong> — add a reason; the member sees it on their profile.</li>
+                        <li>Only approved testimonials are public. Typical testimonials are written by parents, tutors and learners.</li>
+                    </ul>
+                </div>
+                @endif
             </section>
             @endif
 
@@ -1369,7 +1410,14 @@
                             @if($guideIsAdmin)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly classes per tutor with a month picker and a six-month trend, counting classes <strong>ticked as completed</strong> &mdash; tick them from Schedules.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmation</td><td class="px-4 py-3 text-gray-600">A rotating "affirmation of the day" card on every dashboard.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Profiles &amp; testimonials</td><td class="px-4 py-3 text-gray-600">Update your name, email and photo from <strong>My profile</strong> (person icon in the top bar) and submit a testimonial, choosing whether your photo may be published. The CEO approves what appears on the website.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
+                            @if($guideIsCeo)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Testimonials review</td><td class="px-4 py-3 text-gray-600">Approve or reject member testimonials before they appear on the landing page &mdash; <strong>Communication &rarr; Testimonials</strong>.</td><td class="px-4 py-3 text-gray-600">CEO</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmations</td><td class="px-4 py-3 text-gray-600">Publish the weekly motivation and switch older posts on/off &mdash; <strong>Communication &rarr; Affirmations</strong>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmation</td><td class="px-4 py-3 text-gray-600">The school's weekly message (or a rotating fallback) appears in a colourful card on every dashboard.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
                             @if($guideIsAdmin || $guideIsTutor || $guideIsLearner || $guideIsParent)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Assignments</td><td class="px-4 py-3 text-gray-600">Tutors can attach up to six pictures to an assignment.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners, Parents</td></tr>
                             @endif

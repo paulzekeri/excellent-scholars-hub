@@ -30,7 +30,11 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\PublicBookingController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
+use App\Http\Controllers\Admin\AffirmationController as AdminAffirmationController;
 use App\Models\Notification;
+use App\Models\Testimonial;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +64,13 @@ Route::get('/', function () {
             'learners' => \App\Models\Learner::count(),
             'parents' => \App\Models\ParentModel::count(),
         ],
+        // Approved member testimonials (note 10); the view falls back to samples.
+        'testimonials' => Testimonial::with('user.role')
+            ->where('status', Testimonial::STATUS_APPROVED)
+            ->whereNotNull('approved_at')
+            ->latest('approved_at')
+            ->take(6)
+            ->get(),
     ]);
 });
 
@@ -88,6 +99,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/help/user-guide', function () {
         return view('help.user-guide');
     })->name('help.user-guide');
+
+    // My profile + testimonial submission (note 10)
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/testimonial', [ProfileController::class, 'storeTestimonial'])->name('profile.testimonial.store');
 
     // In-app messaging (parents <-> CEO / administrators)
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
@@ -138,6 +154,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::post('/enquiries/{enquiry}/status', [AdminEnquiryController::class, 'updateStatus'])->name('enquiries.status');
     Route::post('/enquiries/{enquiry}/notes', [AdminEnquiryController::class, 'storeNote'])->name('enquiries.notes.store');
 
+    // Weekly affirmations written by the school (note 8).
+    Route::get('/affirmations', [AdminAffirmationController::class, 'index'])->name('affirmations.index');
+    Route::post('/affirmations', [AdminAffirmationController::class, 'store'])->name('affirmations.store');
+    Route::post('/affirmations/{affirmation}/toggle', [AdminAffirmationController::class, 'toggle'])->name('affirmations.toggle');
+    Route::delete('/affirmations/{affirmation}', [AdminAffirmationController::class, 'destroy'])->name('affirmations.destroy');
+
     // Conversion wizard (phase 4): parent + learner accounts and class enrolment.
     Route::get('/enquiries/{enquiry}/convert', [AdminEnquiryConversionController::class, 'show'])->name('enquiries.convert');
     Route::post('/enquiries/{enquiry}/convert', [AdminEnquiryConversionController::class, 'store'])->name('enquiries.convert.store');
@@ -165,6 +187,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:ceo'])->group(
     Route::patch('/payment-accounts/{paymentAccount}', [AdminPaymentAccountController::class, 'update'])->name('payment-accounts.update');
     Route::patch('/payment-accounts/{paymentAccount}/toggle', [AdminPaymentAccountController::class, 'toggle'])->name('payment-accounts.toggle');
     Route::delete('/payment-accounts/{paymentAccount}', [AdminPaymentAccountController::class, 'destroy'])->name('payment-accounts.destroy');
+
+    // Testimonials the CEO approves for the landing page (note 10).
+    Route::get('/testimonials', [AdminTestimonialController::class, 'index'])->name('testimonials.index');
+    Route::post('/testimonials/{testimonial}/approve', [AdminTestimonialController::class, 'approve'])->name('testimonials.approve');
+    Route::post('/testimonials/{testimonial}/reject', [AdminTestimonialController::class, 'reject'])->name('testimonials.reject');
 });
 
 // Tutor Routes

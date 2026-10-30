@@ -65,14 +65,21 @@
             ];
         }
 
+        $communicationItems = [
+            ['label' => 'Messages', 'icon' => 'fa-comment-dots', 'route' => 'messages.index', 'badge' => $navUnreadMessages],
+            ['label' => 'Broadcasts', 'icon' => 'fa-bullhorn', 'route' => 'admin.messages.index'],
+            ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'badge' => $navUnreadNotifications],
+            ['label' => 'Affirmations', 'icon' => 'fa-sun', 'route' => 'admin.affirmations.index', 'match' => 'admin.affirmations.*'],
+        ];
+
+        if ($user->isCeo()) {
+            $communicationItems[] = ['label' => 'Testimonials', 'icon' => 'fa-star', 'route' => 'admin.testimonials.index', 'match' => 'admin.testimonials.*'];
+        }
+
         $navSections[] = [
             'title' => 'Communication',
             'icon' => 'fa-comments',
-            'items' => [
-                ['label' => 'Messages', 'icon' => 'fa-comment-dots', 'route' => 'messages.index', 'badge' => $navUnreadMessages],
-                ['label' => 'Broadcasts', 'icon' => 'fa-bullhorn', 'route' => 'admin.messages.index'],
-                ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'badge' => $navUnreadNotifications],
-            ],
+            'items' => $communicationItems,
         ];
 
         $navSections[] = [

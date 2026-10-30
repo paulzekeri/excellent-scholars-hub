@@ -9,6 +9,8 @@
         <p class="text-gray-600 mt-1">Welcome back, {{ auth()->user()->name }}!</p>
     </div>
 
+    @include('partials.affirmation')
+
     @php
         $focusSession = $liveSession ?? $nextSession;
         $isLive = (bool) $liveSession;

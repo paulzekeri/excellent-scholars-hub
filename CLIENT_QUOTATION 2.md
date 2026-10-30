@@ -111,7 +111,29 @@ Important Notes:
 
 ## 
 
-## **CLIENT ACCEPTANCE & SIGN-OFF**
+## **PHASE 2 (V2) — DEFERRED ITEMS (NOT INCLUDED IN THIS QUOTATION)**
+
+The following requests were discussed and are **deliberately moved to a second phase**. They are **not
+covered by the fees in Part 1**; they will be quoted separately when the school is ready to schedule them.
+
+| Ref | Deferred item | Phase |
+| :---- | :---- | :---- |
+| Meeting note 9(ii) | Admin/CEO-managed landing-page slider (add, reorder and remove slides from the backend) | V2 |
+| Meeting note 9(iii) | Social media links on the public website | V2 |
+| Meeting note 13 (P5) | Automated assessment reminders by cron + a public guardian status page | V2 |
+| Meeting note 11 | Fully automated online payment gateway (Paystack) with the gateway response saved and a CEO view | V2 (deferred 29 October 2026) |
+| Related | Automatic Google Meet/Zoom link creation for assessments/classes (needs OAuth credentials) | V2 |
+
+**Notes on the deferred items**
+
+* The current deployment has **no cron job**. Assessment visibility is handled by the in-app
+  "today's assessment calls" panels on the admin, CEO and tutor dashboards. V2 reminders will require the
+  school to enable a daily cron job on the hosting account.
+* The public landing page, live programmes and CEO-approved testimonials are included now; only the
+  **dynamic slider** and **social links** are deferred.
+* Everything delivered under meeting-note items **1–8, 9(i), 10, 12 and 13 (P1–P4)** is in the current scope.
+  The final consolidated, re-priced quotation (meeting note 14) will list those additions formally.
+
 
 I confirm that I have reviewed and accepted the pricing structure, payment terms, and hosting responsibilities outlined in this documentation
 

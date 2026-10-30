@@ -134,6 +134,30 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Member profiles and CEO-approved testimonials (note 10, 30 October 2026)
+
+Members can now manage their own profile and share a testimonial; the CEO decides what appears on the
+public website.
+
+| Area | Change | Where |
+|------|--------|-------|
+| My profile | Every role gets **My profile** (top bar): update name and email and upload/replace/remove a profile photo (JPG/PNG/WebP ≤ 4 MB); learners may keep no email; username is read-only | `ProfileController`, `profile/edit.blade.php` |
+| Testimonial | Members write up to 1,000 characters and tick **"Publish my profile photo"** (requires a photo); one testimonial per member; any edit returns it to the CEO for approval | `ProfileController@storeTestimonial`, `testimonials` table |
+| CEO review | **Communication → Testimonials** (CEO only): pending/approved/rejected tabs, approve for the website, or reject with a reason the member sees | `Admin\TestimonialController`, `admin/testimonials/index.blade.php` |
+| Landing page | Approved testimonials render live (name, role, quote, photo only when allowed); sample quotes remain the fallback when nothing is approved | `routes/web.php` (`/`), `landing.blade.php` |
+| Tests | `tests/Feature/ProfileTest.php` (7) and `TestimonialTest.php` (7) — photo replace/remove, unique email, learner without email, submission/consent, CEO approval/rejection, photo publishing and landing visibility | `tests/Feature` |
+
+### Weekly affirmations written by the school (note 8, 30 October 2026)
+
+The affirmation card is no longer only a built-in rotation: the school writes the weekly message.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Compose | **Communication → Affirmations** (admin + CEO): publish a message (max 500 characters); new posts take over immediately | `Admin\AffirmationController`, `admin/affirmations/index.blade.php` |
+| History | Older posts stay listed with author/date; switch one off (falls back to the previous active post or the rotation) or delete it | same |
+| Dashboards | A colourful blue/orange card shows the latest active post on **every** dashboard — including the learner dashboard, which previously had no affirmation | `partials/affirmation.blade.php`, dashboards |
+| Tests | `tests/Feature/AffirmationTest.php` (7) — publish, newest wins, switch-off fallback, permissions, validation, delete, render | `tests/Feature` |
+
 ### Class completion tick and an honest monthly tutor report (note 5, 30 October 2026)
 
 The monthly report used to count *scheduled* sessions, so a cancelled class still looked like teaching. The

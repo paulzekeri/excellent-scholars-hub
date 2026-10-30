@@ -251,17 +251,36 @@
             <p class="text-sm uppercase tracking-widest text-accent font-bold">Testimonials</p>
             <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900">What our school community says</h2>
         </div>
+        @php
+            $items = $testimonials->map(function ($testimonial) {
+                return [
+                    'quote' => $testimonial->body,
+                    'name' => optional($testimonial->user)->name ?? 'Member',
+                    'role' => $testimonial->roleLabel(),
+                    'photo' => $testimonial->photoUrl(),
+                ];
+            })->all();
+
+            if (empty($items)) {
+                $items = [
+                    ['quote' => 'I can see my daughter\'s attendance and assignments without calling the school. The learning goals shared with me are a game changer.', 'name' => 'Mrs. A.', 'role' => 'Parent', 'photo' => null],
+                    ['quote' => 'Scheduling a session, recording attendance and grading submissions now takes me minutes instead of an evening.', 'name' => 'Mr. O.', 'role' => 'Tutor', 'photo' => null],
+                    ['quote' => 'I always know when my next class is and can join with one click from my dashboard.', 'name' => 'Tolu', 'role' => 'Learner', 'photo' => null],
+                ];
+            }
+        @endphp
         <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach([
-                ['quote' => 'I can see my daughter\'s attendance and assignments without calling the school. The learning goals shared with me are a game changer.', 'name' => 'Mrs. A.', 'role' => 'Parent'],
-                ['quote' => 'Scheduling a session, recording attendance and grading submissions now takes me minutes instead of an evening.', 'name' => 'Mr. O.', 'role' => 'Tutor'],
-                ['quote' => 'I always know when my next class is and can join with one click from my dashboard.', 'name' => 'Tolu', 'role' => 'Learner'],
-            ] as $testimonial)
+            @foreach($items as $testimonial)
                 <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <div class="text-accent"><i class="fas fa-quote-left text-2xl"></i></div>
                     <blockquote class="mt-4 text-gray-700">{{ $testimonial['quote'] }}</blockquote>
-                    <figcaption class="mt-4 text-sm text-gray-500">
-                        <span class="font-semibold text-gray-800">{{ $testimonial['name'] }}</span> · {{ $testimonial['role'] }}
+                    <figcaption class="mt-4 flex items-center gap-3 text-sm text-gray-500">
+                        @if($testimonial['photo'])
+                            <img src="{{ $testimonial['photo'] }}" alt="{{ $testimonial['name'] }}" class="h-10 w-10 rounded-full object-cover">
+                        @endif
+                        <span>
+                            <span class="font-semibold text-gray-800">{{ $testimonial['name'] }}</span> · {{ $testimonial['role'] }}
+                        </span>
                     </figcaption>
                 </figure>
             @endforeach

@@ -15,7 +15,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'username', 'email', 'password', 'must_change_password', 'password_changed_at',
-        'role_id', 'phone', 'is_active',
+        'role_id', 'phone', 'photo_path', 'is_active',
     ];
 
     protected $hidden = [
@@ -118,6 +118,35 @@ class User extends Authenticatable
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    /** The member's landing-page testimonial (one per user). */
+    public function testimonial()
+    {
+        return $this->hasOne(Testimonial::class);
+    }
+
+    /** Public URL of the uploaded profile photo, if there is one. */
+    public function photoUrl(): ?string
+    {
+        if (! $this->photo_path) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->photo_path);
+    }
+
+    /** One or two letters for an avatar when no photo exists. */
+    public function initials(): string
+    {
+        $words = preg_split('/\s+/', trim((string) $this->name)) ?: [];
+        $letters = '';
+
+        foreach (array_slice($words, 0, 2) as $word) {
+            $letters .= mb_substr($word, 0, 1);
+        }
+
+        return mb_strtoupper($letters ?: 'U');
     }
 
     public function sentMessages()

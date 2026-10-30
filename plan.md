@@ -186,7 +186,19 @@
       Schedules; `completed_at` / `completed_by` and an activity-log entry record who ticked it. The monthly
       report and six-month trend now count **completed** classes and show "completed of scheduled" per tutor.
       Tests: `ScheduleCompletionTest` (7), full suite 175 passing
-- [ ] Remaining gaps from the meeting note (see `PLAN_CLIENT_ADDITIONS.md`): admin-authored affirmations
-      (note 8), dynamic
-      slider + testimonials backend + social links (notes 9, 10), and the final quotation rewrite (note 14)
+- [x] **Note 10 — profiles and testimonials** — **My profile** lets every member update their name, email
+      and photo (replace/remove, JPG/PNG/WebP up to 4 MB; learners may keep no email), and submit a
+      testimonial with a "publish my profile photo" consent question. The CEO reviews submissions in
+      **Communication → Testimonials** (approve or reject with a reason); approved testimonials render on the
+      landing page with the photo only when allowed, falling back to the sample quotes when nothing is
+      approved. Tests: `ProfileTest` (7) + `TestimonialTest` (7), full suite 189 passing
+- [x] **Note 8 — admin-authored affirmations** — administrators/CEO publish the weekly message from
+      **Communication → Affirmations**; every dashboard (including learners) shows the latest active post in a
+      colourful blue/orange card, with switch-off/delete and the built-in daily rotation as fallback.
+      Tests: `AffirmationTest` (7), full suite 196 passing
+- [ ] **V2 items marked on the quotation** — admin-managed landing slider (9-ii), social media links (9-iii),
+      assessment reminders + guardian status page (13-P5), payment gateway (11), automatic Meet/Zoom links.
+      **Not included in the current scope**; see the v2 section of `CLIENT_QUOTATION 2.md`.
+- [ ] **Note 14 — final quotation rewrite** — the additions above still need to be folded into the final
+      quotation with pricing; the deferred items are already marked as v2.
 

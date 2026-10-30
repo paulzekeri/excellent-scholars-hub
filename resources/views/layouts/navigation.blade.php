@@ -54,6 +54,15 @@
                 @endif
             </a>
 
+            <a href="{{ route('profile.edit') }}" title="My profile" aria-label="My profile"
+               class="rounded-lg p-2 text-blue-100 transition hover:bg-white/10 hover:text-white">
+                @if($navUser->photoUrl())
+                    <img src="{{ $navUser->photoUrl() }}" alt="{{ $navUser->name }}" class="h-6 w-6 rounded-full object-cover">
+                @else
+                    <i class="fas fa-user-circle text-lg"></i>
+                @endif
+            </a>
+
             <a href="{{ route('help.user-guide') }}" title="Help & User Guide" aria-label="Help and user guide"
                class="hidden rounded-lg p-2 text-blue-100 transition hover:bg-white/10 hover:text-white sm:inline-flex">
                 <i class="fas fa-question-circle text-lg"></i>

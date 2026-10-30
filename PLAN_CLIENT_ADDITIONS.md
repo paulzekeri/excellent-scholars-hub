@@ -21,15 +21,16 @@ guide, sidebar). This is the honest picture of all 14 notes:
 | 5 | Monthly classes per tutor | `[x]` — admin/CEO can tick a class as completed (with audit + reopen); the report now counts **completed** classes and shows completed vs scheduled |
 | 6 | Blue / white / orange branding | `[x]` |
 | 7 | Tutor learning goals, shared by admin/CEO | `[x]` for parent + tutor; sharing with **learners** not built |
-| 8 | Affirmation card | `[~]` — static daily rotation; no admin-authored weekly post |
-| 9 | Landing page (slider, testimonials, about, register) | `[~]` — page + live programmes exist; slides and testimonials are hard-coded |
-| 9-i | Testimonials backend + admin approval | `[ ]` |
-| 9-ii | Admin/CEO-managed slider | `[ ]` |
-| 9-iii | Social media links | `[ ]` |
-| 10 | Profile update (name/email/photo) + testimonial consent, CEO tick | `[ ]` |
+| 8 | Affirmation card | `[x]` — administrators/CEO publish the weekly affirmation from **Affirmations**; every dashboard shows the latest active post (colourful card), with the built-in rotation as fallback |
+| 9 | Landing page (slider, testimonials, about, register) | `[~]` — page + live programmes exist; testimonials are now member-written and CEO-approved; the slider remains static |
+| 9-i | Testimonials backend + admin approval | `[x]` — members submit from **My profile**; the CEO approves/rejects; approved ones appear on the landing page (photo only when allowed) |
+| 9-ii | Admin/CEO-managed slider | `[ ]` — **deferred to v2** (marked on the quotation) |
+| 9-iii | Social media links | `[ ]` — **deferred to v2** (marked on the quotation) |
+| 10 | Profile update (name/email/photo) + testimonial consent, CEO tick | `[x]` — **My profile** (name, email, photo with replace/remove), testimonial submission with a photo-consent question, CEO approval/rejection with a note |
 | 11 | Automated payment gateway | **Deferred by the client (29 Oct 2026)** — not in scope; `PaystackService` stays as the stub |
 | 12 | Children without email: username login + reset | `[x]` — username login, provisioning, forced first-login change, guardian-delivered reset, parent-initiated reset and the backfill/audit commands are shipped (Phase 11) |
-| 13 | Prospective-learner video-call assessment workflow | `[ ]` — designed in `PLAN_LOGIN_AND_ADMISSIONS.md` §2 (conversion requires the guardian email from note 12) |
+| 13 | Prospective-learner video-call assessment workflow | `[~]` — P1–P4 shipped (capture → booking → result → conversion); **P5 reminders/status page deferred to v2** |
+| 14 | Final quotation with all additions and pricing | `[~]` — deferred items (9-ii, 9-iii, 13-P5, 11) are marked **v2** on the quotation; the full re-priced final quotation is still to be written |
 
 **Client clarifications (29 October 2026):**
 
@@ -261,5 +262,6 @@ Design: `PLAN_LOGIN_AND_ADMISSIONS.md` §2. Phase 1 shipped on 29 October 2026.
       timeline/activity log and emails both sets of credentials (flashing them when mail is off). Guards:
       placed only, guardian email present and not a staff/learner address, class capacity, duplicate
       usernames refused, idempotent via a locked transaction. Tests: `EnquiryConversionTest` (10).
-- [ ] **P5** — optional cron reminders, guardian status page, automatic Meet/Zoom links.
+- [ ] **P5** — optional cron reminders, guardian status page, automatic Meet/Zoom links. **Deferred to v2
+      and marked on the quotation** (the deployment has no cron; today's panels already cover visibility).
 
