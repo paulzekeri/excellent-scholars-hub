@@ -121,6 +121,9 @@ guide, sidebar). This is the honest picture of all 14 notes:
 - [x] Flyer typography and landing treatment: Poppins headings / Inter body (Caveat script only on the public
       page), navy corner + wave, subject strip, book illustration, brush underline, pale-blue callouts, navy footer
       with `@esh_tutoring` socials. Existing `logo.jpg` kept per the client's instruction.
+- [x] LMS palette pass: sun scale for attention (replaces yellow **and** amber), pale-blue table headers with navy
+      labels, `#F5F8FC` canvas, shared `partials.stat-card` (blue people / navy academics / orange finance / sun
+      attention / green success), sun sidebar active bar + unread badges, hairline top bar.
 - [x] `partials/affirmation` card (deterministic per day) on all four dashboards.
 
 ## Phase 6 — Learning goals (note 11)

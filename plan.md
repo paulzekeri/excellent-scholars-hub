@@ -121,6 +121,9 @@
 - [x] **Flyer look and feel** — Poppins headings + Inter body (`Caveat` script on the marketing page only), the
       landing hero rebuilt as the flyer: navy corner + wave, subject strip, colour-coded book illustration, brush
       underline, pale-blue callouts, sun sparkles and a navy footer with the school's socials
+- [x] **LMS palette pass** — brand sun scale replaces Tailwind yellow/amber (attention), pale-blue table headers,
+      `#F5F8FC` canvas, `partials/stat-card` with semantic tones (people/academics/finance/attention/success),
+      sun active bar and unread badges, hairline top bar, `text-gray-400` meta lifted to `gray-500`
 - [x] **Affirmation of the day** — rotation card on all four dashboards
 - [x] **Public landing page** — hero slider, live programmes, how-it-works, testimonials, about/contact and
       register CTA at `/` for guests (signed-in users still redirect to their dashboard)
