@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ClassSchedule;
 use App\Models\Assignment;
 use App\Models\LearningMaterial;
+use App\Models\LearningGoal;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -50,6 +51,13 @@ class DashboardController extends Controller
                 ->latest()
                 ->take(5)
                 ->get(),
+            // Note 7 — goals the school shared with this learner.
+            'sharedGoals' => LearningGoal::visibleToLearner($learner)
+                ->with('schoolClass')
+                ->latest('shared_at')
+                ->take(3)
+                ->get(),
+            'sharedGoalsCount' => LearningGoal::visibleToLearner($learner)->count(),
         ];
 
 

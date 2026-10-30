@@ -1032,6 +1032,22 @@
                         <p class="text-sm text-gray-700"><strong>📌 Note:</strong> Sessions that haven't started yet will show as "Scheduled", and completed ones will show as "Completed". The Join button is only available for scheduled sessions with a meeting link.</p>
                     </div>
                 </div>
+
+                <!-- Learning Goals -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-bullseye text-orange-500 mr-2"></i>6. Learning Goals
+                    </h3>
+                    <p class="text-gray-600 mb-2">
+                        Goals your tutor set — and the school shared with you — appear on your dashboard under
+                        <strong>Goals shared with you</strong>, and in full on <strong>My Learning → Learning Goals</strong>.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li>Each goal shows what you are aiming for, the class and term, and any attachment from your tutor.</li>
+                        <li>Only goals the school has chosen to share with learners appear here.</li>
+                        <li>Use the goals as your checklist for the term — tick them off with your tutor in class.</li>
+                    </ul>
+                </div>
             </section>
             @endif
 
@@ -1393,7 +1409,7 @@
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Inbox</td><td class="px-4 py-3 text-gray-600">Tutors and learners now have their own inbox and can reply.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners</td></tr>
                             @endif
                             @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learning goals</td><td class="px-4 py-3 text-gray-600">Tutors upload goals; the school shares them with parents and tutors — see <a href="#learning-goals" class="text-blue-700 underline">Learning goals</a>.</td><td class="px-4 py-3 text-gray-600">Tutors, Admin, CEO, Parents</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learning goals</td><td class="px-4 py-3 text-gray-600">Tutors upload goals; the school shares them with parents, learners and tutors — see <a href="#learning-goals" class="text-blue-700 underline">Learning goals</a>. Learners see shared goals on their dashboard and in My Learning.</td><td class="px-4 py-3 text-gray-600">Tutors, Admin, CEO, Parents, Learners</td></tr>
                             @endif
                             @if($guideIsLearner)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Learner panel</td><td class="px-4 py-3 text-gray-600">"Live now / Up next" panel at the top of the dashboard — see <a href="#dashboard-extras" class="text-blue-700 underline">Dashboard extras</a>.</td><td class="px-4 py-3 text-gray-600">Learners</td></tr>
@@ -1585,7 +1601,7 @@
 
 
             <!-- ========== LEARNING GOALS ========== -->
-            @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
+            @if($guideIsAdmin || $guideIsTutor || $guideIsParent || $guideIsLearner)
             <section id="learning-goals" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
                     <i class="fas fa-bullseye text-orange-500 mr-2"></i>Learning goals
@@ -1596,10 +1612,14 @@
                         shared with parents — nothing reaches you automatically.
                     @elseif($guideIsTutor)
                         You record what each learner is working towards. Administrators and the CEO review those goals and
-                        decide which ones are shared with the parent and/or you — nothing reaches a parent automatically.
+                        decide which ones are shared with the parent, the learner and/or you — nothing reaches a parent or
+                        learner automatically.
+                    @elseif($guideIsLearner)
+                        Your tutor records what you are working towards. The school reviews those goals and decides which
+                        ones you can see — they then appear on your dashboard and in <strong>My Learning → Learning Goals</strong>.
                     @else
                         Tutors record what each learner is working towards. You review those goals and decide which ones
-                        are shared with the parent and/or the tutor — nothing reaches a parent automatically.
+                        are shared with the parent, the learner and/or the tutor — nothing reaches them automatically.
                     @endif
                 </p>
 
@@ -1621,10 +1641,10 @@
                 @if($guideIsAdmin)
                 <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">For administrators and the CEO — sharing</h3>
                 <ol class="space-y-2 mb-6">
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Goals</strong> in the admin menu. The tiles show all goals, how many are shared with parents, with tutors, and how many are awaiting review.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Goals</strong> in the admin menu. The tiles show all goals, how many are shared with parents, learners and tutors, and how many are awaiting review.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Filter by tutor or by sharing status if the list is long.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">In the <strong>Share with</strong> column tick <strong>Parent</strong> and/or <strong>Tutor</strong>, then click <strong>Save</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">The date and the name of the person who shared it are recorded in <strong>Last shared</strong>. Unticking both switches withdraws the goal.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">In the <strong>Share with</strong> column tick <strong>Parent</strong>, <strong>Learner</strong> and/or <strong>Tutor</strong>, then click <strong>Save</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">The date and the name of the person who shared it are recorded in <strong>Last shared</strong>. Unticking all switches withdraws the goal.</span></li>
                 </ol>
                 @endif
 
@@ -1642,6 +1662,15 @@
                 <p class="text-gray-600">
                     The bottom of the <strong>Goals</strong> screen lists goals another tutor wrote and the school shared
                     with you, including who shared it and when.
+                </p>
+                @endif
+
+                @if($guideIsLearner)
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">For learners — where to find them</h3>
+                <p class="text-gray-600">
+                    Goals shared with you appear under <strong>Goals shared with you</strong> on your dashboard (the
+                    latest three) and in full under <strong>My Learning → Learning Goals</strong>. Each card shows the
+                    target, the class and term, and any attachment the tutor added.
                 </p>
                 @endif
             </section>
@@ -1748,7 +1777,7 @@
                     @if($guideIsAdmin || $guideIsParent)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ A parent says they cannot see a learning goal.</h3>
-                        <p class="text-gray-600 text-sm">Goals only reach parents once an administrator or the CEO ticks <strong>Parent</strong> in the <strong>Share with</strong> column on the Learning Goals screen (and clicks <strong>Save</strong>). Unticking it withdraws the goal again.</p>
+                        <p class="text-gray-600 text-sm">Goals only reach people once an administrator or the CEO ticks <strong>Parent</strong>, <strong>Learner</strong> and/or <strong>Tutor</strong> in the <strong>Share with</strong> column on the Learning Goals screen (and clicks <strong>Save</strong>). Unticking a box withdraws the goal again — learners lose it from their dashboard and My Learning page immediately.</p>
                     </div>
                     @endif
 

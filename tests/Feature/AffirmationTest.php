@@ -134,6 +134,7 @@ class AffirmationTest extends TestCase
     public function test_the_message_is_required_and_limited_to_five_hundred_characters(): void
     {
         $admin = $this->makeUser('admin', 'Validation Affirmation Admin');
+        $before = Affirmation::count();
 
         $this->actingAs($admin)
             ->from(route('admin.affirmations.index'))
@@ -145,7 +146,7 @@ class AffirmationTest extends TestCase
             ->post(route('admin.affirmations.store'), ['body' => str_repeat('a', 501)])
             ->assertSessionHasErrors('body');
 
-        $this->assertSame(0, Affirmation::count());
+        $this->assertSame($before, Affirmation::count());
     }
 
     public function test_the_school_can_delete_an_affirmation(): void

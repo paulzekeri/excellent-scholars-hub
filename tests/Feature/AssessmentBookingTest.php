@@ -116,10 +116,12 @@ class AssessmentBookingTest extends TestCase
 
     public function test_a_public_request_needs_the_child_guardian_and_contact_details(): void
     {
+        $before = Enquiry::count();
+
         $this->from('/')->post(route('assessments.request'), [])
             ->assertSessionHasErrors(['child_name', 'guardian_name', 'guardian_phone', 'guardian_email']);
 
-        $this->assertSame(0, Enquiry::count());
+        $this->assertSame($before, Enquiry::count());
     }
 
     public function test_the_honeypot_blocks_bots_without_creating_an_enquiry(): void
@@ -132,7 +134,7 @@ class AssessmentBookingTest extends TestCase
             'website' => 'http://spam.example.com',
         ])->assertRedirect('/#book-assessment');
 
-        $this->assertSame(0, Enquiry::count());
+        $this->assertDatabaseMissing('enquiries', ['child_name' => 'Bot Child']);
     }
 
     public function test_an_admin_books_the_call_and_emails_the_link_to_the_guardian(): void
@@ -187,7 +189,7 @@ class AssessmentBookingTest extends TestCase
             ->post(route('admin.enquiries.assessments.store', $enquiry), $this->bookingPayload($tutor))
             ->assertSessionHas('error');
 
-        $this->assertSame(0, AssessmentSession::count());
+        $this->assertSame(0, $enquiry->assessments()->count());
         $this->assertSame(Enquiry::STATUS_NEW, $enquiry->fresh()->status);
     }
 
@@ -211,7 +213,7 @@ class AssessmentBookingTest extends TestCase
             ]))
             ->assertSessionHasErrors('meeting_link');
 
-        $this->assertSame(0, AssessmentSession::count());
+        $this->assertSame(0, $enquiry->assessments()->count());
     }
 
     public function test_a_phone_assessment_does_not_need_a_meeting_link(): void
@@ -229,7 +231,7 @@ class AssessmentBookingTest extends TestCase
             ]))
             ->assertSessionHas('success');
 
-        $assessment = AssessmentSession::firstOrFail();
+        $assessment = $enquiry->assessments()->firstOrFail();
 
         $this->assertSame(AssessmentSession::PLATFORM_PHONE, $assessment->platform);
         $this->assertNull($assessment->meeting_link);

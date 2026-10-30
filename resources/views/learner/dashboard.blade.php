@@ -166,5 +166,46 @@
             </div>
         </div>
     </div>
+
+    <!-- Goals shared with you (note 7) -->
+    <div class="bg-white rounded-xl shadow-md p-6 mt-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-bullseye text-orange-500 mr-2"></i>Goals shared with you
+                @if($sharedGoalsCount > 0)
+                    <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700">{{ $sharedGoalsCount }}</span>
+                @endif
+            </h2>
+            <a href="{{ route('learner.learning-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View all <i class="fas fa-arrow-right ml-1"></i></a>
+        </div>
+
+        @if($sharedGoals->isEmpty())
+            <p class="text-sm text-gray-500">No goals have been shared with you yet — they appear here when your school shares them.</p>
+        @else
+            <ul class="space-y-3">
+                @foreach($sharedGoals as $goal)
+                    <li class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <p class="font-medium text-gray-800">{{ $goal->title }}</p>
+                            <span class="text-xs text-gray-500">
+                                {{ $goal->schoolClass->name ?? 'General' }} · {{ $goal->term ?: 'No term' }}
+                            </span>
+                        </div>
+                        @if($goal->target)
+                            <p class="text-xs text-gray-600 mt-1"><strong>Target:</strong> {{ $goal->target }}</p>
+                        @endif
+                        @if($goal->description)
+                            <p class="text-sm text-gray-600 mt-1">{{ \Illuminate\Support\Str::limit($goal->description, 140) }}</p>
+                        @endif
+                        @if($goal->file_path)
+                            <a href="{{ route('learner.learning-goals.download', $goal) }}" class="mt-2 inline-block text-xs text-orange-600 hover:text-orange-800">
+                                <i class="fas fa-download mr-1"></i> Attachment
+                            </a>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
 </div>
 @endsection

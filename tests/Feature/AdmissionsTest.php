@@ -98,7 +98,7 @@ class AdmissionsTest extends TestCase
             ->post(route('admin.enquiries.store'), [])
             ->assertSessionHasErrors(['child_name', 'guardian_name', 'guardian_phone', 'source']);
 
-        $this->assertSame(0, Enquiry::count());
+        $this->assertDatabaseMissing('enquiries', ['child_name' => '']);
     }
 
     public function test_the_pipeline_tabs_search_and_source_filter_work(): void

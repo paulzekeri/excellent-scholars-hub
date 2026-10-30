@@ -111,7 +111,9 @@
 - [x] **Monthly classes per tutor** — month picker, ranked bars and a six-month trend on the admin **and**
       CEO dashboard, counting classes **ticked as completed** (with completed vs scheduled shown)
 - [x] **Learning goals** — tutors upload (per learner/class, optional file); `role:admin,ceo` screen shares with
-      parent and/or tutor; parent child screen gains a Learning Goals tab; tutors see goals shared with them
+      parent, **learner** and/or tutor; parent child screen gains a Learning Goals tab; tutors see goals shared
+      with them; learners see shared goals on their dashboard and a **My Learning → Learning Goals** page with
+      attachment downloads
 - [x] **Categorised messaging** — broadcasts to parents / tutors / students / everyone / one class, fan-out
       `messages` + notifications, broadcast report, inbox for every role, category filters for administrators
 - [x] **Blue / white / orange branding** — indigo removed from all 38 affected views, orange accents, red kept for

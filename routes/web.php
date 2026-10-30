@@ -26,6 +26,7 @@ use App\Http\Controllers\Parent\PaymentController as ParentPaymentController;
 use App\Http\Controllers\Learner\DashboardController as LearnerDashboard;
 use App\Http\Controllers\Learner\ClassController as LearnerClassController;
 use App\Http\Controllers\Learner\AssignmentController as LearnerAssignmentController;
+use App\Http\Controllers\Learner\LearningGoalController as LearnerLearningGoalController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Auth\ChangePasswordController;
@@ -251,4 +252,8 @@ Route::prefix('learner')->name('learner.')->middleware(['auth', 'role:learner'])
     Route::get('/assignments', [LearnerAssignmentController::class, 'index'])->name('assignments');
     Route::get('/assignments/{assignment}/submit', [LearnerAssignmentController::class, 'submit'])->name('assignments.submit');
     Route::post('/assignments/{assignment}/submit', [LearnerAssignmentController::class, 'store'])->name('assignments.submit.store');
+
+    // Goals the school shared with this learner (note 7).
+    Route::get('/learning-goals', [LearnerLearningGoalController::class, 'index'])->name('learning-goals.index');
+    Route::get('/learning-goals/{goal}/download', [LearnerLearningGoalController::class, 'download'])->name('learning-goals.download');
 });

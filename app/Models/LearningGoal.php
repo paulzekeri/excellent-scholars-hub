@@ -16,12 +16,13 @@ class LearningGoal extends Model
     protected $fillable = [
         'tutor_id', 'learner_id', 'class_id', 'title', 'description', 'term',
         'target', 'file_path', 'file_name', 'status',
-        'shared_with_parent', 'shared_with_tutor', 'shared_by', 'shared_at',
+        'shared_with_parent', 'shared_with_tutor', 'shared_with_learner', 'shared_by', 'shared_at',
     ];
 
     protected $casts = [
         'shared_with_parent' => 'boolean',
         'shared_with_tutor' => 'boolean',
+        'shared_with_learner' => 'boolean',
         'shared_at' => 'datetime',
     ];
 
@@ -57,6 +58,47 @@ class LearningGoal extends Model
         return $query->where('shared_with_tutor', true);
     }
 
+    /** Goals the learner is allowed to see on their own dashboard. */
+    public function scopeSharedWithLearner($query)
+    {
+        return $query->where('shared_with_learner', true);
+    }
+
+    /**
+     * Goals shared with this learner: their own goals plus class-wide goals for
+     * a class they are enrolled in.
+     */
+    public function scopeVisibleToLearner($query, Learner $learner)
+    {
+        $classIds = $learner->classes()->pluck('classes.id');
+
+        return $query->where('shared_with_learner', true)
+            ->where(function ($query) use ($learner, $classIds) {
+                $query->where('learner_id', $learner->id)
+                    ->orWhere(function ($query) use ($classIds) {
+                        $query->whereNull('learner_id')->whereIn('class_id', $classIds);
+                    });
+            });
+    }
+
+    /**
+     * A goal is visible to a learner when it is shared with learners and it is
+     * about that learner (or about one of their classes, for class-wide goals).
+     */
+    public function isVisibleToLearner(Learner $learner): bool
+    {
+        if (! $this->shared_with_learner) {
+            return false;
+        }
+
+        if ($this->learner_id) {
+            return (int) $this->learner_id === (int) $learner->id;
+        }
+
+        return $this->class_id
+            && $learner->classes()->whereKey($this->class_id)->exists();
+    }
+
     /** "Ada Obi · First Term · JSS 2 Maths" */
     public function contextLabel(): string
     {
@@ -71,6 +113,6 @@ class LearningGoal extends Model
 
     public function isShared(): bool
     {
-        return $this->shared_with_parent || $this->shared_with_tutor;
+        return $this->shared_with_parent || $this->shared_with_tutor || $this->shared_with_learner;
     }
 }

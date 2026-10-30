@@ -30,8 +30,13 @@ class LearningGoalController extends Controller
             ->when($shared === 'tutor', function ($query) {
                 $query->where('shared_with_tutor', true);
             })
+            ->when($shared === 'learner', function ($query) {
+                $query->where('shared_with_learner', true);
+            })
             ->when($shared === 'unshared', function ($query) {
-                $query->where('shared_with_parent', false)->where('shared_with_tutor', false);
+                $query->where('shared_with_parent', false)
+                    ->where('shared_with_tutor', false)
+                    ->where('shared_with_learner', false);
             })
             ->latest()
             ->paginate(15)
@@ -47,28 +52,35 @@ class LearningGoalController extends Controller
                 'total' => LearningGoal::count(),
                 'parent' => LearningGoal::where('shared_with_parent', true)->count(),
                 'tutor' => LearningGoal::where('shared_with_tutor', true)->count(),
-                'unshared' => LearningGoal::where('shared_with_parent', false)->where('shared_with_tutor', false)->count(),
+                'learner' => LearningGoal::where('shared_with_learner', true)->count(),
+                'unshared' => LearningGoal::where('shared_with_parent', false)
+                    ->where('shared_with_tutor', false)
+                    ->where('shared_with_learner', false)
+                    ->count(),
             ],
         ]);
     }
 
     /**
-     * Toggle the two sharing switches for a goal.
+     * Toggle the three sharing switches for a goal.
      */
     public function share(Request $request, LearningGoal $goal)
     {
         $validated = $request->validate([
             'shared_with_parent' => 'nullable|boolean',
             'shared_with_tutor' => 'nullable|boolean',
+            'shared_with_learner' => 'nullable|boolean',
         ]);
 
         $shareWithParent = (bool) ($validated['shared_with_parent'] ?? false);
         $shareWithTutor = (bool) ($validated['shared_with_tutor'] ?? false);
-        $isShared = $shareWithParent || $shareWithTutor;
+        $shareWithLearner = (bool) ($validated['shared_with_learner'] ?? false);
+        $isShared = $shareWithParent || $shareWithTutor || $shareWithLearner;
 
         $goal->update([
             'shared_with_parent' => $shareWithParent,
             'shared_with_tutor' => $shareWithTutor,
+            'shared_with_learner' => $shareWithLearner,
             'shared_by' => $isShared ? auth()->id() : null,
             'shared_at' => $isShared ? now() : null,
         ]);

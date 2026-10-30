@@ -86,7 +86,8 @@ class UserGuideRolesTest extends TestCase
             ->assertDontSee('For Parents/Guardians')
             ->assertDontSee('5. Verifying Fees')
             ->assertDontSee('Monthly classes per tutor')
-            ->assertDontSee('Learning goals');
+            ->assertSee('For learners — where to find them')
+            ->assertSee('Learning goals');
     }
 
     public function test_a_parent_only_sees_fee_and_child_sections(): void

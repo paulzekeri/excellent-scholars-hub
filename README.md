@@ -134,6 +134,19 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Learning goals shared with learners (note 7 follow-up, 30 October 2026)
+
+The meeting note asked for goals to reach learners as well as parents and tutors. That last audience is now
+covered.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Share switch | **Share with** now has **Parent / Learner / Tutor**; the tiles and filter include a learner count | `Admin\LearningGoalController`, `admin/learning-goals/index.blade.php` |
+| Learner view | A **"Goals shared with you"** panel on the learner dashboard (latest 3) and **My Learning → Learning Goals** with the full list, targets, class/term, tutor and attachment downloads | `Learner\LearningGoalController`, `learner/learning-goals/index.blade.php`, learner dashboard |
+| Scope | A learner sees goals shared with learners that are **theirs** or **class-wide for a class they attend**; anything else returns 403, including the attachment URL | `LearningGoal::scopeVisibleToLearner()` / `isVisibleToLearner()` |
+| Data | `learning_goals.shared_with_learner` | migration `2026_10_30_000005_add_learner_sharing_to_learning_goals` |
+| Tests | `tests/Feature/LearnerLearningGoalsTest.php` (7) — dashboard/page visibility, hidden goals, class-wide isolation, download guards, admin switch, role access | `tests/Feature` |
+
 ### Member profiles and CEO-approved testimonials (note 10, 30 October 2026)
 
 Members can now manage their own profile and share a testimonial; the CEO decides what appears on the

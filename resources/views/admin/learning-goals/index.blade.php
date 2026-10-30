@@ -4,10 +4,10 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800">Learning Goals</h1>
-        <p class="text-gray-600 mt-1">Every goal uploaded by tutors — share the right ones with parents and tutors (CEO and administrators)</p>
+        <p class="text-gray-600 mt-1">Every goal uploaded by tutors — share the right ones with parents, learners and tutors (CEO and administrators)</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-600">
             <p class="text-gray-500 text-sm">All goals</p>
             <p class="text-2xl font-bold text-gray-800">{{ $counts['total'] }}</p>
@@ -15,6 +15,10 @@
         <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-400">
             <p class="text-gray-500 text-sm">Shared with parents</p>
             <p class="text-2xl font-bold text-gray-800">{{ $counts['parent'] }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-green-500">
+            <p class="text-gray-500 text-sm">Shared with learners</p>
+            <p class="text-2xl font-bold text-gray-800">{{ $counts['learner'] }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-orange-500">
             <p class="text-gray-500 text-sm">Shared with tutors</p>
@@ -41,6 +45,7 @@
             <select name="shared" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">Any</option>
                 <option value="parent" @selected($shared === 'parent')>Shared with parent</option>
+                <option value="learner" @selected($shared === 'learner')>Shared with learner</option>
                 <option value="tutor" @selected($shared === 'tutor')>Shared with tutor</option>
                 <option value="unshared" @selected($shared === 'unshared')>Awaiting review</option>
             </select>
@@ -98,6 +103,11 @@
                                         <input type="hidden" name="shared_with_parent" value="0">
                                         <input type="checkbox" name="shared_with_parent" value="1" @checked($goal->shared_with_parent)>
                                         <span>Parent</span>
+                                    </label>
+                                    <label class="flex items-center gap-2">
+                                        <input type="hidden" name="shared_with_learner" value="0">
+                                        <input type="checkbox" name="shared_with_learner" value="1" @checked($goal->shared_with_learner)>
+                                        <span>Learner</span>
                                     </label>
                                     <label class="flex items-center gap-2">
                                         <input type="hidden" name="shared_with_tutor" value="0">

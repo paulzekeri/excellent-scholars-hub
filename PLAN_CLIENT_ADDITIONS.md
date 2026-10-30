@@ -20,7 +20,7 @@ guide, sidebar). This is the honest picture of all 14 notes:
 | 4 | Assignment images + optional max students | `[x]` |
 | 5 | Monthly classes per tutor | `[x]` — admin/CEO can tick a class as completed (with audit + reopen); the report now counts **completed** classes and shows completed vs scheduled |
 | 6 | Blue / white / orange branding | `[x]` |
-| 7 | Tutor learning goals, shared by admin/CEO | `[x]` for parent + tutor; sharing with **learners** not built |
+| 7 | Tutor learning goals, shared by admin/CEO | `[x]` — shared with parents, **learners** and tutors; learners get a dashboard panel and a "My Learning Goals" page with attachment downloads |
 | 8 | Affirmation card | `[x]` — administrators/CEO publish the weekly affirmation from **Affirmations**; every dashboard shows the latest active post (colourful card), with the built-in rotation as fallback |
 | 9 | Landing page (slider, testimonials, about, register) | `[~]` — page + live programmes exist; testimonials are now member-written and CEO-approved; the slider remains static |
 | 9-i | Testimonials backend + admin approval | `[x]` — members submit from **My profile**; the CEO approves/rejects; approved ones appear on the landing page (photo only when allowed) |
@@ -124,8 +124,10 @@ guide, sidebar). This is the honest picture of all 14 notes:
 
 - [x] Migration + `LearningGoal` model (`tutor`, `learner`, `class`, `sharedBy`).
 - [x] Tutor: upload goals per learner or per class, with optional PDF/image evidence.
-- [x] Admin/CEO: see every goal, share/unshare with parent and/or tutor, download.
+- [x] Admin/CEO: see every goal, share/unshare with parent, **learner** and/or tutor, download.
 - [x] Parent: new "Learning Goals" tab on the child detail screen (shared only).
+- [x] Learner: "Goals shared with you" dashboard panel and a **My Learning → Learning Goals** page
+      (own goals + class-wide goals for their classes, attachment downloads, 403 for anything not shared).
 - [x] Tutor: "Shared with you" section on the goals screen.
 
 ## Phase 7 — Categorised messaging (note 5)

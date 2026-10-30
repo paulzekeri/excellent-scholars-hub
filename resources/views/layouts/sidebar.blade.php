@@ -165,6 +165,7 @@
                 ['label' => 'My Classes', 'icon' => 'fa-chalkboard', 'route' => 'learner.classes'],
                 ['label' => 'Assignments', 'icon' => 'fa-tasks', 'route' => 'learner.assignments'],
                 ['label' => 'Materials', 'icon' => 'fa-folder-open', 'route' => 'learner.materials'],
+                ['label' => 'Learning Goals', 'icon' => 'fa-bullseye', 'route' => 'learner.learning-goals.index', 'match' => 'learner.learning-goals.*'],
             ],
         ];
 
