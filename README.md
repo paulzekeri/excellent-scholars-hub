@@ -171,8 +171,9 @@ The public landing page now carries the flyer's visual language instead of a pla
 | Element | Implementation |
 |---|---|
 | Type | **Poppins** 600–800 headings + **Inter** body everywhere; **Caveat** script used only on the marketing page ("Bigger goals, brighter future", "Come and see us"). App headings inherit Poppins through a single `h1–h3` rule in `layouts/app.blade.php`; utility classes still win |
-| Hero | Cream `#FBFAF7` paper, **navy corner shape + navy bottom wave** (inline SVG), pale-blue circle, **subject strip** (Math \| English \| Sciences \| SATs/11+ \| Coding & AI \| Chess \| Creative Writing), navy headline with an **orange→sun brush underline**, navy / orange / outline CTA set |
-| Illustration | Hand-built inline SVG: graduation cap, four colour-coded book spines (LEARN / GROW / ACHIEVE / EXCEL), monitor, sun-yellow sticky note with the script line and sun sparkles — no external image dependency |
+| Hero | Cream `#FBFAF7` paper, **navy corner shape + navy bottom wave** (inline SVG), sun-tinted glow, **subject strip** (Math \| English \| Sciences \| SATs/11+ \| Coding & AI \| Chess \| Creative Writing), navy headline with an **orange→sun brush underline**, navy / orange / outline CTA set |
+| Slider panel | **Navy gradient block** (`#0A2550 → #0C2B5D → #123A73`) with a `white/10` border, 2rem radius, `shadow-2xl`, a soft orange glow and an **overflow-clipped inner layer** so the sun sticky note can still overhang the corner. Chosen over white/grey because the client wanted less white on the page |
+| Illustration | Hand-built inline SVG, recoloured for the dark panel: **sun** cap and "EXCEL" spine, **orange** "ACHIEVE", **light blue** `#93C5FD` "GROW", **white** "LEARN", lighter monitor frame, `#94A3B8` stand, sun sparkle and orange accent — every label uses navy text (5:1–9:1 contrast) |
 | Sections | Pale-blue `#EAF2FB` programme cards with circular icon chips, sun/orange section eyebrows, quote cards on cream paper with initial-avatar fallbacks, navy About band with sun check marks, navy footer band carrying the flyer's socials (`@esh_tutoring` on Instagram, X, TikTok, Facebook) and the contact block |
 | Boundaries | The slider content, testimonial data, booking form, nav anchors and every asserted string are unchanged — this is styling only, so the landing tests still guard the structure |
 

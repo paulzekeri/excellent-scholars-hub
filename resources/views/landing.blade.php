@@ -130,7 +130,7 @@
         class="pointer-events-none absolute -left-44 -top-52 h-[34rem] w-[34rem] text-[#0a2550]">
         <path d="M0 0h600C430 40 300 140 210 260 140 354 60 470 0 600V0Z"/>
     </svg>
-    <div class="pointer-events-none absolute right-0 top-24 h-72 w-72 rounded-full bg-[#EAF2FB]"></div>
+    <div class="pointer-events-none absolute right-0 top-24 h-72 w-72 rounded-full bg-[#F7C94B]/25"></div>
     <svg aria-hidden="true" viewBox="0 0 1440 120" fill="currentColor"
         class="pointer-events-none absolute inset-x-0 bottom-0 h-14 w-full text-[#0a2550]">
         <path d="M0 52c240 54 480 66 720 32s480-54 720-18v54H0V52Z"/>
@@ -151,7 +151,7 @@
             <div class="slide {{ $index === 0 ? 'active' : '' }}" data-slide="{{ $index }}">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <span class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#0a2550] shadow-sm">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-[#D7E0EC] bg-[#EAF2FB] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[#0a2550] shadow-sm">
                             <span class="h-2 w-2 rounded-full bg-accent"></span>{{ $slide['eyebrow'] }}
                         </span>
                         <h1 class="relative mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-[#0a2550] sm:text-5xl lg:text-6xl">
@@ -172,44 +172,48 @@
                         </div>
                     </div>
                     <div class="relative mx-auto w-full max-w-md lg:max-w-lg">
-                        <div class="relative rounded-[2rem] border border-[#D7E0EC] bg-[#E9EEF5] p-6 shadow-xl">
+                        <div class="relative rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#0A2550] via-[#0C2B5D] to-[#123A73] p-6 shadow-2xl">
+                            <div class="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
+                                <div class="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-accent/20 blur-2xl"></div>
+                            </div>
+
                             <div class="absolute -left-3 -top-5 z-10 rotate-[-6deg] rounded-sm bg-sun px-4 py-3 shadow-lg sm:-left-6">
                                 <p class="font-script text-2xl leading-none text-[#0a2550]">Bigger goals<br>brighter future</p>
                             </div>
 
-                            <svg aria-hidden="true" viewBox="0 0 520 420" class="h-auto w-full" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="300" cy="190" r="150" fill="#F8FBFE"/>
+                            <svg aria-hidden="true" viewBox="0 0 520 420" class="relative h-auto w-full" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="300" cy="190" r="150" fill="#164078"/>
                                 <path d="M150 120c10-10 20-10 30 0M430 90c8-8 16-8 24 0M420 210c8-8 16-8 24 0"
-                                    stroke="#F26B21" stroke-width="6" stroke-linecap="round"/>
-                                <polygon points="250,86 330,64 410,86 330,108" fill="#0A2550"/>
-                                <path d="M330 108v26" stroke="#0A2550" stroke-width="5"/>
+                                    stroke="#F7C94B" stroke-width="6" stroke-linecap="round"/>
+                                <polygon points="250,86 330,64 410,86 330,108" fill="#F7C94B"/>
+                                <path d="M330 108v26" stroke="#F7C94B" stroke-width="5"/>
                                 <circle cx="330" cy="140" r="7" fill="#F26B21"/>
                                 <g transform="rotate(-2 200 315)">
-                                    <rect x="62" y="292" width="286" height="34" rx="8" fill="#0A2550"/>
-                                    <text x="96" y="315" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">EXCEL</text>
+                                    <rect x="62" y="292" width="286" height="34" rx="8" fill="#F7C94B"/>
+                                    <text x="96" y="315" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#0A2550">EXCEL</text>
                                 </g>
                                 <g transform="rotate(1.5 200 278)">
                                     <rect x="56" y="258" width="286" height="34" rx="8" fill="#F26B21"/>
-                                    <text x="96" y="281" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">ACHIEVE</text>
+                                    <text x="96" y="281" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#0A2550">ACHIEVE</text>
                                 </g>
                                 <g transform="rotate(-1 200 244)">
-                                    <rect x="66" y="224" width="286" height="34" rx="8" fill="#1D4ED8"/>
-                                    <text x="96" y="247" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">GROW</text>
+                                    <rect x="66" y="224" width="286" height="34" rx="8" fill="#93C5FD"/>
+                                    <text x="96" y="247" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#0A2550">GROW</text>
                                 </g>
                                 <g transform="rotate(2 200 210)">
-                                    <rect x="58" y="190" width="286" height="34" rx="8" fill="#F26B21"/>
-                                    <text x="96" y="213" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">LEARN</text>
+                                    <rect x="58" y="190" width="286" height="34" rx="8" fill="#FFFFFF"/>
+                                    <text x="96" y="213" font-family="Poppins, sans-serif" font-size="17" font-weight="700" fill="#0A2550">LEARN</text>
                                 </g>
-                                <rect x="320" y="250" width="150" height="96" rx="10" fill="#0F1F3A"/>
-                                <rect x="332" y="262" width="126" height="72" rx="6" fill="#1D4ED8" opacity=".35"/>
-                                <path d="M300 352h190l14 16H286l14-16Z" fill="#CBD5E1"/>
-                                <rect x="358" y="358" width="74" height="4" rx="2" fill="#94A3B8"/>
+                                <rect x="320" y="250" width="150" height="96" rx="10" fill="#E7EEF8"/>
+                                <rect x="332" y="262" width="126" height="72" rx="6" fill="#1D4ED8" opacity=".55"/>
+                                <path d="M300 352h190l14 16H286l14-16Z" fill="#94A3B8"/>
+                                <rect x="358" y="358" width="74" height="4" rx="2" fill="#64748B"/>
                                 <path d="M440 140l6 14 14 6-14 6-6 14-6-14-14-6 14-6 6-14Z" fill="#F7C94B"/>
                                 <path d="M180 150l4 10 10 4-10 4-4 10-4-10-10-4 10-4 4-10Z" fill="#F26B21"/>
                             </svg>
                         </div>
 
-                        <span class="absolute -right-2 bottom-6 flex h-14 w-14 items-center justify-center rounded-full bg-[#0a2550] text-white shadow-lg">
+                        <span class="absolute -right-2 bottom-6 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-blue-950 shadow-lg">
                             <i class="fas {{ $slide['icon'] }} text-xl"></i>
                         </span>
                     </div>
