@@ -36,48 +36,50 @@
         section[id] { scroll-margin-top: 5rem; }
         @media (min-width: 640px) { section[id] { scroll-margin-top: 6rem; } }
         #esh-mobile-menu summary::-webkit-details-marker { display: none; }
-        #esh-mobile-menu[open] summary { background-color: #f9fafb; }
+        #esh-mobile-menu[open] summary { background-color: rgba(255, 255, 255, .14); }
         .slide { display: none; }
         .slide.active { display: block; animation: fade 0.6s ease-in-out; }
         @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .dot.active { background-color: #F26B21; }
     </style>
 </head>
-<body class="bg-white text-gray-800 antialiased">
-<header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+<body class="bg-[#FBFAF7] text-gray-800 antialiased">
+<header class="sticky top-0 z-50 bg-[#0A2550]/95 backdrop-blur border-b border-white/10 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center gap-2 sm:gap-3 sm:h-20">
             <!-- Brand: logo always visible, wordmark shrinks instead of pushing the actions off-screen -->
             <a href="{{ url('/') }}" class="flex min-w-0 items-center gap-2 sm:gap-3">
-                <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="h-9 w-auto shrink-0 sm:h-11">
-                <span class="min-w-0 font-bold text-base leading-tight text-brand-dark sm:text-lg">
+                <span class="shrink-0 rounded-md bg-white p-1 shadow-sm">
+                    <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="h-8 w-auto sm:h-10">
+                </span>
+                <span class="min-w-0 font-bold text-base leading-tight text-white sm:text-lg">
                     <span class="block truncate">Excellent</span>
-                    <span class="block truncate text-orange-700">Scholars Hub</span>
+                    <span class="block truncate text-sun">Scholars Hub</span>
                 </span>
             </a>
 
             <!-- Desktop section links -->
-            <nav class="hidden lg:flex ml-auto items-center gap-8 text-sm font-medium text-gray-600">
-                <a href="#about" class="hover:text-brand">About us</a>
-                <a href="#programmes" class="hover:text-brand">Programmes</a>
-                <a href="#how" class="hover:text-brand">How it works</a>
-                <a href="#book-assessment" class="hover:text-brand font-semibold text-brand">Book assessment</a>
-                <a href="#testimonials" class="hover:text-brand">Testimonials</a>
-                <a href="#contact" class="hover:text-brand">Contact</a>
+            <nav class="hidden lg:flex ml-auto items-center gap-8 text-sm font-medium text-blue-100">
+                <a href="#about" class="transition hover:text-sun">About us</a>
+                <a href="#programmes" class="transition hover:text-sun">Programmes</a>
+                <a href="#how" class="transition hover:text-sun">How it works</a>
+                <a href="#book-assessment" class="font-semibold text-sun transition hover:text-white">Book assessment</a>
+                <a href="#testimonials" class="transition hover:text-sun">Testimonials</a>
+                <a href="#contact" class="transition hover:text-sun">Contact</a>
             </nav>
 
             <div class="ml-auto flex shrink-0 items-center gap-2 lg:ml-8">
-                <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center text-brand font-semibold px-3 py-2 sm:px-4 rounded-lg border border-brand-light hover:bg-brand-light transition">Log in</a>
+                <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center text-white font-semibold px-3 py-2 sm:px-4 rounded-lg border border-white/30 hover:bg-white/10 transition">Log in</a>
                 <a href="{{ route('register') }}" class="inline-flex items-center bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg transition shadow">
                     <i class="fas fa-user-plus mr-2 hidden sm:inline"></i>Register
                 </a>
 
                 <!-- Small-screen menu: compact button, panel opens under the header -->
                 <details id="esh-mobile-menu" class="relative lg:hidden">
-                    <summary class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-gray-200 text-brand-dark transition hover:bg-gray-50" aria-label="Open section menu">
+                    <summary class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-white/25 text-white transition hover:bg-white/10" aria-label="Open section menu">
                         <i class="fas fa-bars"></i>
                     </summary>
-                    <div class="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-100 bg-white p-2 shadow-xl">
+                    <div class="absolute right-0 top-full mt-2 w-56 rounded-xl border border-[#D7E0EC] bg-white p-2 shadow-xl">
                         <a href="#about" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">About us</a>
                         <a href="#programmes" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">Programmes</a>
                         <a href="#how" class="block rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-brand-light hover:text-brand">How it works</a>
@@ -345,7 +347,7 @@
         @endphp
         <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($items as $testimonial)
-                <figure class="bg-[#FBFAF7] border border-gray-100 rounded-2xl p-6 shadow-sm">
+                <figure class="bg-white border border-[#E3E9F1] rounded-2xl p-6 shadow-sm">
                     <div class="text-accent"><i class="fas fa-quote-left text-2xl"></i></div>
                     <blockquote class="mt-4 text-gray-700">{{ $testimonial['quote'] }}</blockquote>
                     <figcaption class="mt-5 flex items-center gap-3 text-sm text-gray-500">
