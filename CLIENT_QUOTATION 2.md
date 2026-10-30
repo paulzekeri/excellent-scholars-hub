@@ -134,6 +134,7 @@ covered by the fees in Part 1**; they will be quoted separately when the school 
 * Everything delivered under meeting-note items **1–8, 9(i), 10, 12 and 13 (P1–P4)** is in the current scope.
   The final consolidated, re-priced quotation (meeting note 14) will list those additions formally.
 
+## **CLIENT ACCEPTANCE & SIGN-OFF**
 
 I confirm that I have reviewed and accepted the pricing structure, payment terms, and hosting responsibilities outlined in this documentation
 
