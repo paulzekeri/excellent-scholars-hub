@@ -11,36 +11,11 @@
 
     @include('partials.affirmation')
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">My Classes</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $myClasses }}</p>
-                </div>
-                <i class="fas fa-chalkboard text-blue-600 text-3xl"></i>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Assignments</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalAssignments }}</p>
-                </div>
-                <i class="fas fa-tasks text-green-600 text-3xl"></i>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Materials</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalMaterials }}</p>
-                </div>
-                <i class="fas fa-folder-open text-blue-600 text-3xl"></i>
-            </div>
-        </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        @include('partials.stat-card', ['label' => 'My Classes', 'value' => $myClasses, 'icon' => 'fa-chalkboard', 'tone' => 'navy'])
+        @include('partials.stat-card', ['label' => 'Assignments', 'value' => $totalAssignments, 'icon' => 'fa-tasks', 'tone' => 'blue'])
+        @include('partials.stat-card', ['label' => 'Materials', 'value' => $totalMaterials, 'icon' => 'fa-folder-open', 'tone' => 'green'])
     </div>
-
     <!-- Today's assessment calls -->
     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">

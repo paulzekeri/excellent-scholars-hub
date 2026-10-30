@@ -60,43 +60,11 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
-        <a href="{{ route('learner.classes') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">My Classes</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $myClasses->count() }}</p>
-                </div>
-                <i class="fas fa-chalkboard text-blue-600 text-3xl"></i>
-            </div>
-        </a>
-        <a href="{{ route('learner.assignments') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Pending Assignments</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $pendingAssignments }}</p>
-                </div>
-                <i class="fas fa-tasks text-green-600 text-3xl"></i>
-            </div>
-        </a>
-        <a href="{{ route('learner.materials') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Materials</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $materials->count() }}</p>
-                </div>
-                <i class="fas fa-folder-open text-blue-600 text-3xl"></i>
-            </div>
-        </a>
-        <a href="{{ route('learner.classes') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-sun hover:shadow-lg transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Upcoming Sessions</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $upcomingCount }}</p>
-                </div>
-                <i class="fas fa-calendar text-sun-ink text-3xl"></i>
-            </div>
-        </a>
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-5 mb-8">
+        @include('partials.stat-card', ['label' => 'My Classes', 'value' => $myClasses->count(), 'icon' => 'fa-chalkboard', 'tone' => 'navy', 'href' => route('learner.classes')])
+        @include('partials.stat-card', ['label' => 'Pending Assignments', 'value' => $pendingAssignments, 'icon' => 'fa-tasks', 'tone' => 'blue', 'href' => route('learner.assignments')])
+        @include('partials.stat-card', ['label' => 'Materials', 'value' => $materials->count(), 'icon' => 'fa-folder-open', 'tone' => 'blue', 'href' => route('learner.materials')])
+        @include('partials.stat-card', ['label' => 'Upcoming Sessions', 'value' => $upcomingCount, 'icon' => 'fa-calendar', 'tone' => 'sun', 'href' => route('learner.classes')])
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

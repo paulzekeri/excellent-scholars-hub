@@ -94,7 +94,7 @@
                                     {{ ucfirst($contact->role->name) }}
                                 </span>
                                 @if($unread > 0)
-                                    <span class="bg-orange-500 text-blue-950 text-xs rounded-full px-2 py-0.5">{{ $unread }} new</span>
+                                    <span class="bg-sun text-[#0a2550] text-xs rounded-full px-2 py-0.5">{{ $unread }} new</span>
                                 @endif
                             </p>
                             <p class="text-sm text-gray-500 truncate">

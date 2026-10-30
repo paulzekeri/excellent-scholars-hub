@@ -13,7 +13,7 @@
             <i class="fas fa-comments mr-2"></i> Message the School
             @php $parentUnreadMessages = auth()->user()->unreadMessagesCount(); @endphp
             @if($parentUnreadMessages > 0)
-                <span class="bg-orange-500 text-blue-950 text-xs rounded-full px-2 py-0.5 ml-2">{{ $parentUnreadMessages }}</span>
+                <span class="bg-sun text-[#0a2550] text-xs rounded-full px-2 py-0.5 ml-2">{{ $parentUnreadMessages }}</span>
             @endif
         </a>
     </div>

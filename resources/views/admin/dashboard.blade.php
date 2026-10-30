@@ -9,119 +9,20 @@
         <p class="text-gray-600 mt-1">Overview of the Excellent Scholars Hub platform</p>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Users</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalUsers }}</p>
-                </div>
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <i class="fas fa-users text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Tutors</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalTutors }}</p>
-                </div>
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <i class="fas fa-chalkboard-teacher text-blue-700 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Learners</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalLearners }}</p>
-                </div>
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <i class="fas fa-user-graduate text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-sun">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Classes</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalClasses }}</p>
-                </div>
-                <div class="bg-sun-light p-3 rounded-full">
-                    <i class="fas fa-chalkboard text-sun-ink text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Schedules</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalSchedules }}</p>
-                </div>
-                <div class="bg-orange-100 p-3 rounded-full">
-                    <i class="fas fa-calendar text-orange-700 text-xl"></i>
-                </div>
-            </div>
-        </div>
-
+    <!-- Stats cards: neutral surfaces, one coloured chip per meaning -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        @include('partials.stat-card', ['label' => 'Total Users', 'value' => $totalUsers, 'icon' => 'fa-users', 'tone' => 'blue'])
+        @include('partials.stat-card', ['label' => 'Total Tutors', 'value' => $totalTutors, 'icon' => 'fa-chalkboard-teacher', 'tone' => 'blue'])
+        @include('partials.stat-card', ['label' => 'Total Learners', 'value' => $totalLearners, 'icon' => 'fa-user-graduate', 'tone' => 'blue'])
+        @include('partials.stat-card', ['label' => 'Total Classes', 'value' => $totalClasses, 'icon' => 'fa-chalkboard', 'tone' => 'navy'])
+        @include('partials.stat-card', ['label' => 'Schedules', 'value' => $totalSchedules, 'icon' => 'fa-calendar', 'tone' => 'navy'])
         @if(auth()->user()->canManagePayments())
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Payments</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $totalPayments }}</p>
-                </div>
-                <div class="bg-orange-100 p-3 rounded-full">
-                    <i class="fas fa-money-bill text-orange-700 text-xl"></i>
-                </div>
-            </div>
-        </div>
+            @include('partials.stat-card', ['label' => 'Payments', 'value' => $totalPayments, 'icon' => 'fa-money-bill', 'tone' => 'orange'])
         @endif
-
-        <a href="{{ route('messages.index') }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:bg-blue-50 transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Unread Messages</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $unreadMessages }}</p>
-                </div>
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <i class="fas fa-comments text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ route('admin.enquiries.index', ['status' => 'new']) }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-400 hover:bg-blue-50 transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">New Enquiries</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $newEnquiries }}</p>
-                </div>
-                <div class="bg-blue-100 p-3 rounded-full">
-                    <i class="fas fa-user-plus text-blue-600 text-xl"></i>
-                </div>
-            </div>
-        </a>
-
-        <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-sun hover:bg-sun-light transition">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Enquiries In Progress</p>
-                    <p class="text-3xl font-bold text-gray-800">{{ $contactedEnquiries }}</p>
-                </div>
-                <div class="bg-sun-light p-3 rounded-full">
-                    <i class="fas fa-phone text-sun-ink text-xl"></i>
-                </div>
-            </div>
-        </a>
+        @include('partials.stat-card', ['label' => 'Unread Messages', 'value' => $unreadMessages, 'icon' => 'fa-comments', 'tone' => 'sun', 'href' => route('messages.index')])
+        @include('partials.stat-card', ['label' => 'New Enquiries', 'value' => $newEnquiries, 'icon' => 'fa-user-plus', 'tone' => 'sun', 'href' => route('admin.enquiries.index', ['status' => 'new'])])
+        @include('partials.stat-card', ['label' => 'Enquiries In Progress', 'value' => $contactedEnquiries, 'icon' => 'fa-phone', 'tone' => 'sun', 'href' => route('admin.enquiries.index', ['status' => 'contacted'])])
     </div>
-
     @include('partials.affirmation')
 
     <!-- Today's assessment calls -->

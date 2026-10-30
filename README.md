@@ -134,6 +134,32 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### LMS palette pass — sun semantics, calm surfaces (30 October 2026)
+
+The public site matched the flyer; the signed-in app was still grey-dominant (2,192 `gray-*` utilities
+versus 5 uses of the brand sun). This pass gives the LMS the same colour logic without touching layout.
+
+| Area | Before | After |
+|---|---|---|
+| Attention colour | Tailwind `yellow-*` (100 uses) **and** `amber-*` (25 uses) doing the same job | One **sun** scale: `sun` `#F7C94B`, `sun-light` `#FFF7DB`, `sun-edge` `#F4DFA0`, `sun-ink` `#8A6100` — defined in the app, plain and landing Tailwind configs |
+| Small meta text | `text-gray-400` (83 uses, ≈2.8:1 on white) | `text-gray-500` (4.8:1) |
+| App canvas | `bg-gray-50` | **`#F5F8FC`** pale blue-grey, so white cards separate |
+| Table headers | `bg-gray-50` + gray labels (23 tables) | **`#EAF2FB`** band with **navy semibold** labels (164 cells) |
+| Stat cards | White card + `border-l-4` in blue/yellow/orange (a rainbow per screen) | Shared **`partials/stat-card`**: neutral card, navy value, one coloured chip — **blue = people, navy = academics, orange = finance, sun = attention, green = success** (23 cards: admin/CEO, tutor, learner) |
+| Sidebar / top bar | Thick `border-b-2 border-orange-500`, orange active bar, orange badges, `text-orange-200` role chip | `border-white/10` hairline, **sun** active bar + icon, **sun** unread badges (navy text), sun role chip; gradient simplified to `#0A2550 → #0D3070` |
+| Unread counters | Orange (`messages/index`, parent dashboard, top bar) | **Sun** — orange is now reserved for "do this" (buttons, delete/reject) |
+
+Accessibility after the pass: white on navy 13.6:1 · navy on sun 9.6:1 · sun-ink on sun-light 5.4:1 ·
+navy labels on the table band 12.9:1 · gray-500 meta 4.8:1 · navy text on orange buttons ≈5:1.
+Zero `yellow-*`/`amber-*`/`text-gray-400` utilities remain in the views.
+
+The sweeps live in `tools/` as re-runnable records: `sun-sweep.php`, `table-sweep.php`,
+`badge-sweep.php`, `dashboard-cards.php` (each reports zero changes once applied).
+
+Also fixed in the same batch: commit `8f0e901` had a bad find/replace that wrote `trangray` instead of
+`translate` in three places, which silently disabled the **mobile off-canvas sidebar**. Restored in
+`ecf5960`.
+
 ### Brand palette alignment — navy / blue / orange, no red (30 October 2026)
 
 The interface now matches the school flyer: **navy structure, royal-blue actions, orange for actions/warnings,

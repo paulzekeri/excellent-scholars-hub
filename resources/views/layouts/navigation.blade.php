@@ -42,7 +42,7 @@
                class="relative rounded-lg p-2 text-blue-100 transition hover:bg-white/10 hover:text-white">
                 <i class="fas fa-comments text-lg"></i>
                 @if($navUnreadMessages > 0)
-                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-blue-950">{{ $navUnreadMessages > 9 ? '9+' : $navUnreadMessages }}</span>
+                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-sun px-1 text-[10px] font-bold text-[#0a2550]">{{ $navUnreadMessages > 9 ? '9+' : $navUnreadMessages }}</span>
                 @endif
             </a>
 
@@ -50,7 +50,7 @@
                class="relative rounded-lg p-2 text-blue-100 transition hover:bg-white/10 hover:text-white">
                 <i class="fas fa-bell text-lg"></i>
                 @if($navUnreadNotifications > 0)
-                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-blue-950">{{ $navUnreadNotifications > 9 ? '9+' : $navUnreadNotifications }}</span>
+                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-sun px-1 text-[10px] font-bold text-[#0a2550]">{{ $navUnreadNotifications > 9 ? '9+' : $navUnreadNotifications }}</span>
                 @endif
             </a>
 
