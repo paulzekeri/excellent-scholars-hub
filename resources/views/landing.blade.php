@@ -17,7 +17,7 @@
                     colors: {
                         brand: { DEFAULT: '#1d4ed8', dark: '#0a2550', light: '#dbeafe' },
                         accent: { DEFAULT: '#F26B21', dark: '#D95A14', light: '#FFF1E6' },
-                        sun: { DEFAULT: '#F7C94B', light: '#FFF7DB' },
+                        sun: { DEFAULT: '#F7C94B', light: '#FFF7DB', ink: '#8A6100', edge: '#F4DFA0' },
                     },
                     fontFamily: {
                         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],

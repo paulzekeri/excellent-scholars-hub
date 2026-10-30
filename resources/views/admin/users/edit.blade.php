@@ -83,11 +83,11 @@
             @php $children = optional($user->parent)->children ?? collect(); @endphp
             <div class="mt-8 border-t border-gray-200 pt-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-1">
-                    <i class="fas fa-user-graduate text-yellow-600 mr-2"></i>Children &amp; logins
+                    <i class="fas fa-user-graduate text-sun-ink mr-2"></i>Children &amp; logins
                 </h2>
                 <p class="text-sm text-gray-500 mb-3">
                     Add a child account with its own username. The login details are emailed to this guardian
-                    (@if($user->email){{ $user->email }}@else <span class="text-amber-600">add an email to this guardian first</span>@endif),
+                    (@if($user->email){{ $user->email }}@else <span class="text-sun-ink">add an email to this guardian first</span>@endif),
                     and the child chooses their own password at first sign-in.
                 </p>
 
@@ -133,12 +133,12 @@
                                         <span class="text-xs text-gray-500 font-mono">{{ optional($child->user)->username }}</span>
                                     @endif
                                     @if(optional($child->user)->email)
-                                        <span class="text-xs text-gray-400">({{ $child->user->email }})</span>
+                                        <span class="text-xs text-gray-500">({{ $child->user->email }})</span>
                                     @else
-                                        <span class="text-xs text-gray-400">(no email — via this guardian)</span>
+                                        <span class="text-xs text-gray-500">(no email — via this guardian)</span>
                                     @endif
                                     @if(optional($child->user)->must_change_password)
-                                        <span class="ml-1 inline-block px-2 py-0.5 text-[10px] rounded-full bg-amber-100 text-amber-800">Awaiting first sign-in</span>
+                                        <span class="ml-1 inline-block px-2 py-0.5 text-[10px] rounded-full bg-sun-light text-sun-ink">Awaiting first sign-in</span>
                                     @endif
                                 </span>
                                 @if($child->user)
@@ -150,7 +150,7 @@
                         @endforeach
                     </ul>
                 @else
-                    <p class="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+                    <p class="text-sm text-gray-600 bg-sun-light border border-sun-edge rounded-lg px-4 py-3">
                         No children are linked to this guardian yet. Use the <strong>Add child</strong> form above to create one.
                     </p>
                 @endif

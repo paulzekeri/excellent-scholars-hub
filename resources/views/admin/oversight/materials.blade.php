@@ -29,14 +29,14 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Uploaded By</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">File Type</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Title</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Uploaded By</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">File Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -62,7 +62,7 @@
                                         <i class="fas fa-download mr-1"></i> Download
                                     </a>
                                 @else
-                                    <span class="text-gray-400 text-sm">No file</span>
+                                    <span class="text-gray-500 text-sm">No file</span>
                                 @endif
                             </td>
                         </tr>

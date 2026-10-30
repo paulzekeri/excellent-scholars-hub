@@ -10,7 +10,7 @@
     </div>
 
     @if(! $tutor)
-        <div class="bg-amber-50 border-l-4 border-amber-500 text-amber-800 p-4 rounded-lg">
+        <div class="bg-sun-light border-l-4 border-sun text-sun-ink p-4 rounded-lg">
             Your account has no tutor profile yet, so no assessments can be assigned to you. Ask an administrator to update your role.
         </div>
     @else
@@ -32,7 +32,7 @@
                     @else
                         <ul class="space-y-3">
                             @foreach($section['items'] as $assessment)
-                                <li class="border border-gray-200 rounded-lg p-4 {{ $assessment->isToday() && $assessment->isScheduled() ? 'border-yellow-300 bg-yellow-50/40' : '' }}">
+                                <li class="border border-gray-200 rounded-lg p-4 {{ $assessment->isToday() && $assessment->isScheduled() ? 'border-sun-edge bg-sun-light/40' : '' }}">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                         <div>
                                             <p class="font-medium text-gray-800">{{ $assessment->scheduleLabel() }}</p>
@@ -63,7 +63,7 @@
                                                     <i class="fas fa-video mr-2"></i> Join call
                                                 </a>
                                             @elseif($assessment->isOnline())
-                                                <span class="text-xs text-amber-600">The school has not added the link yet.</span>
+                                                <span class="text-xs text-sun-ink">The school has not added the link yet.</span>
                                             @else
                                                 <span class="text-xs text-gray-500">{{ $assessment->platformLabel() }}</span>
                                             @endif

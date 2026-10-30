@@ -96,7 +96,7 @@
                             @if($enquiry->guardian_email)
                                 <a href="mailto:{{ $enquiry->guardian_email }}" class="hover:text-blue-700">{{ $enquiry->guardian_email }}</a>
                             @else
-                                <span class="text-amber-600">Not captured yet — needed before conversion</span>
+                                <span class="text-sun-ink">Not captured yet — needed before conversion</span>
                             @endif
                         </dd>
                     </div>
@@ -257,7 +257,7 @@
                         </button>
                     </form>
                 @elseif($enquiry->status === \App\Models\Enquiry::STATUS_NEW)
-                    <p class="mt-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                    <p class="mt-4 rounded-lg bg-sun-light border border-sun-edge px-4 py-3 text-sm text-sun-ink">
                         Mark the enquiry as <strong>Contacted</strong> (status panel on the right), then book the assessment here.
                     </p>
                 @endif
@@ -278,7 +278,7 @@
                                     <div class="flex flex-wrap items-center gap-2">
                                         <span class="px-2 py-0.5 text-xs rounded-full {{ $entry->typeBadge() }}">{{ $entry->typeLabel() }}</span>
                                         <span class="text-xs text-gray-500">{{ $entry->created_at->format('M j, Y H:i') }}</span>
-                                        <span class="text-xs text-gray-400">· {{ optional($entry->user)->name ?? 'System' }}</span>
+                                        <span class="text-xs text-gray-500">· {{ optional($entry->user)->name ?? 'System' }}</span>
                                     </div>
                                     <p class="text-sm text-gray-700 mt-1 whitespace-pre-line">{{ $entry->body }}</p>
                                 </div>

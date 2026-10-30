@@ -23,7 +23,7 @@
                     @if($material->description)
                         <p class="text-sm text-gray-600 mt-2">{{ $material->description }}</p>
                     @endif
-                    <div class="flex items-center gap-4 mt-3 text-xs text-gray-400">
+                    <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
                         <span><i class="far fa-file mr-1"></i> {{ round($material->file_size / 1024, 2) }} KB</span>
                         <span><i class="far fa-calendar mr-1"></i> {{ $material->created_at->format('M d, Y') }}</span>
                     </div>
@@ -38,7 +38,7 @@
         <div class="text-center py-12">
             <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
             <p class="text-gray-500 text-lg">No materials available yet.</p>
-            <p class="text-gray-400 text-sm mt-1">Materials will appear here when your tutors upload them.</p>
+            <p class="text-gray-500 text-sm mt-1">Materials will appear here when your tutors upload them.</p>
         </div>
     @endforelse
 

@@ -42,15 +42,15 @@
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted File</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted At</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Student</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Submitted File</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Notes</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Submitted At</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Score</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -63,14 +63,14 @@
                                     <i class="fas fa-download mr-1"></i> Download
                                 </a>
                             @else
-                                <span class="text-gray-400">No file</span>
+                                <span class="text-gray-500">No file</span>
                             @endif
                         </td>
                         <td class="px-4 py-3 text-sm max-w-xs">
                             @if($submission->content)
                                 <p class="text-gray-600 truncate" title="{{ $submission->content }}">{{ $submission->content }}</p>
                             @else
-                                <span class="text-gray-400">-</span>
+                                <span class="text-gray-500">-</span>
                             @endif
                         </td>
                         <td class="px-4 py-3 text-sm">
@@ -80,13 +80,13 @@
                             @if($submission->score !== null)
                                 <span class="font-medium">{{ $submission->score }}/{{ $assignment->total_points }}</span>
                             @else
-                                <span class="text-gray-400">Not graded</span>
+                                <span class="text-gray-500">Not graded</span>
                             @endif
                         </td>
                         <td class="px-4 py-3">
                             <span class="px-2 py-1 text-xs rounded-full
                                 @if($submission->status == 'graded') bg-green-100 text-green-800
-                                @elseif($submission->status == 'submitted') bg-yellow-100 text-yellow-800
+                                @elseif($submission->status == 'submitted') bg-sun-light text-sun-ink
                                 @else bg-gray-100 text-gray-800 @endif">
                                 {{ ucfirst($submission->status) }}
                             </span>

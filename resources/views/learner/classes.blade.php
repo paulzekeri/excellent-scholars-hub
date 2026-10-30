@@ -25,7 +25,7 @@
                         @if($schedule->meeting_link && $schedule->status == 'scheduled')
                             <a href="{{ $schedule->meeting_link }}" target="_blank" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition inline-flex items-center"><i class="fas fa-video mr-2"></i> Join Class</a>
                         @else
-                            <span class="text-gray-400"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
+                            <span class="text-gray-500"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
                         @endif
                     </div>
                 </div>

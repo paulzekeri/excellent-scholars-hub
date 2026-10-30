@@ -47,14 +47,14 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-sun">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Total Classes</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $totalClasses }}</p>
                 </div>
-                <div class="bg-yellow-100 p-3 rounded-full">
-                    <i class="fas fa-chalkboard text-yellow-600 text-xl"></i>
+                <div class="bg-sun-light p-3 rounded-full">
+                    <i class="fas fa-chalkboard text-sun-ink text-xl"></i>
                 </div>
             </div>
         </div>
@@ -109,14 +109,14 @@
             </div>
         </a>
 
-        <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-amber-400 hover:bg-amber-50 transition">
+        <a href="{{ route('admin.enquiries.index', ['status' => 'contacted']) }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-sun hover:bg-sun-light transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Enquiries In Progress</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $contactedEnquiries }}</p>
                 </div>
-                <div class="bg-amber-100 p-3 rounded-full">
-                    <i class="fas fa-phone text-amber-600 text-xl"></i>
+                <div class="bg-sun-light p-3 rounded-full">
+                    <i class="fas fa-phone text-sun-ink text-xl"></i>
                 </div>
             </div>
         </a>
@@ -189,7 +189,7 @@
                 <div>
                     <div class="flex justify-between text-sm mb-1">
                         <span class="font-medium text-gray-800">{{ $tutor->user->name ?? 'Tutor #' . $tutor->id }}</span>
-                        <span class="{{ $tutor->month_completed > 0 ? 'text-green-700 font-semibold' : 'text-gray-400' }}">{{ $tutor->month_completed }} completed <span class="font-normal text-gray-400">of {{ $tutor->month_sessions }} scheduled</span></span>
+                        <span class="{{ $tutor->month_completed > 0 ? 'text-green-700 font-semibold' : 'text-gray-500' }}">{{ $tutor->month_completed }} completed <span class="font-normal text-gray-500">of {{ $tutor->month_sessions }} scheduled</span></span>
                     </div>
                     <div class="w-full bg-gray-100 rounded-full h-2.5">
                         <div class="{{ $tutor->month_completed > 0 ? 'bg-green-600' : 'bg-gray-200' }} h-2.5 rounded-full" style="width: {{ round($tutor->month_completed / $maxMonthCompleted * 100) }}%"></div>
@@ -222,9 +222,9 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Email</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Role</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -237,7 +237,7 @@
                                     @elseif($user->role->slug == 'admin') bg-orange-100 text-orange-900
                                     @elseif($user->role->slug == 'tutor') bg-green-100 text-green-800
                                     @elseif($user->role->slug == 'learner') bg-blue-100 text-blue-800
-                                    @else bg-yellow-100 text-yellow-800 @endif">
+                                    @else bg-sun-light text-sun-ink @endif">
                                     {{ ucfirst($user->role->name) }}</span></td>
                             </tr>
                         @empty

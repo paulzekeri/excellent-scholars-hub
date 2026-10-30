@@ -27,7 +27,7 @@
                         </p>
                     </div>
                     @if($goal->shared_at)
-                        <span class="shrink-0 text-xs text-gray-400">Shared {{ $goal->shared_at->format('M j, Y') }}</span>
+                        <span class="shrink-0 text-xs text-gray-500">Shared {{ $goal->shared_at->format('M j, Y') }}</span>
                     @endif
                 </div>
 

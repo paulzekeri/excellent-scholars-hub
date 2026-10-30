@@ -50,16 +50,16 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent / Guardian</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Username</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Phone</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Parent / Guardian</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -70,14 +70,14 @@
                                 @if($user->username)
                                     <span class="font-mono text-gray-800">{{ $user->username }}</span>
                                 @else
-                                    <span class="text-gray-400">&mdash;</span>
+                                    <span class="text-gray-500">&mdash;</span>
                                 @endif
                                 @if($user->isLearner())
                                     @php $guardianEmail = optional(optional(optional($user->learner)->parent)->user)->email; @endphp
                                     @if($guardianEmail)
-                                        <span class="block text-xs text-gray-400">Guardian: {{ $guardianEmail }}</span>
+                                        <span class="block text-xs text-gray-500">Guardian: {{ $guardianEmail }}</span>
                                     @else
-                                        <span class="block text-xs text-amber-600">No guardian email</span>
+                                        <span class="block text-xs text-sun-ink">No guardian email</span>
                                     @endif
                                 @endif
                             </td>
@@ -85,7 +85,7 @@
                                 @if($user->email)
                                     {{ $user->email }}
                                 @else
-                                    <span class="text-gray-400">No email &mdash; via guardian</span>
+                                    <span class="text-gray-500">No email &mdash; via guardian</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $user->phone ?? 'N/A' }}</td>
@@ -95,7 +95,7 @@
                                     @elseif($user->role->slug == 'admin') bg-orange-100 text-orange-900
                                     @elseif($user->role->slug == 'tutor') bg-green-100 text-green-800
                                     @elseif($user->role->slug == 'learner') bg-blue-100 text-blue-800
-                                    @else bg-yellow-100 text-yellow-800 @endif">
+                                    @else bg-sun-light text-sun-ink @endif">
                                     {{ ucfirst($user->role->name) }}
                                 </span>
                             </td>
@@ -104,17 +104,17 @@
                                     @if($user->learner && $user->learner->parent && $user->learner->parent->user)
                                         {{ $user->learner->parent->user->name }}
                                     @else
-                                        <span class="text-amber-600"><i class="fas fa-exclamation-circle mr-1"></i>Not linked</span>
+                                        <span class="text-sun-ink"><i class="fas fa-exclamation-circle mr-1"></i>Not linked</span>
                                     @endif
                                 @elseif($user->isParent())
                                     @if($user->parent)
                                         @php $childCount = $user->parent->children->count(); @endphp
-                                        <span class="text-gray-400">Parent of {{ $childCount }} {{ \Illuminate\Support\Str::plural('learner', $childCount) }}</span>
+                                        <span class="text-gray-500">Parent of {{ $childCount }} {{ \Illuminate\Support\Str::plural('learner', $childCount) }}</span>
                                     @else
-                                        <span class="text-gray-400">No parent profile</span>
+                                        <span class="text-gray-500">No parent profile</span>
                                     @endif
                                 @else
-                                    <span class="text-gray-400">&mdash;</span>
+                                    <span class="text-gray-500">&mdash;</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
@@ -122,7 +122,7 @@
                                     {{ $user->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                                 @if($user->must_change_password)
-                                    <span class="mt-1 block px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-800">
+                                    <span class="mt-1 block px-2 py-1 text-xs rounded-full bg-sun-light text-sun-ink">
                                         Awaiting first sign-in
                                     </span>
                                 @endif

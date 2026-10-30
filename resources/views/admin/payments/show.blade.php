@@ -79,7 +79,7 @@
                         {{ $payment->verified_at->format('M d, Y H:i') }}
                         <span class="block text-xs font-normal text-gray-500">by {{ $payment->verifiedBy->name ?? 'CEO' }}</span>
                     @else
-                        <span class="text-gray-400">Not yet</span>
+                        <span class="text-gray-500">Not yet</span>
                     @endif
                 </dd>
             </div>
@@ -131,13 +131,13 @@
         <div class="px-6 py-4 border-b"><h2 class="text-lg font-semibold text-gray-800">Installment history for this fee</h2></div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payer</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receipt</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Payer</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Receipt</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">

@@ -25,6 +25,7 @@
                             sun: '#F7C94B',
                             ink: '#0f1f3a',
                         },
+                        sun: { DEFAULT: '#F7C94B', light: '#FFF7DB', ink: '#8A6100', edge: '#F4DFA0' },
                     },
                     fontFamily: {
                         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -37,7 +38,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @livewireStyles
 </head>
-<body class="bg-gray-50 font-sans antialiased">
+<body class="bg-[#F5F8FC] font-sans antialiased">
     <style>
         /* Brand typography: Poppins headings, Inter body (utility classes still win). */
         h1, h2, h3 { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.015em; }

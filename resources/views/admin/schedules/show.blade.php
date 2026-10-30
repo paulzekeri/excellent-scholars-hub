@@ -4,7 +4,7 @@
 @php
     $statusStyles = [
         'scheduled' => 'bg-blue-100 text-blue-800',
-        'ongoing' => 'bg-yellow-100 text-yellow-800',
+        'ongoing' => 'bg-sun-light text-sun-ink',
         'completed' => 'bg-green-100 text-green-800',
         'cancelled' => 'bg-orange-100 text-orange-900',
     ];
@@ -25,30 +25,30 @@
                 <div class="flex flex-wrap items-center gap-3 mb-2">
                     <span class="px-3 py-1 text-xs font-medium rounded-full {{ $statusStyle }}">{{ ucfirst($schedule->status) }}</span>
                     @if($schedule->start_time->isToday())
-                        <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-yellow-400 text-blue-950">Today</span>
+                        <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>
                     @endif
                     @if($platformLabel)
                         <span class="text-xs text-gray-500"><i class="fas fa-video mr-1"></i> {{ $platformLabel }}</span>
                     @endif
                     @if($schedule->status == 'ongoing')
-                        <span class="text-xs font-medium text-yellow-700"><i class="fas fa-circle text-yellow-500 mr-1"></i> In progress</span>
+                        <span class="text-xs font-medium text-sun-ink"><i class="fas fa-circle text-sun-ink mr-1"></i> In progress</span>
                     @endif
                 </div>
                 <h1 class="text-3xl font-bold text-gray-800">{{ $schedule->title }}</h1>
                 <p class="text-gray-600 mt-2">
                     @if($class)
                         <a href="{{ route('admin.classes.show', $class) }}" class="text-blue-600 hover:text-blue-800">{{ $class->name }}</a>
-                        <span class="text-gray-400 mx-1">|</span> Code: <strong>{{ $class->code }}</strong>
+                        <span class="text-gray-500 mx-1">|</span> Code: <strong>{{ $class->code }}</strong>
                     @else
                         <span class="text-gray-500">Class no longer available</span>
                     @endif
-                    <span class="text-gray-400 mx-1">|</span> Tutor: <strong>{{ $schedule->tutor->user->name ?? 'N/A' }}</strong>
+                    <span class="text-gray-500 mx-1">|</span> Tutor: <strong>{{ $schedule->tutor->user->name ?? 'N/A' }}</strong>
                 </p>
-                <p class="mt-1 {{ $schedule->start_time->isToday() ? 'text-yellow-800 font-semibold' : 'text-gray-600' }}">
+                <p class="mt-1 {{ $schedule->start_time->isToday() ? 'text-sun-ink font-semibold' : 'text-gray-600' }}">
                     <i class="far fa-calendar-alt mr-1"></i> {{ $schedule->start_time->format('D, M d, Y') }}
-                    <span class="text-gray-400 mx-1">|</span>
+                    <span class="text-gray-500 mx-1">|</span>
                     <i class="far fa-clock mr-1"></i> {{ $schedule->start_time->format('h:i A') }} - {{ $schedule->end_time->format('h:i A') }}
-                    <span class="text-xs text-gray-400 ml-2">({{ $schedule->start_time->diffForHumans() }})</span>
+                    <span class="text-xs text-gray-500 ml-2">({{ $schedule->start_time->diffForHumans() }})</span>
                 </p>
                 @if($schedule->description)
                     <p class="text-gray-500 text-sm mt-3 max-w-2xl">{{ $schedule->description }}</p>
@@ -64,7 +64,7 @@
                     </a>
                     <p class="text-xs text-gray-500 mt-2">Opens the meeting in a new tab</p>
                 @elseif($isUpcomingOrLive)
-                    <div class="inline-block bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm text-left">
+                    <div class="inline-block bg-sun-light border border-sun-edge text-sun-ink px-4 py-3 rounded-lg text-sm text-left">
                         <i class="fas fa-exclamation-triangle mr-1"></i> No meeting link set for this session.
                     </div>
                 @elseif($schedule->status == 'completed' && $schedule->recording_url)
@@ -96,7 +96,7 @@
                         <form action="{{ route('admin.schedules.reopen', $schedule) }}" method="POST"
                             onsubmit="return confirm('Reopen this session? It will stop counting on the tutor report.')">
                             @csrf
-                            <button type="submit" class="inline-flex items-center text-sm text-yellow-700 hover:text-yellow-900">
+                            <button type="submit" class="inline-flex items-center text-sm text-sun-ink hover:text-sun-ink">
                                 <i class="fas fa-undo mr-1"></i> Reopen (undo completion)
                             </button>
                         </form>
@@ -122,19 +122,19 @@
                     </h2>
                     <div class="flex flex-wrap gap-2 text-xs">
                         <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">Present {{ $attendanceSummary['present'] }}</span>
-                        <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Late {{ $attendanceSummary['late'] }}</span>
+                        <span class="px-2 py-1 rounded-full bg-sun-light text-sun-ink">Late {{ $attendanceSummary['late'] }}</span>
                         <span class="px-2 py-1 rounded-full bg-orange-100 text-orange-900">Absent {{ $attendanceSummary['absent'] }}</span>
                         <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">Excused {{ $attendanceSummary['excused'] }}</span>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-[#EAF2FB]">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Learner</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Marked</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Learner</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Notes</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Marked</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -151,7 +151,7 @@
                                             <span class="px-2 py-1 text-xs rounded-full font-medium
                                                 @if($row['record']->status == 'present') bg-green-100 text-green-800
                                                 @elseif($row['record']->status == 'absent') bg-orange-100 text-orange-900
-                                                @elseif($row['record']->status == 'late') bg-yellow-100 text-yellow-800
+                                                @elseif($row['record']->status == 'late') bg-sun-light text-sun-ink
                                                 @elseif($row['record']->status == 'excused') bg-blue-100 text-blue-800
                                                 @else bg-gray-100 text-gray-800 @endif">
                                                 {{ ucfirst($row['record']->status) }}
@@ -246,13 +246,13 @@
                     <li>
                         <a href="{{ route('admin.oversight.attendance.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
                             <span><i class="fas fa-user-check mr-2 text-orange-700 w-4"></i> Class attendance</span>
-                            <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                            <i class="fas fa-chevron-right text-xs text-gray-500"></i>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('admin.classes.show', $class) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
-                            <span><i class="fas fa-chalkboard mr-2 text-yellow-600 w-4"></i> Class &amp; enrolled learners</span>
-                            <i class="fas fa-chevron-right text-xs text-gray-400"></i>
+                            <span><i class="fas fa-chalkboard mr-2 text-sun-ink w-4"></i> Class &amp; enrolled learners</span>
+                            <i class="fas fa-chevron-right text-xs text-gray-500"></i>
                         </a>
                     </li>
                 </ul>

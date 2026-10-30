@@ -37,12 +37,12 @@
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-[#EAF2FB]">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grade</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Grade</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -90,7 +90,7 @@
                     <button type="submit" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-user-plus mr-1"></i> Enroll Learner</button>
                 </form>
                 @else
-                <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+                <div class="bg-sun-light border border-sun-edge text-sun-ink px-4 py-3 rounded-lg">
                     <i class="fas fa-exclamation-triangle mr-1"></i> This class has reached maximum capacity ({{ $class->max_students }} students).
                 </div>
                 @endif

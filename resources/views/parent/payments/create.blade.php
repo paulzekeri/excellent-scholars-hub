@@ -28,7 +28,7 @@
 
         @if($children->isEmpty())
             <div class="text-center py-8">
-                <i class="fas fa-child text-gray-400 text-5xl mb-3"></i>
+                <i class="fas fa-child text-gray-500 text-5xl mb-3"></i>
                 <p class="text-gray-600">No children are linked to your account yet, so there is nothing to pay for.</p>
                 <p class="text-sm text-gray-500">Please contact the administrator.</p>
             </div>

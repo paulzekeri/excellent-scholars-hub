@@ -102,17 +102,17 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reference</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Learner</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fee (term / class)</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Installment</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receipt</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Check</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Reference</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Learner</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Fee (term / class)</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Installment</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Method</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Receipt</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Check</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -152,7 +152,7 @@
                                     <i class="fas fa-file-invoice mr-1"></i> Download
                                 </a>
                             @else
-                                <span class="text-gray-400 text-xs">None</span>
+                                <span class="text-gray-500 text-xs">None</span>
                             @endif
                         </td>
                         <td class="px-6 py-4">
@@ -169,9 +169,9 @@
                                 <a href="{{ route('admin.payments.show', $payment) }}" class="ml-2 text-xs text-gray-600 hover:text-orange-700">Review</a>
                             @elseif($payment->verified_at)
                                 <span class="block text-xs text-gray-600">by {{ $payment->verifiedBy->name ?? 'CEO' }}</span>
-                                <span class="block text-xs text-gray-400">{{ $payment->verified_at->format('M d, Y') }}</span>
+                                <span class="block text-xs text-gray-500">{{ $payment->verified_at->format('M d, Y') }}</span>
                             @else
-                                <span class="text-xs text-gray-400">—</span>
+                                <span class="text-xs text-gray-500">—</span>
                             @endif
                         </td>
                     </tr>

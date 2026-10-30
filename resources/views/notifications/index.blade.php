@@ -34,7 +34,7 @@
                     </div>
                     <h3 class="font-semibold text-gray-800 mt-2">{{ $notification->title }}</h3>
                     <p class="text-gray-600 mt-1">{{ $notification->message }}</p>
-                    <p class="text-xs text-gray-400 mt-2">{{ $notification->created_at->diffForHumans() }}</p>
+                    <p class="text-xs text-gray-500 mt-2">{{ $notification->created_at->diffForHumans() }}</p>
                 </div>
                 @if(!$notification->is_read)
                 <form action="{{ route('notifications.read', $notification) }}" method="POST">@csrf

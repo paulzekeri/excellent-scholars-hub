@@ -9,18 +9,18 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Start</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">End</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr>
+                <thead class="bg-[#EAF2FB]">
+                    <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Start</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">End</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach($schedules as $schedule)
                     @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
-                    <tr class="{{ $isToday ? 'bg-yellow-50 hover:bg-yellow-100' : 'hover:bg-gray-50' }}">
-                        <td class="px-6 py-4 text-sm font-medium {{ $isToday ? 'text-yellow-900' : '' }}">{{ $schedule->title }}</td>
+                    <tr class="{{ $isToday ? 'bg-sun-light hover:bg-sun-light' : 'hover:bg-gray-50' }}">
+                        <td class="px-6 py-4 text-sm font-medium {{ $isToday ? 'text-sun-ink' : '' }}">{{ $schedule->title }}</td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
-                        <td class="px-6 py-4 text-sm {{ $isToday ? 'text-yellow-900 font-semibold' : '' }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-yellow-400 text-blue-950">Today</span>@endif</td>
+                        <td class="px-6 py-4 text-sm {{ $isToday ? 'text-sun-ink font-semibold' : '' }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>@endif</td>
                         <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-yellow-100 text-yellow-800 @endif">{{ ucfirst($schedule->status) }}</span></td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-sun-light text-sun-ink @endif">{{ ucfirst($schedule->status) }}</span></td>
                         <td class="px-6 py-4 text-sm space-x-2">
                             <a href="{{ route('tutor.attendance.index', $schedule) }}" class="text-blue-600 hover:text-blue-800"><i class="fas fa-check-circle"></i> Attendance</a>
                             @if($schedule->status != 'completed')

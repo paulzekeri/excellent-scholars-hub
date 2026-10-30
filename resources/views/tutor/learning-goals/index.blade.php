@@ -14,14 +14,14 @@
         <div class="px-6 py-4 border-b"><h2 class="text-lg font-semibold text-gray-800">My goals</h2></div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Learner / class</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Term</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sharing</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"></th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Goal</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Learner / class</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Term</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">File</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Sharing</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -44,7 +44,7 @@
                                 @if($goal->file_path)
                                     <a href="{{ route('tutor.learning-goals.download', $goal) }}" class="text-orange-700 hover:text-orange-800"><i class="fas fa-download mr-1"></i> File</a>
                                 @else
-                                    <span class="text-gray-400 text-xs">None</span>
+                                    <span class="text-gray-500 text-xs">None</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-xs">
@@ -89,7 +89,7 @@
                         @if($goal->description)
                             <p class="text-sm text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($goal->description, 160) }}</p>
                         @endif
-                        <p class="text-xs text-gray-400 mt-1">
+                        <p class="text-xs text-gray-500 mt-1">
                             Shared {{ $goal->shared_at ? $goal->shared_at->format('M d, Y') : '' }}
                             @if($goal->sharedBy) by {{ $goal->sharedBy->name }} @endif
                         </p>

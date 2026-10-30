@@ -86,7 +86,7 @@
                             <p class="font-medium text-gray-800 flex items-center flex-wrap gap-2">
                                 {{ $contact->name }}
                                 <span class="px-2 py-0.5 text-xs rounded-full
-                                    @if($contact->isCeo()) bg-yellow-100 text-yellow-800
+                                    @if($contact->isCeo()) bg-sun-light text-sun-ink
                                     @elseif($contact->isAdmin()) bg-orange-100 text-orange-900
                                     @elseif($contact->isTutor()) bg-blue-100 text-blue-800
                                     @elseif($contact->isLearner()) bg-green-100 text-green-800
@@ -101,7 +101,7 @@
                                 {{ $lastMessage ? \Illuminate\Support\Str::limit($lastMessage->body, 80) : 'No messages yet — start the conversation.' }}
                             </p>
                         </div>
-                        <span class="text-xs text-gray-400 whitespace-nowrap ml-4">
+                        <span class="text-xs text-gray-500 whitespace-nowrap ml-4">
                             @if($lastMessage)
                                 {{ $lastMessage->created_at->diffForHumans() }}
                             @endif
@@ -113,7 +113,7 @@
                     <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
                     <p>No contacts available yet.</p>
                     @if(auth()->user()->isAdministrator())
-                        <p class="text-sm text-gray-400 mt-1">Try another category, or send a categorised message from the button above.</p>
+                        <p class="text-sm text-gray-500 mt-1">Try another category, or send a categorised message from the button above.</p>
                     @endif
                 </li>
             @endforelse

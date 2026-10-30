@@ -12,8 +12,8 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tutor</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Students</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr>
+                <thead class="bg-[#EAF2FB]">
+                    <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Code</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Tutor</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Subject</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Students</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach($classes as $class)

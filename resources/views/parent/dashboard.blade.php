@@ -36,7 +36,7 @@
                             {{ $child->user->name }}
                             <span class="ml-1 font-mono text-gray-800">{{ $child->user->username ?: 'no username yet' }}</span>
                             @if($child->user->email)
-                                <span class="text-xs text-gray-400">({{ $child->user->email }})</span>
+                                <span class="text-xs text-gray-500">({{ $child->user->email }})</span>
                             @endif
                         </span>
                         <form action="{{ route('parent.children.password-reset', $child) }}" method="POST"
@@ -88,7 +88,7 @@
                         <p class="text-sm text-gray-600"><i class="fas fa-phone mr-2"></i>{{ $child->phone ?? 'N/A' }}</p>
                     </div>
 
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Tap a card to see the details</p>
+                    <p class="text-xs font-semibold text-[#0a2550] uppercase tracking-wide mb-2">Tap a card to see the details</p>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'schedule']) }}"
                            class="block rounded-lg border border-gray-200 p-3 hover:border-blue-400 hover:bg-blue-50 transition"
@@ -101,10 +101,10 @@
                             <p class="text-xs text-gray-500 leading-tight">Class Schedule</p>
                         </a>
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'pending']) }}"
-                           class="block rounded-lg border border-gray-200 p-3 hover:border-yellow-400 hover:bg-yellow-50 transition"
+                           class="block rounded-lg border border-gray-200 p-3 hover:border-sun hover:bg-sun-light transition"
                            title="View pending assignments">
                             <div class="flex items-center justify-between">
-                                <i class="fas fa-hourglass-half text-yellow-500"></i>
+                                <i class="fas fa-hourglass-half text-sun-ink"></i>
                                 <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
                             </div>
                             <p class="text-2xl font-bold text-gray-800 mt-1">{{ $stats['pendingAssignments'] }}</p>
@@ -159,9 +159,9 @@
                             <i class="fas fa-user-check mr-1 text-green-600"></i> Attendance:
                             @if($stats['attendanceRate'] !== null)
                                 <span class="font-semibold {{ $stats['attendanceRate'] >= 75 ? 'text-green-600' : 'text-orange-700' }}">{{ $stats['attendanceRate'] }}%</span>
-                                <span class="text-gray-400">({{ $stats['attendanceAttended'] }}/{{ $stats['attendanceRecorded'] }} sessions)</span>
+                                <span class="text-gray-500">({{ $stats['attendanceAttended'] }}/{{ $stats['attendanceRecorded'] }} sessions)</span>
                             @else
-                                <span class="text-gray-400">No records yet</span>
+                                <span class="text-gray-500">No records yet</span>
                             @endif
                         </a>
                         @if($stats['missedClasses'] > 0)
@@ -182,9 +182,9 @@
             </div>
         @empty
             <div class="col-span-full text-center py-12">
-                <i class="fas fa-child text-gray-400 text-6xl mb-4"></i>
+                <i class="fas fa-child text-gray-500 text-6xl mb-4"></i>
                 <p class="text-gray-500 text-lg">No children linked to your account yet.</p>
-                <p class="text-gray-400">Please contact the administrator.</p>
+                <p class="text-gray-500">Please contact the administrator.</p>
             </div>
         @endforelse
     </div>

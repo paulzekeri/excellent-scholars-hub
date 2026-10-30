@@ -26,7 +26,7 @@
         @foreach($tabs as $key => $tab)
             <a href="{{ route('admin.assessments.index', array_filter(['scope' => $key, 'tutor_id' => $tutorId])) }}"
                 class="px-3 py-2 rounded-lg text-sm font-medium border transition {{ $scope === $key ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50' }}">
-                {{ $tab['label'] }} <span class="ml-1 text-xs {{ $scope === $key ? 'text-blue-100' : 'text-gray-400' }}">{{ $tab['count'] }}</span>
+                {{ $tab['label'] }} <span class="ml-1 text-xs {{ $scope === $key ? 'text-blue-100' : 'text-gray-500' }}">{{ $tab['count'] }}</span>
             </a>
         @endforeach
 
@@ -45,14 +45,14 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">When</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Child</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guardian</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tutor</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Platform</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">When</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Child</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Guardian</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Tutor</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Platform</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
                         <th class="px-6 py-3"></th>
                     </tr>
                 </thead>
@@ -62,7 +62,7 @@
                             <td class="px-6 py-4">
                                 <span class="font-medium text-gray-800">{{ $assessment->scheduleLabel() }}</span>
                                 @if($assessment->isToday())
-                                    <span class="ml-2 px-2 py-0.5 text-[10px] rounded-full bg-yellow-200 text-yellow-900">Today</span>
+                                    <span class="ml-2 px-2 py-0.5 text-[10px] rounded-full bg-sun-edge text-sun-ink">Today</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
@@ -70,7 +70,7 @@
                                     <a href="{{ route('admin.enquiries.show', $assessment->enquiry) }}" class="font-medium text-gray-800 hover:text-blue-700">{{ $assessment->enquiry->child_name }}</a>
                                     <span class="block text-xs text-gray-500 font-mono">{{ $assessment->enquiry->reference }}</span>
                                 @else
-                                    <span class="text-gray-400">Enquiry deleted</span>
+                                    <span class="text-gray-500">Enquiry deleted</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-gray-600">
@@ -94,7 +94,7 @@
                                         <i class="fas fa-video mr-1"></i> Join
                                     </a>
                                 @elseif($assessment->isOnline())
-                                    <span class="text-xs text-amber-600">No link</span>
+                                    <span class="text-xs text-sun-ink">No link</span>
                                 @else
                                     <span class="text-xs text-gray-500">{{ $assessment->platformLabel() }}</span>
                                 @endif

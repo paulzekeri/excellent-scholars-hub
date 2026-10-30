@@ -166,9 +166,9 @@
         </div>
     @empty
         <div class="text-center py-12 bg-white rounded-xl shadow-md">
-            <i class="fas fa-child text-gray-400 text-6xl mb-4"></i>
+            <i class="fas fa-child text-gray-500 text-6xl mb-4"></i>
             <p class="text-gray-500 text-lg">No children linked to your account yet.</p>
-            <p class="text-gray-400">Please contact the administrator.</p>
+            <p class="text-gray-500">Please contact the administrator.</p>
         </div>
     @endforelse
 
@@ -177,15 +177,15 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Child</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fee</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receipt</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Child</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Fee</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Method</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Receipt</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -213,7 +213,7 @@
                                         <i class="fas fa-file-invoice mr-1"></i> Download
                                     </a>
                                 @else
-                                    <span class="text-xs text-gray-400">None</span>
+                                    <span class="text-xs text-gray-500">None</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">

@@ -62,7 +62,7 @@
                             @if($account->instructions)
                                 <p class="text-xs text-gray-500 mt-2"><i class="fas fa-circle-info mr-1"></i>{{ $account->instructions }}</p>
                             @endif
-                            <p class="text-xs text-gray-400 mt-2">
+                            <p class="text-xs text-gray-500 mt-2">
                                 Added {{ $account->created_at->format('M d, Y') }}
                                 @if($account->createdBy) by {{ $account->createdBy->name }} @endif
                                 · {{ $account->payments_count }} payment{{ $account->payments_count === 1 ? '' : 's' }} recorded

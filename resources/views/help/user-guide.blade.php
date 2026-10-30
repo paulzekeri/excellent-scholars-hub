@@ -397,7 +397,7 @@
                 <!-- Manage Classes -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-chalkboard text-yellow-600 mr-2"></i>3. Managing Classes
+                        <i class="fas fa-chalkboard text-sun-ink mr-2"></i>3. Managing Classes
                     </h3>
                     <p class="text-gray-600 mb-3">Create and manage the classes (subjects/courses) on the platform.</p>
 
@@ -789,7 +789,7 @@
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1 mb-3 ml-4">
                         <li><span class="text-green-600 font-medium">Present</span> — Learner attended the session</li>
                         <li><span class="text-orange-700 font-medium">Absent</span> — Learner was absent</li>
-                        <li><span class="text-yellow-600 font-medium">Late</span> — Learner arrived late</li>
+                        <li><span class="text-sun-ink font-medium">Late</span> — Learner arrived late</li>
                         <li><span class="text-blue-600 font-medium">Excused</span> — Absence was pre-approved/excused</li>
                     </ul>
                     <ol class="space-y-2" start="3">
@@ -928,7 +928,7 @@
                 <!-- My Classes -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-chalkboard text-yellow-600 mr-2"></i>2. My Classes
+                        <i class="fas fa-chalkboard text-sun-ink mr-2"></i>2. My Classes
                     </h3>
                     <p class="text-gray-600 mb-3">View your enrolled classes and their schedules.</p>
                     <ol class="space-y-2">
@@ -1055,7 +1055,7 @@
             @if($guideIsParent)
             <section id="for-parents" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-users text-yellow-600 mr-2"></i>For Parents / Guardians
+                    <i class="fas fa-users text-sun-ink mr-2"></i>For Parents / Guardians
                 </h2>
                 <p class="text-gray-600 mb-6">
                     As a <strong>Parent or Guardian</strong>, you can monitor your child's academic progress, view their
@@ -1113,7 +1113,7 @@
                             </h4>
                             <p class="text-sm text-gray-600">A table showing each class date, the class name, and the attendance status:
                                 <span class="text-green-600">Present</span>, 
-                                <span class="text-yellow-600">Late</span>, 
+                                <span class="text-sun-ink">Late</span>, 
                                 <span class="text-blue-600">Excused</span>, or 
                                 <span class="text-orange-700">Absent</span>.
                             </p>
@@ -1347,7 +1347,7 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Notification Types</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
                     <li><strong>Information</strong> (<i class="fas fa-info-circle text-blue-600"></i> blue badge) &mdash; general news the recipient should know. No action required.</li>
-                    <li><strong>Reminder</strong> (<i class="fas fa-clock text-amber-600"></i> amber badge) &mdash; a nudge about something still to be done, usually with a deadline.</li>
+                    <li><strong>Reminder</strong> (<i class="fas fa-clock text-sun-ink"></i> amber badge) &mdash; a nudge about something still to be done, usually with a deadline.</li>
                     <li><strong>Alert</strong> (<i class="fas fa-exclamation-triangle text-orange-700"></i> orange badge) &mdash; urgent or exceptional news that needs immediate attention.</li>
                     <li><strong>Message</strong> (grey badge) &mdash; created automatically when someone sends you a direct message; administrators cannot pick it.</li>
                 </ul>
@@ -1388,11 +1388,11 @@
 
                 <div class="overflow-x-auto mb-8">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-[#EAF2FB]">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Area</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">What changed</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Who</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Area</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">What changed</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Who</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -1762,7 +1762,7 @@
                 <p class="text-gray-600">
                     The platform uses the school colours: <strong>deep navy and royal blue</strong> for structure and main
                     actions, <strong>white</strong> for cards and content, <strong class="text-orange-700">orange</strong> for
-                    actions, warnings and attention, and <strong class="text-yellow-700">sun-yellow</strong> for highlights and
+                    actions, warnings and attention, and <strong class="text-sun-ink">sun-yellow</strong> for highlights and
                     today's classes. <strong>Red is not used anywhere in the interface.</strong>
                 </p>
             </section>

@@ -88,13 +88,13 @@
                 <i class="fas fa-folder-open text-blue-600 text-3xl"></i>
             </div>
         </a>
-        <a href="{{ route('learner.classes') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition">
+        <a href="{{ route('learner.classes') }}" class="block bg-white rounded-xl shadow-md p-6 border-l-4 border-sun hover:shadow-lg transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Upcoming Sessions</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $upcomingCount }}</p>
                 </div>
-                <i class="fas fa-calendar text-yellow-600 text-3xl"></i>
+                <i class="fas fa-calendar text-sun-ink text-3xl"></i>
             </div>
         </a>
     </div>
@@ -132,16 +132,16 @@
             <div class="space-y-4">
                 @forelse($upcomingClasses as $schedule)
                     @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
-                    <div class="border-l-4 {{ $isToday ? 'border-yellow-500 bg-yellow-50' : 'border-blue-500 bg-blue-50' }} p-4 rounded-r-lg">
+                    <div class="border-l-4 {{ $isToday ? 'border-sun bg-sun-light' : 'border-blue-500 bg-blue-50' }} p-4 rounded-r-lg">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="font-semibold {{ $isToday ? 'text-yellow-900' : 'text-gray-800' }}">{{ $schedule->title }}@if($isToday) <span class="ml-1 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-yellow-400 text-blue-950">Today</span>@endif</p>
+                                <p class="font-semibold {{ $isToday ? 'text-sun-ink' : 'text-gray-800' }}">{{ $schedule->title }}@if($isToday) <span class="ml-1 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>@endif</p>
                                 <p class="text-sm text-gray-600">{{ $schedule->class->name }}</p>
-                                <p class="text-xs {{ $isToday ? 'text-yellow-800 font-semibold' : 'text-gray-500' }}">
+                                <p class="text-xs {{ $isToday ? 'text-sun-ink font-semibold' : 'text-gray-500' }}">
                                     <i class="far fa-calendar-alt mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('D, M d, Y') }}
                                 </p>
-                                <p class="text-xs {{ $isToday ? 'text-yellow-800' : 'text-gray-500' }}">
+                                <p class="text-xs {{ $isToday ? 'text-sun-ink' : 'text-gray-500' }}">
                                     <i class="far fa-clock mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}
                                 </p>
@@ -152,7 +152,7 @@
                                     <i class="fas fa-video mr-1"></i> Join
                                 </a>
                             @else
-                                <span class="text-gray-400 text-sm"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
+                                <span class="text-gray-500 text-sm"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
                             @endif
                         </div>
                     </div>
@@ -160,7 +160,7 @@
                     <div class="text-center py-8">
                         <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
                         <p class="text-gray-500">No upcoming sessions scheduled.</p>
-                        <p class="text-xs text-gray-400 mt-1">Sessions appear here when your tutor creates schedules for your classes.</p>
+                        <p class="text-xs text-gray-500 mt-1">Sessions appear here when your tutor creates schedules for your classes.</p>
                     </div>
                 @endforelse
             </div>
@@ -173,7 +173,7 @@
             <h2 class="text-lg font-semibold text-gray-800">
                 <i class="fas fa-bullseye text-orange-700 mr-2"></i>Goals shared with you
                 @if($sharedGoalsCount > 0)
-                    <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-yellow-800">{{ $sharedGoalsCount }}</span>
+                    <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-sun-ink">{{ $sharedGoalsCount }}</span>
                 @endif
             </h2>
             <a href="{{ route('learner.learning-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View all <i class="fas fa-arrow-right ml-1"></i></a>
@@ -198,7 +198,7 @@
                             <p class="text-sm text-gray-600 mt-1">{{ \Illuminate\Support\Str::limit($goal->description, 140) }}</p>
                         @endif
                         @if($goal->file_path)
-                            <a href="{{ route('learner.learning-goals.download', $goal) }}" class="mt-2 inline-block text-xs text-orange-700 hover:text-yellow-900">
+                            <a href="{{ route('learner.learning-goals.download', $goal) }}" class="mt-2 inline-block text-xs text-orange-700 hover:text-sun-ink">
                                 <i class="fas fa-download mr-1"></i> Attachment
                             </a>
                         @endif

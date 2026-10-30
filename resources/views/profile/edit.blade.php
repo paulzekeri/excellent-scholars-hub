@@ -103,7 +103,7 @@
                     <span>
                         Publish my profile photo with this testimonial.
                         @if(! $user->photo_path)
-                            <span class="block text-xs text-amber-600">Add a profile photo first to use this.</span>
+                            <span class="block text-xs text-sun-ink">Add a profile photo first to use this.</span>
                         @endif
                     </span>
                 </label>

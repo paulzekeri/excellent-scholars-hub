@@ -21,7 +21,7 @@
         @foreach($tabs as $key => $tab)
             <a href="{{ route('admin.testimonials.index', ['status' => $key]) }}"
                 class="px-3 py-2 rounded-lg text-sm font-medium border transition {{ $status === $key ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50' }}">
-                {{ $tab['label'] }} <span class="ml-1 text-xs {{ $status === $key ? 'text-blue-100' : 'text-gray-400' }}">{{ $tab['count'] }}</span>
+                {{ $tab['label'] }} <span class="ml-1 text-xs {{ $status === $key ? 'text-blue-100' : 'text-gray-500' }}">{{ $tab['count'] }}</span>
             </a>
         @endforeach
     </div>

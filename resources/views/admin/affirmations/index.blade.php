@@ -60,7 +60,7 @@
                             </span>
                             <form action="{{ route('admin.affirmations.toggle', $affirmation) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="text-xs {{ $affirmation->is_active ? 'text-yellow-700 hover:text-yellow-900' : 'text-green-700 hover:text-green-900' }}">
+                                <button type="submit" class="text-xs {{ $affirmation->is_active ? 'text-sun-ink hover:text-sun-ink' : 'text-green-700 hover:text-green-900' }}">
                                     {{ $affirmation->is_active ? 'Switch off' : 'Switch on' }}
                                 </button>
                             </form>

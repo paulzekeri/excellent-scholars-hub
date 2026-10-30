@@ -189,7 +189,7 @@
 @endphp
 
 <aside id="esh-sidebar"
-       class="esh-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col bg-gradient-to-b from-[#0a2550] via-[#0d3070] to-[#0a2550] text-blue-50 shadow-2xl transition-transform duration-200 lg:translate-x-0">
+       class="esh-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col bg-gradient-to-b from-[#0a2550] to-[#0d3070] text-blue-50 shadow-2xl transition-transform duration-200 lg:translate-x-0">
 
     <!-- Brand -->
     <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-4">
@@ -225,14 +225,14 @@
                         <a href="{{ route($item['route']) }}" title="{{ $item['label'] }}"
                            class="esh-item relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition {{ $active ? 'bg-white/15 text-white ring-1 ring-white/10' : 'text-blue-100/80 hover:bg-white/10 hover:text-white' }}">
                             @if($active)
-                                <span class="absolute bottom-1.5 left-0 top-1.5 w-1 rounded-r bg-orange-400"></span>
+                                <span class="absolute bottom-1.5 left-0 top-1.5 w-1 rounded-r bg-sun"></span>
                             @endif
-                            <i class="fas {{ $item['icon'] }} w-5 shrink-0 text-center text-[15px] {{ $active ? 'text-orange-300' : 'text-blue-200/70' }}"></i>
+                            <i class="fas {{ $item['icon'] }} w-5 shrink-0 text-center text-[15px] {{ $active ? 'text-sun' : 'text-blue-200/70' }}"></i>
                             <span class="esh-label flex-1 truncate">{{ $item['label'] }}</span>
                             @if(!empty($item['badge']))
-                                <span class="esh-badge rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-bold text-blue-950">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
+                                <span class="esh-badge rounded-full bg-sun px-2 py-0.5 text-[11px] font-bold text-[#0a2550]">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
                             @elseif(!empty($item['hint']))
-                                <span class="esh-label rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-orange-200">{{ $item['hint'] }}</span>
+                                <span class="esh-label rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-sun">{{ $item['hint'] }}</span>
                             @endif
                         </a>
                     @endforeach

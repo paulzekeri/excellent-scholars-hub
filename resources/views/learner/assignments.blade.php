@@ -11,7 +11,7 @@
                 <div class="flex-1">
                     <h3 class="font-semibold text-lg text-gray-800">{{ $assignment->title }}</h3>
                     <p class="text-sm text-gray-500 mt-1">{{ $assignment->class->name }}</p>
-                    <p class="text-xs text-gray-400 mt-1">Due: {{ \Carbon\Carbon::parse($assignment->due_date)->format('M d, Y') }} | Points: {{ $assignment->total_points }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Due: {{ \Carbon\Carbon::parse($assignment->due_date)->format('M d, Y') }} | Points: {{ $assignment->total_points }}</p>
                 </div>
                 <span class="text-3xl @if($assignment->submissions->where('learner_id', auth()->user()->learner->id)->first()) text-green-400 @else text-orange-400 @endif"><i class="fas @if($assignment->submissions->where('learner_id', auth()->user()->learner->id)->first()) fa-check-circle @else fa-clock @endif"></i></span>
             </div>

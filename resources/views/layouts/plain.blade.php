@@ -26,6 +26,7 @@
                             sun: '#F7C94B',
                             ink: '#0f1f3a',
                         },
+                        sun: { DEFAULT: '#F7C94B', light: '#FFF7DB', ink: '#8A6100', edge: '#F4DFA0' },
                     },
                     fontFamily: {
                         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
@@ -52,7 +53,7 @@
             @endif
 
             @if(session('error'))
-                <div class="mb-4 bg-amber-100 border-l-4 border-amber-500 text-amber-900 p-4 rounded" role="alert">
+                <div class="mb-4 bg-sun-light border-l-4 border-sun text-sun-ink p-4 rounded" role="alert">
                     {{ session('error') }}
                 </div>
             @endif

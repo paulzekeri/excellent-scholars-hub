@@ -29,13 +29,13 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Learner</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Learner</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Notes</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -48,7 +48,7 @@
                                 <span class="px-2 py-1 text-xs rounded-full font-medium
                                     @if($record->status == 'present') bg-green-100 text-green-800
                                     @elseif($record->status == 'absent') bg-orange-100 text-orange-900
-                                    @elseif($record->status == 'late') bg-yellow-100 text-yellow-800
+                                    @elseif($record->status == 'late') bg-sun-light text-sun-ink
                                     @elseif($record->status == 'excused') bg-blue-100 text-blue-800
                                     @else bg-gray-100 text-gray-800 @endif">
                                     {{ ucfirst($record->status) }}

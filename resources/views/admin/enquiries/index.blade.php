@@ -32,7 +32,7 @@
             <a href="{{ route('admin.enquiries.index', array_merge($filters, ['status' => $key])) }}"
                 class="px-3 py-2 rounded-lg text-sm font-medium border transition {{ $status === $key ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50' }}">
                 {{ $tab['label'] }}
-                <span class="ml-1 text-xs {{ $status === $key ? 'text-blue-100' : 'text-gray-400' }}">{{ $tab['count'] }}</span>
+                <span class="ml-1 text-xs {{ $status === $key ? 'text-blue-100' : 'text-gray-500' }}">{{ $tab['count'] }}</span>
             </a>
         @endforeach
     </div>
@@ -63,15 +63,15 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reference</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Child</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guardian</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Age</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Reference</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Child</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Guardian</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Source</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Owner</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Age</th>
                         <th class="px-6 py-3"></th>
                     </tr>
                 </thead>
@@ -93,7 +93,7 @@
                                 {{ $enquiry->guardian_name }}
                                 <a href="tel:{{ $enquiry->guardian_phone }}" class="block text-xs text-gray-500 hover:text-blue-700">{{ $enquiry->guardian_phone }}</a>
                                 @if($enquiry->guardian_email)
-                                    <span class="block text-xs text-gray-400">{{ $enquiry->guardian_email }}</span>
+                                    <span class="block text-xs text-gray-500">{{ $enquiry->guardian_email }}</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">

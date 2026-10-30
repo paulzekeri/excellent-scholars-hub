@@ -88,13 +88,13 @@
                                                     @if($submission->score !== null)
                                                         <span class="font-medium">{{ $submission->score }}/{{ $assignment->total_points }}</span>
                                                     @else
-                                                        <span class="text-gray-400">Not graded</span>
+                                                        <span class="text-gray-500">Not graded</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-3 py-2">
                                                     <span class="px-2 py-0.5 text-xs rounded-full
                                                         @if($submission->status == 'graded') bg-green-100 text-green-800
-                                                        @elseif($submission->status == 'submitted') bg-yellow-100 text-yellow-800
+                                                        @elseif($submission->status == 'submitted') bg-sun-light text-sun-ink
                                                         @else bg-gray-100 text-gray-800 @endif">
                                                         {{ ucfirst($submission->status) }}
                                                     </span>
@@ -105,7 +105,7 @@
                                 </table>
                             </div>
                         @else
-                            <p class="text-sm text-gray-400 italic">No submissions yet.</p>
+                            <p class="text-sm text-gray-500 italic">No submissions yet.</p>
                         @endif
                     </div>
                 </div>

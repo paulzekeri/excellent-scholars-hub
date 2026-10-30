@@ -10,8 +10,8 @@
         <form action="{{ route('tutor.attendance.store', $schedule) }}" method="POST">@csrf
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th></tr>
+                    <thead class="bg-[#EAF2FB]">
+                        <tr><th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Student</th><th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th><th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Notes</th></tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @forelse($learners as $learner)

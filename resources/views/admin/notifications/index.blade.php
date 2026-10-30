@@ -9,8 +9,8 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recipient</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th></tr>
+                <thead class="bg-[#EAF2FB]">
+                    <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Type</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Recipient</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($notifications as $notification)
@@ -23,7 +23,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm">{{ $notification->user_id ? ($notification->user->name ?? 'Deleted User') : 'All Users' }}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($notification->is_read) bg-green-100 text-green-800 @else bg-yellow-100 text-yellow-800 @endif">{{ $notification->is_read ? 'Read' : 'Unread' }}</span></td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($notification->is_read) bg-green-100 text-green-800 @else bg-sun-light text-sun-ink @endif">{{ $notification->is_read ? 'Read' : 'Unread' }}</span></td>
                         <td class="px-6 py-4 text-sm">{{ $notification->created_at->format('M d, Y h:i A') }}</td>
                         <td class="px-6 py-4 text-sm">
                             <div class="flex items-center gap-4">
@@ -73,24 +73,24 @@
         <div class="p-6 space-y-4">
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                    <p class="text-xs uppercase text-gray-400">Type</p>
+                    <p class="text-xs uppercase text-gray-500">Type</p>
                     <p id="notification-modal-type" class="text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs uppercase text-gray-400">Status</p>
+                    <p class="text-xs uppercase text-gray-500">Status</p>
                     <p id="notification-modal-status" class="text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs uppercase text-gray-400">Recipient</p>
+                    <p class="text-xs uppercase text-gray-500">Recipient</p>
                     <p id="notification-modal-recipient" class="text-gray-700"></p>
                 </div>
                 <div>
-                    <p class="text-xs uppercase text-gray-400">Sent</p>
+                    <p class="text-xs uppercase text-gray-500">Sent</p>
                     <p id="notification-modal-date" class="text-gray-700"></p>
                 </div>
             </div>
             <div>
-                <p class="text-xs uppercase text-gray-400">Message</p>
+                <p class="text-xs uppercase text-gray-500">Message</p>
                 <p id="notification-modal-message" class="text-sm text-gray-700 whitespace-pre-line mt-1"></p>
             </div>
         </div>

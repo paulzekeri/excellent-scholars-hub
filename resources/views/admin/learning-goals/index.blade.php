@@ -59,14 +59,14 @@
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-[#EAF2FB]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Goal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Learner / class</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tutor</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Share with</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last shared</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Goal</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Learner / class</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Tutor</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">File</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Share with</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Last shared</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -86,14 +86,14 @@
                                 @if($goal->schoolClass)
                                     <span class="block text-xs text-gray-500">{{ $goal->schoolClass->name }}</span>
                                 @endif
-                                <span class="block text-xs text-gray-400">{{ $goal->term ?? 'No term' }}</span>
+                                <span class="block text-xs text-gray-500">{{ $goal->term ?? 'No term' }}</span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $goal->tutor->user->name ?? '—' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 @if($goal->file_path)
                                     <a href="{{ route('admin.learning-goals.download', $goal) }}" class="text-orange-700 hover:text-orange-800"><i class="fas fa-download mr-1"></i> File</a>
                                 @else
-                                    <span class="text-gray-400 text-xs">None</span>
+                                    <span class="text-gray-500 text-xs">None</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">

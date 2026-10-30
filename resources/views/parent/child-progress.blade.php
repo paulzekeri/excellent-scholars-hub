@@ -71,7 +71,7 @@
             'count' => $stats['pendingAssignments'],
             'label' => 'Assignments Pending',
             'icon' => 'fa-hourglass-half',
-            'iconClass' => 'text-yellow-500',
+            'iconClass' => 'text-sun-ink',
             'active' => $tab === 'pending',
         ])
         @include('parent.partials.stat-card', [
@@ -95,7 +95,7 @@
             'count' => $stats['missedClasses'],
             'label' => 'Classes Missed',
             'icon' => 'fa-calendar-times',
-            'iconClass' => $stats['missedClasses'] > 0 ? 'text-orange-700' : 'text-gray-400',
+            'iconClass' => $stats['missedClasses'] > 0 ? 'text-orange-700' : 'text-gray-500',
             'active' => $tab === 'attendance',
         ])
         @include('parent.partials.stat-card', [
@@ -154,7 +154,7 @@
             <div class="bg-white rounded-xl shadow-md p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-hourglass-half text-yellow-500 mr-2"></i>Pending Assignments
+                        <i class="fas fa-hourglass-half text-sun-ink mr-2"></i>Pending Assignments
                     </h2>
                     <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'pending']) }}" class="text-sm text-blue-600 hover:text-blue-800">
                         View all <i class="fas fa-arrow-right ml-1"></i>
@@ -194,10 +194,10 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Notes</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -234,11 +234,11 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date &amp; Time</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Session</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tutor</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date &amp; Time</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Session</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Tutor</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -276,11 +276,11 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-hourglass-half text-yellow-500 mr-2"></i>Pending Assignments
+                        <i class="fas fa-hourglass-half text-sun-ink mr-2"></i>Pending Assignments
                     </h2>
                     <p class="text-sm text-gray-500">Assignments {{ $learner->user->name }} has not submitted yet</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800 font-semibold self-start">
+                <span class="px-3 py-1 rounded-full text-sm bg-sun-light text-sun-ink font-semibold self-start">
                     {{ $pendingAssignments->total() }} pending
                 </span>
             </div>
@@ -288,11 +288,11 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assignment</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Assignment</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Due Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Points</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -315,7 +315,7 @@
                                     @elseif($assignment->status === 'closed')
                                         <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">Closed</span>
                                     @else
-                                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Not submitted</span>
+                                        <span class="px-2 py-1 text-xs rounded-full bg-sun-light text-sun-ink">Not submitted</span>
                                     @endif
                                 </td>
                             </tr>
@@ -346,12 +346,12 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assignment</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Feedback</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Assignment</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Submitted</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Score</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Feedback</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -374,14 +374,14 @@
                                     @elseif($submission->status === 'graded')
                                         <span class="text-gray-500">Graded</span>
                                     @else
-                                        <span class="text-yellow-600">Pending grading</span>
+                                        <span class="text-sun-ink">Pending grading</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($submission->status === 'graded') bg-green-100 text-green-800
                                         @elseif($submission->status === 'submitted') bg-blue-100 text-blue-800
-                                        @elseif($submission->status === 'resubmitted') bg-yellow-100 text-yellow-800
+                                        @elseif($submission->status === 'resubmitted') bg-sun-light text-sun-ink
                                         @else bg-gray-100 text-gray-800 @endif">
                                         {{ ucfirst($submission->status) }}
                                     </span>
@@ -391,13 +391,13 @@
                                         <div class="bg-gray-50 rounded p-2 text-gray-700 text-xs">
                                             <span class="font-medium text-blue-600">Tutor:</span> {{ $submission->feedback }}
                                             @if($submission->graded_at)
-                                                <div class="mt-1 text-gray-400">Graded on {{ $submission->graded_at->format('M d, Y') }}</div>
+                                                <div class="mt-1 text-gray-500">Graded on {{ $submission->graded_at->format('M d, Y') }}</div>
                                             @endif
                                         </div>
                                     @elseif($submission->status === 'graded')
-                                        <span class="text-gray-400 italic">No feedback provided</span>
+                                        <span class="text-gray-500 italic">No feedback provided</span>
                                     @else
-                                        <span class="text-yellow-600 text-xs">Awaiting grading</span>
+                                        <span class="text-sun-ink text-xs">Awaiting grading</span>
                                     @endif
                                 </td>
                             </tr>
@@ -441,7 +441,7 @@
                                 @if($material->description)
                                     <p class="text-sm text-gray-600 mt-2">{{ $material->description }}</p>
                                 @endif
-                                <div class="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                                <div class="flex items-center gap-4 mt-2 text-xs text-gray-500">
                                     @if($material->file_size)
                                         <span>
                                             <i class="far fa-file mr-1"></i>
@@ -461,7 +461,7 @@
                     <div class="text-center py-10">
                         <i class="fas fa-folder-open text-5xl text-gray-300 mb-4"></i>
                         <p class="text-gray-500">No materials have been shared yet.</p>
-                        <p class="text-gray-400 text-sm mt-1">Materials appear here when a tutor uploads them for your child's classes.</p>
+                        <p class="text-gray-500 text-sm mt-1">Materials appear here when a tutor uploads them for your child's classes.</p>
                     </div>
                 @endforelse
             </div>
@@ -507,7 +507,7 @@
         </div>
 
         @if($unrecordedSessions->isNotEmpty())
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-r-lg mb-6">
+            <div class="bg-sun-light border-l-4 border-sun text-sun-ink p-4 rounded-r-lg mb-6">
                 <p class="font-medium">
                     <i class="fas fa-info-circle mr-2"></i>{{ $unrecordedSessions->count() }} past session{{ $unrecordedSessions->count() === 1 ? '' : 's' }} without recorded attendance
                 </p>
@@ -552,11 +552,11 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Session</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Session</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Notes</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -609,7 +609,7 @@
                                 @if($goal->description)
                                     <p class="text-sm text-gray-600 mt-2">{{ $goal->description }}</p>
                                 @endif
-                                <div class="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-400">
+                                <div class="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-500">
                                     <span><i class="fas fa-chalkboard-teacher mr-1"></i>{{ $goal->tutor->user->name ?? 'Tutor' }}</span>
                                     @if($goal->shared_at)
                                         <span><i class="far fa-calendar mr-1"></i>Shared {{ $goal->shared_at->format('M d, Y') }}</span>
@@ -628,7 +628,7 @@
                     <div class="text-center py-10">
                         <i class="fas fa-bullseye text-5xl text-gray-300 mb-4"></i>
                         <p class="text-gray-500">No learning goals have been shared yet.</p>
-                        <p class="text-gray-400 text-sm mt-1">Tutors upload goals; the school shares the relevant ones with you.</p>
+                        <p class="text-gray-500 text-sm mt-1">Tutors upload goals; the school shares the relevant ones with you.</p>
                     </div>
                 @endforelse
             </div>

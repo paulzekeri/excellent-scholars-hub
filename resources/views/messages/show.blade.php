@@ -27,7 +27,7 @@
                     <div class="max-w-lg rounded-2xl px-4 py-3 text-sm shadow-sm
                         {{ $message->sender_id === auth()->id() ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-200' }}">
                         <p class="whitespace-pre-line">{{ $message->body }}</p>
-                        <p class="text-xs mt-1 {{ $message->sender_id === auth()->id() ? 'text-blue-200' : 'text-gray-400' }}">
+                        <p class="text-xs mt-1 {{ $message->sender_id === auth()->id() ? 'text-blue-200' : 'text-gray-500' }}">
                             {{ $message->created_at->format('M d, Y h:i A') }}
                         </p>
                     </div>
@@ -52,7 +52,7 @@
                     <i class="fas fa-paper-plane mr-1"></i> Send
                 </button>
             </div>
-            <p class="text-xs text-gray-400 mt-2">Messages are private between you and {{ $user->name }}. Maximum 2,000 characters.</p>
+            <p class="text-xs text-gray-500 mt-2">Messages are private between you and {{ $user->name }}. Maximum 2,000 characters.</p>
         </form>
     </div>
 </div>

@@ -11,7 +11,7 @@
         : ($navUser->isTutor() ? route('tutor.dashboard') : ($navUser->isParent() ? route('parent.dashboard') : route('learner.dashboard')));
 @endphp
 
-<header class="sticky top-0 z-30 border-b-2 border-orange-500 bg-gradient-to-r from-[#0a2550] via-[#0d3070] to-[#0a2550] text-white shadow-lg">
+<header class="sticky top-0 z-30 border-b border-white/10 bg-gradient-to-r from-[#0a2550] to-[#0d3070] text-white shadow-lg">
     <div class="flex h-16 items-center gap-2 px-3 sm:gap-3 sm:px-6 lg:px-8">
         <!-- Mobile drawer toggle -->
         <button type="button" id="esh-drawer-toggle"
@@ -33,7 +33,7 @@
                 <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="h-full w-full object-contain">
             </span>
             <span class="hidden min-w-0 truncate text-sm font-semibold sm:block sm:text-base">Excellent Scholars Hub</span>
-            <span class="hidden shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-orange-200 sm:inline">{{ $navRoleLabel }}</span>
+            <span class="hidden shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-sun sm:inline">{{ $navRoleLabel }}</span>
         </a>
 
         <!-- Quick actions -->
