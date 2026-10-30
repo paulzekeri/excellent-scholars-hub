@@ -753,8 +753,9 @@ that already exists.
 
 Ship P1 alone if the client wants something live next week; P1–P3 need no auth work at all.
 
-**Status:** P1 (capture/pipeline), P2 (booking/public request/three-party call link) and P3 (result and
-placement) are shipped up to 30 October 2026. P4 (conversion) and P5 (reminders/status page) remain.
+**Status:** P1 (capture/pipeline), P2 (booking/public request/three-party call link), P3 (result and
+placement) and P4 (conversion and enrolment) are shipped up to 30 October 2026. Only P5 (optional
+reminders and a guardian status page) remains.
 
 ### 2.9 Test plan
 

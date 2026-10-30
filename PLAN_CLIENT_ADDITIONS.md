@@ -18,7 +18,7 @@ guide, sidebar). This is the honest picture of all 14 notes:
 | 2 | Categorised messaging | `[x]` |
 | 3 | Learner ongoing/next class panel | `[x]` |
 | 4 | Assignment images + optional max students | `[x]` |
-| 5 | Monthly classes per tutor | `[~]` — report exists (month picker + 6-month trend) but counts **scheduled** sessions; no admin/CEO "class completed" tick yet |
+| 5 | Monthly classes per tutor | `[x]` — admin/CEO can tick a class as completed (with audit + reopen); the report now counts **completed** classes and shows completed vs scheduled |
 | 6 | Blue / white / orange branding | `[x]` |
 | 7 | Tutor learning goals, shared by admin/CEO | `[x]` for parent + tutor; sharing with **learners** not built |
 | 8 | Affirmation card | `[~]` — static daily rotation; no admin-authored weekly post |
@@ -111,6 +111,10 @@ guide, sidebar). This is the honest picture of all 14 notes:
 
 - [x] Monthly classes-per-tutor ranking with a month picker on the admin **and** CEO
       dashboard (`?month=YYYY-MM`), plus a 6-month trend strip.
+- [x] **Note 5 completion tick:** administrators and the CEO can mark a past session completed (or reopen it)
+      from Schedules; the tick records `completed_at` / `completed_by` and an `activity_logs` row. The
+      monthly report and trend now count **completed** classes and show "completed of scheduled" per tutor,
+      so the number matches what a tutor is paid for.
 - [x] Palette: indigo → blue, orange accents, white surfaces (red stays reserved for
       "today" and errors).
 - [x] `partials/affirmation` card (deterministic per day) on all four dashboards.

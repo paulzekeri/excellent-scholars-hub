@@ -79,10 +79,35 @@
                     <p class="text-sm text-gray-500"><i class="fas fa-ban mr-1"></i> Session cancelled</p>
                 @endif
 
-                <div class="mt-3">
+                <div class="mt-3 flex flex-col items-start lg:items-end gap-2">
                     <a href="{{ route('admin.schedules.edit', $schedule) }}" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
                         <i class="fas fa-edit mr-1"></i> Edit schedule
                     </a>
+
+                    @if($schedule->status !== 'completed' && $schedule->hasEnded())
+                        <form action="{{ route('admin.schedules.complete', $schedule) }}" method="POST"
+                            onsubmit="return confirm('Mark this class as completed? It will count on the tutor report.')">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center text-sm text-green-700 hover:text-green-900">
+                                <i class="fas fa-check mr-1"></i> Mark completed
+                            </button>
+                        </form>
+                    @elseif($schedule->status === 'completed')
+                        <form action="{{ route('admin.schedules.reopen', $schedule) }}" method="POST"
+                            onsubmit="return confirm('Reopen this session? It will stop counting on the tutor report.')">
+                            @csrf
+                            <button type="submit" class="inline-flex items-center text-sm text-yellow-700 hover:text-yellow-900">
+                                <i class="fas fa-undo mr-1"></i> Reopen (undo completion)
+                            </button>
+                        </form>
+                    @endif
+
+                    @if($schedule->isCompleted() && $schedule->completed_at)
+                        <p class="text-xs text-gray-500">
+                            Completed {{ $schedule->completed_at->format('M j, Y g:i a') }}
+                            @if($schedule->completedBy) by {{ $schedule->completedBy->name }} @endif
+                        </p>
+                    @endif
                 </div>
             </div>
         </div>

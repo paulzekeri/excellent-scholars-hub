@@ -174,7 +174,10 @@
         <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
             <div>
                 <h2 class="text-lg font-semibold text-gray-800">Classes per tutor — {{ $monthStart->format('F Y') }}</h2>
-                <p class="text-sm text-gray-500">{{ $monthSessions }} session(s) scheduled across {{ $tutorMonthly->count() }} tutor(s).</p>
+                <p class="text-sm text-gray-500">
+                    {{ $monthCompleted }} completed of {{ $monthSessions }} scheduled across {{ $tutorMonthly->count() }} tutor(s).
+                    <a href="{{ route('admin.schedules.index') }}" class="text-blue-700 hover:text-blue-900">Tick a class as completed &rarr;</a>
+                </p>
             </div>
             <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
                 <input type="month" name="month" value="{{ $monthStart->format('Y-m') }}" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
@@ -186,10 +189,10 @@
                 <div>
                     <div class="flex justify-between text-sm mb-1">
                         <span class="font-medium text-gray-800">{{ $tutor->user->name ?? 'Tutor #' . $tutor->id }}</span>
-                        <span class="{{ $tutor->month_sessions > 0 ? 'text-blue-700 font-semibold' : 'text-gray-400' }}">{{ $tutor->month_sessions }} session(s)</span>
+                        <span class="{{ $tutor->month_completed > 0 ? 'text-green-700 font-semibold' : 'text-gray-400' }}">{{ $tutor->month_completed }} completed <span class="font-normal text-gray-400">of {{ $tutor->month_sessions }} scheduled</span></span>
                     </div>
                     <div class="w-full bg-gray-100 rounded-full h-2.5">
-                        <div class="{{ $tutor->month_sessions > 0 ? 'bg-blue-600' : 'bg-gray-200' }} h-2.5 rounded-full" style="width: {{ round($tutor->month_sessions / $maxMonthSessions * 100) }}%"></div>
+                        <div class="{{ $tutor->month_completed > 0 ? 'bg-green-600' : 'bg-gray-200' }} h-2.5 rounded-full" style="width: {{ round($tutor->month_completed / $maxMonthCompleted * 100) }}%"></div>
                     </div>
                 </div>
             @empty
@@ -197,7 +200,7 @@
             @endforelse
         </div>
         <div class="mt-6 border-t border-gray-100 pt-4">
-            <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Last 6 months</p>
+            <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Last 6 months (completed classes)</p>
             <div class="flex items-end gap-3 h-24">
                 @php $trendMax = max(1, (int) $monthlyTrend->max('count')); @endphp
                 @foreach($monthlyTrend as $point)

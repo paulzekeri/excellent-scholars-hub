@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Assignment;
 use App\Models\ClassSchedule;
 use App\Models\Classes;
@@ -127,6 +128,61 @@ class ScheduleController extends Controller
         $schedule->update($request->all());
 
         return redirect()->route('admin.schedules.index')->with('success', 'Schedule updated successfully.');
+    }
+
+    /**
+     * Note 5 — the school confirms a class was actually taken, so it counts on
+     * the monthly tutor report (and therefore towards paying the tutor).
+     */
+    public function markCompleted(ClassSchedule $schedule)
+    {
+        if ($schedule->isCompleted()) {
+            return back()->with('error', 'This class session is already marked as completed.');
+        }
+
+        if (! $schedule->hasEnded()) {
+            return back()->with('error', 'This class session has not ended yet. You can only tick it after the scheduled end time.');
+        }
+
+        $schedule->update([
+            'status' => 'completed',
+            'completed_at' => now(),
+            'completed_by' => auth()->id(),
+        ]);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'schedule.completed',
+            'description' => 'Marked "' . $schedule->title . '" as completed.',
+            'model_type' => ClassSchedule::class,
+            'model_id' => $schedule->id,
+        ]);
+
+        return back()->with('success', 'Class marked as completed. It now counts on the tutor report.');
+    }
+
+    /** Undo a tick — the session stops counting towards the tutor report. */
+    public function reopen(ClassSchedule $schedule)
+    {
+        if (! $schedule->isCompleted()) {
+            return back()->with('error', 'Only a completed session can be reopened.');
+        }
+
+        $schedule->update([
+            'status' => 'scheduled',
+            'completed_at' => null,
+            'completed_by' => null,
+        ]);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'schedule.reopened',
+            'description' => 'Reopened "' . $schedule->title . '" so it no longer counts as completed.',
+            'model_type' => ClassSchedule::class,
+            'model_id' => $schedule->id,
+        ]);
+
+        return back()->with('success', 'Session reopened — it no longer counts on the tutor report.');
     }
 
     public function destroy(ClassSchedule $schedule)

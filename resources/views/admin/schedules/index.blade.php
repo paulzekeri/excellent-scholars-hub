@@ -24,6 +24,17 @@
                         <td class="px-6 py-4 text-sm">
                             <a href="{{ route('admin.schedules.show', $schedule) }}" class="text-blue-600 hover:text-blue-800 mr-3" title="View session &amp; join"><i class="fas fa-eye"></i></a>
                             <a href="{{ route('admin.schedules.edit', $schedule) }}" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></a>
+                            @if($schedule->status !== 'completed')
+                                <form action="{{ route('admin.schedules.complete', $schedule) }}" method="POST" class="inline" onsubmit="return confirm('Mark this class as completed? It will count on the tutor report.')">
+                                    @csrf
+                                    <button type="submit" class="text-green-600 hover:text-green-800 mr-3" title="Mark completed"><i class="fas fa-check"></i></button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.schedules.reopen', $schedule) }}" method="POST" class="inline" onsubmit="return confirm('Reopen this session? It will stop counting on the tutor report.')">
+                                    @csrf
+                                    <button type="submit" class="text-yellow-600 hover:text-yellow-800 mr-3" title="Reopen"><i class="fas fa-undo"></i></button>
+                                </form>
+                            @endif
                             <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></form>
                         </td>
                     </tr>

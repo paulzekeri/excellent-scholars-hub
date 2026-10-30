@@ -33,8 +33,12 @@ class DashboardController extends Controller
             ->withCount(['schedules as month_sessions' => function ($query) use ($monthStart, $monthEnd) {
                 $query->whereBetween('start_time', [$monthStart, $monthEnd]);
             }])
+            ->withCount(['schedules as month_completed' => function ($query) use ($monthStart, $monthEnd) {
+                $query->where('status', 'completed')
+                    ->whereBetween('start_time', [$monthStart, $monthEnd]);
+            }])
             ->get()
-            ->sortByDesc('month_sessions')
+            ->sortByDesc('month_completed')
             ->values();
 
         $monthlyTrend = collect(range(5, 0))->map(function ($monthsAgo) {
@@ -42,7 +46,9 @@ class DashboardController extends Controller
 
             return [
                 'label' => $start->format('M'),
-                'count' => ClassSchedule::whereBetween('start_time', [$start, $start->copy()->endOfMonth()])->count(),
+                'count' => ClassSchedule::where('status', 'completed')
+                    ->whereBetween('start_time', [$start, $start->copy()->endOfMonth()])
+                    ->count(),
             ];
         });
 
@@ -64,7 +70,8 @@ class DashboardController extends Controller
             'tutorMonthly' => $tutorMonthly,
             'monthStart' => $monthStart,
             'monthSessions' => (int) $tutorMonthly->sum('month_sessions'),
-            'maxMonthSessions' => max(1, (int) $tutorMonthly->max('month_sessions')),
+            'monthCompleted' => (int) $tutorMonthly->sum('month_completed'),
+            'maxMonthCompleted' => max(1, (int) $tutorMonthly->max('month_completed')),
             'monthlyTrend' => $monthlyTrend,
             // Admissions (note 13) — enquiries captured before a learner exists.
             'newEnquiries' => Enquiry::where('status', Enquiry::STATUS_NEW)->count(),

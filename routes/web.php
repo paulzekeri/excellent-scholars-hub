@@ -107,6 +107,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::delete('/classes/{class}/unenroll/{learner}', [AdminClassController::class, 'unenroll'])->name('classes.unenroll');
 
     Route::resource('schedules', AdminScheduleController::class);
+    Route::post('/schedules/{schedule}/complete', [AdminScheduleController::class, 'markCompleted'])->name('schedules.complete');
+    Route::post('/schedules/{schedule}/reopen', [AdminScheduleController::class, 'reopen'])->name('schedules.reopen');
     
     Route::resource('notifications', AdminNotificationController::class)->only(['index', 'create', 'store', 'destroy']);
     

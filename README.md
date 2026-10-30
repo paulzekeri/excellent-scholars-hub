@@ -134,6 +134,20 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Class completion tick and an honest monthly tutor report (note 5, 30 October 2026)
+
+The monthly report used to count *scheduled* sessions, so a cancelled class still looked like teaching. The
+school can now tick the classes that actually took place, and the report counts those.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Completion tick | Administrators and the CEO can **mark a past session completed** from the Schedules list or the session page; the guard still refuses sessions whose end time has not passed | `Admin\ScheduleController@markCompleted`, `admin/schedules/*` |
+| Audit | `class_schedules.completed_at` / `completed_by` plus an `activity_logs` entry record who ticked it and when; the session page shows it | migration `2026_10_30_000002_add_completion_columns_to_class_schedules_table` |
+| Reopen | Undo a tick (**Reopen**) — the session returns to *scheduled* and stops counting | `Admin\ScheduleController@reopen` |
+| Report | **Classes per tutor** now counts completed classes, shows "X completed of Y scheduled" per tutor, and the six-month trend counts completions; a link jumps to Schedules | `Admin\DashboardController`, `admin/dashboard.blade.php` |
+| Tutor side | The tutor's own "Complete" action now also stamps `completed_at` / `completed_by` and logs the change | `Tutor\ScheduleController@markCompleted` |
+| Tests | `tests/Feature/ScheduleCompletionTest.php` (7) — admin/CEO tick, future-session guard, tutor tick, reopen, permissions, monthly completed counts and month isolation | `tests/Feature` |
+
 ### Enquiry conversion (note 13, phase 4, 30 October 2026)
 
 An *Awaiting enrolment* enquiry can now become a real family without re-typing anything: the school

@@ -338,6 +338,6 @@ class ClientAdditionsTest extends TestCase
             ->assertOk()
             ->assertSee('Classes per tutor')
             ->assertSee($tutor->user->name)
-            ->assertSee('1 session(s)');
+            ->assertSeeText('0 completed of 1 scheduled');
     }
 }

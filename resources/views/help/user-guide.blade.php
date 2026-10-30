@@ -457,6 +457,13 @@
                             <span class="text-gray-600">Click <strong>"Create Schedule"</strong>.</span>
                         </li>
                     </ol>
+
+                    <p class="font-medium text-gray-700 mt-4 mb-2">To tick a class as completed:</p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li>After the scheduled end time, use the green <strong>tick</strong> on the Schedules list (or <strong>Mark completed</strong> on the session page).</li>
+                        <li>The tick records who confirmed it and when, and the class starts counting on the monthly tutor report.</li>
+                        <li>If it was ticked by mistake, use the yellow <strong>undo</strong> button (or <strong>Reopen</strong>) — it stops counting.</li>
+                    </ul>
                 </div>
 
                 <!-- Verify Payments -->
@@ -1360,7 +1367,7 @@
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Conversion</td><td class="px-4 py-3 text-gray-600">Turn an <em>Awaiting enrolment</em> enquiry into parent + learner accounts, enrol the child in the recommended class and email the logins &mdash; <strong>Convert to learner</strong> on the enquiry.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
                             @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly count of classes per tutor with a month picker and a six-month trend.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly classes per tutor with a month picker and a six-month trend, counting classes <strong>ticked as completed</strong> &mdash; tick them from Schedules.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmation</td><td class="px-4 py-3 text-gray-600">A rotating "affirmation of the day" card on every dashboard.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
                             @if($guideIsAdmin || $guideIsTutor || $guideIsLearner || $guideIsParent)
@@ -1667,10 +1674,10 @@
                 <ol class="space-y-2 mb-4">
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open the <strong>Admin</strong> or <strong>CEO dashboard</strong>.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">In the <strong>Classes per tutor</strong> card, pick a month and click <strong>View</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Each tutor gets a bar showing how many sessions they taught in that month; the strip below shows the last six months.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Each tutor gets a bar showing how many classes were <strong>completed</strong> out of the sessions scheduled that month; the strip below shows the last six months of completed classes.</span></li>
                 </ol>
                 <div class="tip-box">
-                    The count is based on scheduled sessions, so a class that was cancelled still counts for the month it was scheduled in.
+                    The count is based on classes ticked as <strong>completed</strong>. Tick a past class in <strong>Schedules</strong> (or reopen a mistake) so the report matches what the tutor is paid for; scheduled-but-not-completed classes are shown for context only.
                 </div>
                 @endif
 

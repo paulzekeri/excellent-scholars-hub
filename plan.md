@@ -108,7 +108,8 @@
       and admin oversight
 - [x] **Learner dashboard: live/nearest class panel** — live session wins, otherwise the nearest upcoming one,
       with Join and a countdown
-- [x] **Monthly classes per tutor** — month picker, ranked bars and a six-month trend on the admin **and** CEO dashboard
+- [x] **Monthly classes per tutor** — month picker, ranked bars and a six-month trend on the admin **and**
+      CEO dashboard, counting classes **ticked as completed** (with completed vs scheduled shown)
 - [x] **Learning goals** — tutors upload (per learner/class, optional file); `role:admin,ceo` screen shares with
       parent and/or tutor; parent child screen gains a Learning Goals tab; tutors see goals shared with them
 - [x] **Categorised messaging** — broadcasts to parents / tutors / students / everyone / one class, fan-out
@@ -181,7 +182,11 @@
       usernames and double submission. Tests: `EnquiryConversionTest` (10), full suite 168 passing
 - [ ] **Note 13 (phase 5)** — optional assessment reminders and a guardian status page. See
       `PLAN_LOGIN_AND_ADMISSIONS.md` §2
-- [ ] Remaining gaps from the meeting note (see `PLAN_CLIENT_ADDITIONS.md`): admin "class completed"
-      tick behind the monthly tutor report (note 5), admin-authored affirmations (note 8), dynamic
+- [x] **Note 5 — admin/CEO "class completed" tick** — mark a past session completed or reopen it from
+      Schedules; `completed_at` / `completed_by` and an activity-log entry record who ticked it. The monthly
+      report and six-month trend now count **completed** classes and show "completed of scheduled" per tutor.
+      Tests: `ScheduleCompletionTest` (7), full suite 175 passing
+- [ ] Remaining gaps from the meeting note (see `PLAN_CLIENT_ADDITIONS.md`): admin-authored affirmations
+      (note 8), dynamic
       slider + testimonials backend + social links (notes 9, 10), and the final quotation rewrite (note 14)
 
