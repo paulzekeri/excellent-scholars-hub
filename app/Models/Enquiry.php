@@ -68,7 +68,7 @@ class Enquiry extends Model
     /** Tailwind chip classes per status (literal so the CDN build keeps them). */
     public const STATUS_BADGES = [
         self::STATUS_NEW => 'bg-blue-100 text-blue-800',
-        self::STATUS_CONTACTED => 'bg-amber-100 text-amber-800',
+        self::STATUS_CONTACTED => 'bg-sun-light text-sun-ink',
         self::STATUS_ASSESSMENT_BOOKED => 'bg-orange-100 text-orange-800',
         self::STATUS_ASSESSED => 'bg-blue-100 text-blue-800',
         self::STATUS_PLACED => 'bg-blue-100 text-blue-800',

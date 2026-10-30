@@ -105,17 +105,21 @@ class TestimonialTest extends TestCase
         $this->assertFalse($testimonial->publish_photo);
     }
 
-    public function test_only_the_ceo_can_review_testimonials(): void
+    public function test_administrators_and_the_ceo_can_review_testimonials(): void
     {
         $parent = $this->makeUser('parent', 'Reviewed Parent');
         $testimonial = $this->makeTestimonial($parent);
 
-        foreach (['admin', 'tutor', 'parent', 'learner'] as $role) {
+        // Members never reach the review screen.
+        foreach (['tutor', 'parent', 'learner'] as $role) {
             $user = $this->makeUser($role, 'No Review ' . $role);
 
             $this->actingAs($user)->get(route('admin.testimonials.index'))->assertForbidden();
             $this->actingAs($user)->post(route('admin.testimonials.approve', $testimonial))->assertForbidden();
         }
+
+        $admin = $this->makeUser('admin', 'Review Admin');
+        $this->actingAs($admin)->get(route('admin.testimonials.index'))->assertOk()->assertSee('Testimonials');
 
         $ceo = $this->makeUser('ceo', 'Review CEO');
         $this->actingAs($ceo)->get(route('admin.testimonials.index'))->assertOk()->assertSee('Testimonials');
@@ -223,5 +227,131 @@ class TestimonialTest extends TestCase
             ->assertOk()
             ->assertSee('Rejected')
             ->assertSee('Please mention your child by first name only.');
+    }
+
+    public function test_a_member_can_send_a_testimonial_through_messages(): void
+    {
+        $admin = $this->makeUser('admin', 'Message Admin');
+        $ceo = $this->makeUser('ceo', 'Message CEO');
+        $tutor = $this->makeUser('tutor', 'Message Tutor');
+
+        $this->actingAs($tutor)
+            ->post(route('messages.store', $admin), [
+                'body' => 'the lesson are very good and my student improved alot',
+                'type' => 'testimonial',
+            ])
+            ->assertRedirect(route('messages.show', $admin));
+
+        $testimonial = Testimonial::where('user_id', $tutor->id)->firstOrFail();
+
+        $this->assertSame(Testimonial::STATUS_PENDING, $testimonial->status);
+        $this->assertSame('the lesson are very good and my student improved alot', $testimonial->body);
+
+        $this->assertDatabaseHas('messages', [
+            'sender_id' => $tutor->id,
+            'receiver_id' => $admin->id,
+            'type' => 'testimonial',
+        ]);
+
+        // The reviewers are told there is something to polish and approve.
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $admin->id,
+            'title' => 'New testimonial to review',
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $ceo->id,
+            'title' => 'New testimonial to review',
+        ]);
+    }
+
+    public function test_a_general_message_does_not_create_a_testimonial(): void
+    {
+        $admin = $this->makeUser('admin', 'Plain Message Admin');
+        $parent = $this->makeUser('parent', 'Plain Message Parent');
+
+        $this->actingAs($parent)
+            ->post(route('messages.store', $admin), [
+                'body' => 'Please can we move Saturday lesson?',
+                'type' => 'general',
+            ])
+            ->assertRedirect(route('messages.show', $admin));
+
+        $this->assertSame(0, Testimonial::where('user_id', $parent->id)->count());
+        $this->assertDatabaseHas('messages', ['sender_id' => $parent->id, 'type' => 'general']);
+    }
+
+    public function test_the_school_cannot_file_a_testimonial_about_itself(): void
+    {
+        $admin = $this->makeUser('admin', 'Filing Admin');
+        $parent = $this->makeUser('parent', 'Recipient Parent');
+
+        $this->actingAs($admin)
+            ->post(route('messages.store', $parent), [
+                'body' => 'We think our school is great.',
+                'type' => 'testimonial',
+            ])
+            ->assertRedirect(route('messages.show', $parent));
+
+        $this->assertSame(0, Testimonial::where('user_id', $admin->id)->count());
+        $this->assertDatabaseHas('messages', ['sender_id' => $admin->id, 'type' => 'general']);
+    }
+
+    public function test_a_reviewer_can_polish_the_wording_without_losing_the_approval(): void
+    {
+        $ceo = $this->makeUser('ceo', 'Polishing CEO');
+        $admin = $this->makeUser('admin', 'Polishing Admin');
+        $parent = $this->makeUser('parent', 'Polished Parent');
+
+        $testimonial = $this->makeTestimonial($parent, [
+            'body' => 'my child dey enjoy the class well well',
+            'status' => Testimonial::STATUS_APPROVED,
+            'approved_by' => $ceo->id,
+            'approved_at' => now(),
+        ]);
+
+        $this->actingAs($admin)
+            ->from(route('admin.testimonials.index'))
+            ->patch(route('admin.testimonials.update', $testimonial), [
+                'body' => 'My child really enjoys the classes and looks forward to every one.',
+            ])
+            ->assertSessionHas('success');
+
+        $testimonial->refresh();
+
+        $this->assertSame('My child really enjoys the classes and looks forward to every one.', $testimonial->body);
+        $this->assertSame(Testimonial::STATUS_APPROVED, $testimonial->status, 'Editing the wording must not un-publish it.');
+
+        // Members cannot rewrite a testimonial.
+        $this->actingAs($parent)
+            ->patch(route('admin.testimonials.update', $testimonial), ['body' => 'Hacked wording.'])
+            ->assertForbidden();
+    }
+
+    public function test_approved_testimonials_are_published_three_at_a_time(): void
+    {
+        $ceo = $this->makeUser('ceo', 'Slider CEO');
+
+        foreach (range(1, 4) as $index) {
+            $member = $this->makeUser('parent', 'Slider Parent ' . $index);
+            $this->makeTestimonial($member, [
+                'body' => 'Slider quote number ' . $index,
+                'status' => Testimonial::STATUS_APPROVED,
+                'approved_by' => $ceo->id,
+                'approved_at' => now(),
+            ]);
+        }
+
+        Auth::logout();
+        $this->flushSession();
+
+        $html = $this->get('/')->assertOk()
+            ->assertSee('Slider quote number 1')
+            ->assertSee('Slider quote number 4')
+            ->getContent();
+
+        // Four approved quotes make two slides of three-and-one.
+        $this->assertSame(2, substr_count($html, 'data-t-slide='));
+        $this->assertStringContainsString('data-t-prev', $html);
+        $this->assertStringContainsString('data-t-next', $html);
     }
 }

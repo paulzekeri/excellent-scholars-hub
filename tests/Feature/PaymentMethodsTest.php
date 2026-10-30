@@ -73,21 +73,25 @@ class PaymentMethodsTest extends TestCase
         ], $overrides);
     }
 
-    public function test_only_the_ceo_can_add_switch_off_edit_and_delete_school_accounts(): void
+    public function test_administrators_and_the_ceo_maintain_the_school_accounts(): void
     {
         $ceo = $this->makeUser('ceo', 'Chief Executive');
         $admin = $this->makeUser('admin', 'School Admin');
+        $tutor = $this->makeUser('tutor', 'Class Tutor');
         [$parentUser] = $this->makeParentWithChild();
 
-        // Bank details are CEO-only, exactly like the payments themselves.
-        $this->actingAs($admin)->get(route('admin.payment-accounts.index'))->assertForbidden();
+        // Bank details are shared by administrators and the CEO. Parents and
+        // tutors never see the screen.
         $this->actingAs($parentUser)->get(route('admin.payment-accounts.index'))->assertForbidden();
+        $this->actingAs($tutor)->get(route('admin.payment-accounts.index'))->assertForbidden();
         $this->actingAs($parentUser)->post(route('admin.payment-accounts.store'), [])->assertForbidden();
+        $this->actingAs($admin)->get(route('admin.payment-accounts.index'))->assertOk();
 
         $number = (string) random_int(1000000000, 9999999999);
         $spaced = substr($number, 0, 4) . ' ' . substr($number, 4);
 
-        $this->actingAs($ceo)->post(route('admin.payment-accounts.store'), [
+        // An administrator can add the school account parents pay into.
+        $this->actingAs($admin)->post(route('admin.payment-accounts.store'), [
             'bank_name' => 'Access Bank',
             'account_name' => 'Excellent Scholars Academy',
             'account_number' => $spaced,
@@ -102,6 +106,7 @@ class PaymentMethodsTest extends TestCase
         $this->actingAs($parentUser)->get(route('parent.payments.create'))
             ->assertOk()
             ->assertSee('Access Bank')
+            ->assertSee('Excellent Scholars Academy')
             ->assertSee($number)
             ->assertSee('Use the child&#039;s name as narration.', false);
 

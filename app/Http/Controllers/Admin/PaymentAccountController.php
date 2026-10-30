@@ -11,17 +11,18 @@ use Illuminate\Validation\Rule;
 /**
  * The school bank accounts parents transfer fees into.
  *
- * Only the CEO maintains them: an account can be added, corrected, switched off
- * (hidden from parents but kept for history) or deleted. Payments keep a
- * `paid_into` snapshot, so deleting an account never rewrites what a parent paid.
+ * Administrators and the CEO maintain them: an account can be added, corrected,
+ * switched off (hidden from parents but kept for history) or deleted. Payments
+ * keep a `paid_into` snapshot, so deleting an account never rewrites what a
+ * parent paid. Verifying the payments themselves stays CEO-only.
  */
 class PaymentAccountController extends Controller
 {
     public function __construct()
     {
-        // Bank details are CEO-only, like the payments themselves.
+        // Bank details are shared by administrators and the CEO.
         $this->middleware(function ($request, $next) {
-            abort_unless(auth()->check() && auth()->user()->canManagePayments(), 403, 'Only the CEO can manage the school bank accounts.');
+            abort_unless(auth()->check() && auth()->user()->isAdministrator(), 403, 'Only administrators and the CEO can manage the school bank accounts.');
 
             return $next($request);
         });

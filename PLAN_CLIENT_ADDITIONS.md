@@ -14,7 +14,7 @@ guide, sidebar). This is the honest picture of all 14 notes:
 
 | Note | Item | Status |
 |---|---|---|
-| 1 | Parent records payment + receipt, CEO verifies | `[x]` — class is per-installment (one row each), not a literal multi-select |
+| 1 | Parent records payment + receipt, CEO verifies | `[x]` — one submission can now cover **several classes** (a row per class plus a general row), each with its own amount and total fee; the receipt is shared by the batch |
 | 2 | Categorised messaging | `[x]` |
 | 3 | Learner ongoing/next class panel | `[x]` |
 | 4 | Assignment images + optional max students | `[x]` |
@@ -30,7 +30,7 @@ guide, sidebar). This is the honest picture of all 14 notes:
 | 11 | Automated payment gateway | **Deferred by the client (29 Oct 2026)** — not in scope; `PaystackService` stays as the stub |
 | 12 | Children without email: username login + reset | `[x]` — username login, provisioning, forced first-login change, guardian-delivered reset, parent-initiated reset and the backfill/audit commands are shipped (Phase 11) |
 | 13 | Prospective-learner video-call assessment workflow | `[~]` — P1–P4 shipped (capture → booking → result → conversion); **P5 reminders/status page deferred to v2** |
-| 14 | Final quotation with all additions and pricing | `[~]` — deferred items (9-ii, 9-iii, 13-P5, 11) are marked **v2** on the quotation; the full re-priced final quotation is still to be written |
+| 14 | Final quotation with all additions and pricing | `[x]` — `CLIENT_QUOTATION 2.md` now carries the delivered-additions table, the VAT-inclusive total (₦260,000 + ₦40,000 VAT = ₦300,000) matching the 2 × ₦150,000 milestones, and the v2 deferred section |
 
 **Client clarifications (29 October 2026):**
 

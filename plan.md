@@ -204,9 +204,16 @@
       **Communication → Affirmations**; every dashboard (including learners) shows the latest active post in a
       colourful blue/orange card, with switch-off/delete and the built-in daily rotation as fallback.
       Tests: `AffirmationTest` (7), full suite 196 passing
+- [x] **v1 wrap-up (30 October 2026)** — administrators (not just the CEO) maintain the **school bank accounts**
+      that parents see; a parent can pay for **several classes in one submission** (one row per class plus a
+      general row, shared receipt and reference); the messaging compose form has a **message-type dropdown**, so
+      parents/tutors/learners can send a **testimonial** that administrators/CEO **edit and approve**, and approved
+      quotes publish **three at a time in the landing slider**.
+      Tests: `PaymentBatchTest` (9) + `TestimonialTest` (12), full suite 217 passing
 - [ ] **V2 items marked on the quotation** — admin-managed landing slider (9-ii), social media links (9-iii),
       assessment reminders + guardian status page (13-P5), payment gateway (11), automatic Meet/Zoom links.
       **Not included in the current scope**; see the v2 section of `CLIENT_QUOTATION 2.md`.
-- [ ] **Note 14 — final quotation rewrite** — the additions above still need to be folded into the final
-      quotation with pricing; the deferred items are already marked as v2.
+- [x] **Note 14 — final quotation** — `CLIENT_QUOTATION 2.md` lists the delivered additions, reconciles the money
+      (subtotal ₦260,000 + VAT ₦40,000 = **₦300,000**, matching the 2 × ₦150,000 milestones) and keeps the v2
+      deferred section.
 

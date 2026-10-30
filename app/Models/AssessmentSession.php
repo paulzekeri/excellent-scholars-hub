@@ -33,7 +33,7 @@ class AssessmentSession extends Model
         self::PLATFORM_GOOGLE_MEET => 'bg-blue-100 text-blue-800',
         self::PLATFORM_ZOOM => 'bg-blue-100 text-blue-800',
         self::PLATFORM_PHONE => 'bg-gray-100 text-gray-700',
-        self::PLATFORM_IN_PERSON => 'bg-amber-100 text-amber-800',
+        self::PLATFORM_IN_PERSON => 'bg-sun-light text-sun-ink',
     ];
 
     /** Platforms that need a meeting link. */
@@ -71,7 +71,7 @@ class AssessmentSession extends Model
 
     public const OUTCOME_BADGES = [
         self::OUTCOME_READY => 'bg-green-100 text-green-800',
-        self::OUTCOME_NEEDS_SUPPORT => 'bg-amber-100 text-amber-800',
+        self::OUTCOME_NEEDS_SUPPORT => 'bg-sun-light text-sun-ink',
         self::OUTCOME_NOT_READY => 'bg-orange-100 text-orange-800',
     ];
 

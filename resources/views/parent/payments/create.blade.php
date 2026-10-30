@@ -61,19 +61,91 @@
                     </datalist>
                     <p class="text-xs text-gray-500 mt-1">Payments sharing a child, term and class share one balance.</p>
                 </div>
-                <div>
-                    <label for="class_id" class="block text-sm font-medium text-gray-700">Class</label>
-                    <select id="class_id" name="class_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Not class-specific</option>
-                        @foreach($children as $learner)
-                            @foreach($learner->classes->sortBy('name') as $class)
-                                <option value="{{ $class->id }}" data-learner="{{ $learner->id }}" @selected((string) old('class_id', $selectedClass) === (string) $class->id)>{{ $class->name }} ({{ $learner->user->name }})</option>
-                            @endforeach
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">Only classes your child attends are listed.</p>
-                    @error('class_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                <div class="md:col-span-2">
+                    <p class="block text-sm font-medium text-gray-700">What are you paying for? <span class="text-orange-700">*</span></p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Tick every class this transfer covers and type what you paid per class — one record is created per ticked class,
+                        so a single transfer can clear two or three subjects at once. Tick <strong>general</strong> for registration,
+                        materials or anything not tied to a class.
+                    </p>
+
+                    @php
+                        $oldClasses = collect(old('class_ids', []))->map(fn ($id) => (int) $id)->all();
+                        $oldAmounts = old('amounts', []);
+                        $oldTotals = old('total_fees', []);
+                    @endphp
+
+                    <div class="mt-3 overflow-x-auto rounded-xl border border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-[#EAF2FB]">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Pay</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Amount paid now</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Total fee (optional)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 bg-white">
+                                <tr data-pay-row>
+                                    <td class="px-3 py-2 align-top">
+                                        <input type="checkbox" name="class_ids[]" value="0" data-pay-check
+                                            class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                                            @checked(in_array(0, $oldClasses, true))>
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <span class="font-medium text-gray-800">General payment</span>
+                                        <span class="block text-xs text-gray-500">Not tied to one class</span>
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <input type="number" step="0.01" min="0" name="amounts[0]" data-pay-amount
+                                            value="{{ $oldAmounts[0] ?? '' }}" placeholder="0.00"
+                                            class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <input type="number" step="0.01" min="0" name="total_fees[0]"
+                                            value="{{ $oldTotals[0] ?? '' }}" placeholder="optional"
+                                            class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </td>
+                                </tr>
+                                @foreach($children as $learner)
+                                    @foreach($learner->classes->sortBy('name') as $class)
+                                        <tr data-pay-row data-learner-row="{{ $learner->id }}">
+                                            <td class="px-3 py-2 align-top">
+                                                <input type="checkbox" name="class_ids[]" value="{{ $class->id }}" data-pay-check
+                                                    class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                                                    @checked(in_array($class->id, $oldClasses, true))>
+                                            </td>
+                                            <td class="px-3 py-2 align-top">
+                                                <span class="font-medium text-gray-800">{{ $class->name }}</span>
+                                                <span class="block text-xs text-gray-500">{{ $learner->user->name }}</span>
+                                            </td>
+                                            <td class="px-3 py-2 align-top">
+                                                <input type="number" step="0.01" min="0" name="amounts[{{ $class->id }}]" data-pay-amount
+                                                    value="{{ $oldAmounts[$class->id] ?? '' }}" placeholder="0.00"
+                                                    class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                                @error('amounts.' . $class->id)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                            </td>
+                                            <td class="px-3 py-2 align-top">
+                                                <input type="number" step="0.01" min="0" name="total_fees[{{ $class->id }}]"
+                                                    value="{{ $oldTotals[$class->id] ?? '' }}" placeholder="optional"
+                                                    class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-xs text-gray-500"><i class="fas fa-circle-info mr-1"></i>Only classes your child attends are listed. Amounts apply to the term chosen above.</p>
+                        <p class="text-sm font-semibold text-[#0a2550]">This submission: <span id="pay-total">0.00</span></p>
+                    </div>
+
+                    @error('class_ids')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    @error('amounts')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
+
             </div>
 
             <div>
@@ -171,17 +243,6 @@
 
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="total_fee" class="block text-sm font-medium text-gray-700">Total Fee</label>
-                    <input type="number" step="0.01" min="0" id="total_fee" name="total_fee" value="{{ old('total_fee') }}" placeholder="e.g. 120000" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                    <p class="text-xs text-gray-500 mt-1">The whole fee for this term/class, if you know it. It lets the school show your balance.</p>
-                    @error('total_fee')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                </div>
-                <div>
-                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount Paid Now <span class="text-orange-700">*</span></label>
-                    <input type="number" step="0.01" min="1" id="amount" name="amount" value="{{ old('amount') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                    @error('amount')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                </div>
                 <div>
                     <label for="reference" id="reference-label" class="block text-sm font-medium text-gray-700">{{ $chosenMethod === \App\Models\Payment::METHOD_CASH ? 'Bursar receipt number (optional)' : 'Transfer reference / narration' }}</label>
                     <input type="text" id="reference" name="reference" value="{{ old('reference') }}" placeholder="e.g. FBN-8821345" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
@@ -317,34 +378,67 @@
             });
         });
 
-        // Only offer the classes the chosen child actually attends.
+        // Multi-class payment rows: only the chosen child's classes are shown,
+        // typing an amount ticks its row, and the submission total updates live.
         const child = document.getElementById('learner_id');
-        const classSelect = document.getElementById('class_id');
+        const payRows = Array.prototype.slice.call(document.querySelectorAll('[data-pay-row]'));
+        const payTotal = document.getElementById('pay-total');
 
-        if (!child || !classSelect) return;
+        function refreshPayRows() {
+            const learnerId = child ? child.value : '';
+            let total = 0;
 
-        function filterClasses() {
-            const learnerId = child.value;
-            let selectionStillValid = false;
+            payRows.forEach(function (row) {
+                const owner = row.getAttribute('data-learner-row');
+                const allowed = !owner || learnerId === '' || owner === learnerId;
 
-            Array.prototype.forEach.call(classSelect.options, function (option) {
-                if (!option.value) return; // "Not class-specific"
+                row.classList.toggle('hidden', !allowed);
 
-                const owners = (option.dataset.learner || '').split(',');
-                const matches = learnerId === '' || owners.indexOf(learnerId) !== -1;
-                option.hidden = !matches;
-                option.disabled = !matches;
+                Array.prototype.forEach.call(row.querySelectorAll('input'), function (input) {
+                    input.disabled = !allowed;
 
-                if (matches && option.selected) selectionStillValid = true;
+                    if (!allowed && input.type === 'checkbox') {
+                        input.checked = false;
+                    }
+                });
+
+                const check = row.querySelector('[data-pay-check]');
+                const amount = row.querySelector('[data-pay-amount]');
+                const value = amount ? parseFloat(amount.value) || 0 : 0;
+
+                if (allowed && check && amount && value > 0 && !check.checked) {
+                    check.checked = true;
+                }
+
+                if (allowed && check && check.checked) {
+                    total += value;
+                }
             });
 
-            if (!selectionStillValid && classSelect.value) {
-                classSelect.value = '';
+            if (payTotal) {
+                payTotal.textContent = total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                });
             }
         }
 
-        child.addEventListener('change', filterClasses);
-        filterClasses();
+        payRows.forEach(function (row) {
+            const check = row.querySelector('[data-pay-check]');
+            const amount = row.querySelector('[data-pay-amount]');
+
+            if (check && amount) {
+                check.addEventListener('change', function () {
+                    if (!check.checked) amount.value = '';
+                    refreshPayRows();
+                });
+            }
+
+            if (amount) amount.addEventListener('input', refreshPayRows);
+        });
+
+        if (child) child.addEventListener('change', refreshPayRows);
+        refreshPayRows();
     });
 </script>
 @endsection

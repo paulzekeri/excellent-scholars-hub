@@ -1,0 +1,265 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Classes;
+use App\Models\Learner;
+use App\Models\Notification;
+use App\Models\ParentModel;
+use App\Models\Payment;
+use App\Models\PaymentAccount;
+use App\Models\Role;
+use App\Models\Tutor;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+/**
+ * A parent often clears two or three subjects in one bank transfer. The form
+ * ticks the classes the transfer covered and records one installment per class
+ * under the same reference, so each class keeps its own fee and balance.
+ */
+class PaymentBatchTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    private function makeUser(string $roleSlug, string $name): User
+    {
+        return User::create([
+            'name' => $name,
+            'email' => strtolower(str_replace(' ', '.', $name)) . '.' . uniqid() . '@example.com',
+            'password' => Hash::make('password123'),
+            'role_id' => Role::where('slug', $roleSlug)->firstOrFail()->id,
+        ]);
+    }
+
+    /**
+     * @return array{0: User, 1: ParentModel, 2: Learner}
+     */
+    private function makeFamily(): array
+    {
+        $parentUser = $this->makeUser('parent', 'Ada Okafor');
+        $parent = ParentModel::create(['user_id' => $parentUser->id]);
+
+        $child = Learner::create([
+            'user_id' => $this->makeUser('learner', 'Chidi Okafor')->id,
+            'parent_id' => $parent->id,
+            'grade_level' => 'JSS 2',
+        ]);
+
+        return [$parentUser, $parent, $child];
+    }
+
+    private function makeClass(string $name = 'JSS2 Mathematics'): Classes
+    {
+        $tutorUser = $this->makeUser('tutor', 'Tutor ' . $name);
+        $tutor = Tutor::create(['user_id' => $tutorUser->id]);
+
+        return Classes::create([
+            'name' => $name,
+            'code' => 'CLS-' . uniqid(),
+            'tutor_id' => $tutor->id,
+            'is_active' => true,
+        ]);
+    }
+
+    private function account(): PaymentAccount
+    {
+        return PaymentAccount::firstOrCreate(
+            ['account_number' => '0099887766'],
+            [
+                'bank_name' => 'GTBank',
+                'account_name' => 'Excellent Scholars Academy',
+                'is_active' => true,
+            ]
+        );
+    }
+
+    /**
+     * @param  array<int, float|int>  $amounts  keyed by class id (0 = general)
+     * @param  array<int, float|int>  $fees
+     */
+    private function batchData(Learner $child, array $amounts, array $fees = [], array $overrides = []): array
+    {
+        return array_merge([
+            'learner_id' => $child->id,
+            'payment_type' => 'tuition',
+            'term' => 'First Term',
+            'payment_method' => Payment::METHOD_TRANSFER,
+            'payment_account_id' => $this->account()->id,
+            'reference' => 'TRF-' . uniqid(),
+            'payment_date' => now()->toDateString(),
+            'class_ids' => array_keys($amounts),
+            'amounts' => $amounts,
+            'total_fees' => $fees,
+        ], $overrides);
+    }
+
+    public function test_one_transfer_can_pay_for_two_classes(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass('JSS2 Mathematics');
+        $english = $this->makeClass('JSS2 English');
+        $child->classes()->attach([$maths->id, $english->id]);
+
+        $this->actingAs($parentUser)
+            ->post(route('parent.payments.store'), $this->batchData(
+                $child,
+                [$maths->id => 60000, $english->id => 40000],
+                [$maths->id => 120000, $english->id => 80000]
+            ))
+            ->assertRedirect(route('parent.payments.index'))
+            ->assertSessionHas('success', fn ($message) => str_contains($message, '2 installments'));
+
+        $payments = Payment::where('learner_id', $child->id)->orderBy('id')->get();
+
+        $this->assertCount(2, $payments);
+        // Both rows carry the single bank reference the parent typed.
+        $this->assertCount(1, $payments->pluck('reference')->unique());
+        $this->assertSame([$maths->id, $english->id], $payments->pluck('class_id')->all());
+        $this->assertSame([60000.0, 40000.0], $payments->pluck('amount')->all());
+        $this->assertSame([120000.0, 80000.0], $payments->pluck('total_fee')->all());
+        $this->assertSame([Payment::STATUS_PENDING, Payment::STATUS_PENDING], $payments->pluck('status')->all());
+    }
+
+    public function test_the_general_row_records_a_payment_that_is_not_tied_to_a_class(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass();
+        $child->classes()->attach($maths->id);
+
+        $this->actingAs($parentUser)
+            ->post(route('parent.payments.store'), $this->batchData($child, [$maths->id => 50000, 0 => 10000]))
+            ->assertRedirect(route('parent.payments.index'));
+
+        $general = Payment::where('learner_id', $child->id)->whereNull('class_id')->firstOrFail();
+
+        $this->assertSame(10000.0, $general->amount);
+        $this->assertSame(2, Payment::where('learner_id', $child->id)->count());
+    }
+
+    public function test_a_ticked_class_without_an_amount_is_skipped(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass();
+        $english = $this->makeClass('JSS2 English');
+        $child->classes()->attach([$maths->id, $english->id]);
+
+        $this->actingAs($parentUser)
+            ->post(route('parent.payments.store'), $this->batchData($child, [$maths->id => 30000, $english->id => 0]))
+            ->assertRedirect(route('parent.payments.index'));
+
+        $this->assertSame(1, Payment::where('learner_id', $child->id)->count());
+        $this->assertSame($maths->id, Payment::where('learner_id', $child->id)->first()->class_id);
+    }
+
+    public function test_a_batch_needs_at_least_one_amount(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass();
+        $child->classes()->attach($maths->id);
+
+        $this->actingAs($parentUser)
+            ->from(route('parent.payments.create'))
+            ->post(route('parent.payments.store'), $this->batchData($child, [$maths->id => 0]))
+            ->assertSessionHasErrors('amounts');
+
+        $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
+    }
+
+    public function test_a_batch_line_must_use_the_childs_own_class(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $own = $this->makeClass();
+        $other = $this->makeClass('Another Learner Class');
+        $child->classes()->attach($own->id);
+
+        $this->actingAs($parentUser)
+            ->from(route('parent.payments.create'))
+            ->post(route('parent.payments.store'), $this->batchData($child, [$other->id => 20000]))
+            ->assertSessionHasErrors('class_ids.' . $other->id);
+
+        $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
+    }
+
+    public function test_a_batch_line_cannot_exceed_its_total_fee(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass();
+        $child->classes()->attach($maths->id);
+
+        $this->actingAs($parentUser)
+            ->from(route('parent.payments.create'))
+            ->post(route('parent.payments.store'), $this->batchData(
+                $child,
+                [$maths->id => 150000],
+                [$maths->id => 100000]
+            ))
+            ->assertSessionHasErrors('amounts.' . $maths->id);
+
+        $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
+    }
+
+    public function test_the_receipt_is_shared_by_every_installment_in_the_batch(): void
+    {
+        Storage::fake('public');
+
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass();
+        $english = $this->makeClass('JSS2 English');
+        $child->classes()->attach([$maths->id, $english->id]);
+
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), $this->batchData(
+            $child,
+            [$maths->id => 20000, $english->id => 20000],
+            [],
+            ['receipt' => UploadedFile::fake()->create('teller.pdf', 80, 'application/pdf')]
+        ))->assertRedirect(route('parent.payments.index'));
+
+        $paths = Payment::where('learner_id', $child->id)->pluck('receipt_path');
+
+        $this->assertCount(2, $paths);
+        $this->assertCount(1, $paths->unique());
+        Storage::disk('public')->assertExists($paths->first());
+    }
+
+    public function test_the_ceo_is_told_once_about_the_whole_transfer(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $ceo = $this->makeUser('ceo', 'Chief Executive');
+        $maths = $this->makeClass();
+        $english = $this->makeClass('JSS2 English');
+        $child->classes()->attach([$maths->id, $english->id]);
+
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), $this->batchData(
+            $child,
+            [$maths->id => 20000, $english->id => 20000]
+        ))->assertRedirect(route('parent.payments.index'));
+
+        $notes = Notification::where('user_id', $ceo->id)
+            ->where('title', 'Payment awaiting verification')
+            ->get();
+
+        $this->assertCount(1, $notes);
+        $this->assertStringContainsString('40,000.00', $notes->first()->message);
+        $this->assertStringContainsString('2 installments', $notes->first()->message);
+    }
+
+    public function test_the_form_lists_the_classes_the_parent_can_pay_for(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass('JSS2 Mathematics');
+        $child->classes()->attach($maths->id);
+
+        $this->actingAs($parentUser)->get(route('parent.payments.create'))
+            ->assertOk()
+            ->assertSee('What are you paying for?')
+            ->assertSee('JSS2 Mathematics')
+            ->assertSee('General payment')
+            ->assertSee('name="amounts[' . $maths->id . ']"', false)
+            ->assertSee('This submission:');
+    }
+}

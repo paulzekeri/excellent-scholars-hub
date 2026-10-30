@@ -41,6 +41,9 @@
         .slide.active { display: block; animation: fade 0.6s ease-in-out; }
         @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .dot.active { background-color: #F26B21; }
+        .t-slide { display: none; }
+        .t-slide.active { display: block; animation: fade 0.5s ease-in-out; }
+        .t-dot.active { background-color: #F26B21; }
     </style>
 </head>
 <body class="bg-[#FBFAF7] text-gray-800 antialiased">
@@ -344,24 +347,55 @@
                     ['quote' => 'I always know when my next class is and can join with one click from my dashboard.', 'name' => 'Tolu', 'role' => 'Learner', 'photo' => null],
                 ];
             }
+
+            // Three quotes per slide; the slider pages through the rest.
+            $testimonialSlides = collect($items)->chunk(3);
         @endphp
-        <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach($items as $testimonial)
-                <figure class="bg-white border border-[#E3E9F1] rounded-2xl p-6 shadow-sm">
-                    <div class="text-accent"><i class="fas fa-quote-left text-2xl"></i></div>
-                    <blockquote class="mt-4 text-gray-700">{{ $testimonial['quote'] }}</blockquote>
-                    <figcaption class="mt-5 flex items-center gap-3 text-sm text-gray-500">
-                        @if($testimonial['photo'])
-                            <img src="{{ $testimonial['photo'] }}" alt="{{ $testimonial['name'] }}" class="h-10 w-10 rounded-full object-cover ring-2 ring-white">
-                        @else
-                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF2FB] font-display text-sm font-bold text-[#0a2550]">{{ strtoupper(substr($testimonial['name'], 0, 1)) }}</span>
-                        @endif
-                        <span>
-                            <span class="font-semibold text-[#0a2550]">{{ $testimonial['name'] }}</span> · {{ $testimonial['role'] }}
-                        </span>
-                    </figcaption>
-                </figure>
+
+        <div class="mt-10" id="testimonial-slider">
+            @foreach($testimonialSlides as $index => $slide)
+                <div class="t-slide {{ $index === 0 ? 'active' : '' }}" data-t-slide="{{ $index }}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        @foreach($slide as $testimonial)
+                            <figure class="bg-white border border-[#E3E9F1] rounded-2xl p-6 shadow-sm">
+                                <div class="text-accent"><i class="fas fa-quote-left text-2xl"></i></div>
+                                <blockquote class="mt-4 text-gray-700">{{ $testimonial['quote'] }}</blockquote>
+                                <figcaption class="mt-5 flex items-center gap-3 text-sm text-gray-500">
+                                    @if($testimonial['photo'])
+                                        <img src="{{ $testimonial['photo'] }}" alt="{{ $testimonial['name'] }}" class="h-10 w-10 rounded-full object-cover ring-2 ring-white">
+                                    @else
+                                        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF2FB] font-display text-sm font-bold text-[#0a2550]">{{ strtoupper(substr($testimonial['name'], 0, 1)) }}</span>
+                                    @endif
+                                    <span>
+                                        <span class="font-semibold text-[#0a2550]">{{ $testimonial['name'] }}</span> · {{ $testimonial['role'] }}
+                                    </span>
+                                </figcaption>
+                            </figure>
+                        @endforeach
+                    </div>
+                </div>
             @endforeach
+
+            @if($testimonialSlides->count() > 1)
+                <div class="mt-8 flex items-center justify-center gap-3">
+                    <button type="button" data-t-prev aria-label="Previous testimonials"
+                        class="flex h-9 w-9 items-center justify-center rounded-full border border-[#0a2550]/20 text-[#0a2550] transition hover:bg-[#0a2550] hover:text-white">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+
+                    <div class="flex items-center gap-2">
+                        @foreach($testimonialSlides as $index => $slide)
+                            <button type="button" class="t-dot h-2.5 w-2.5 rounded-full bg-[#0a2550]/20 transition"
+                                data-t-dot="{{ $index }}" aria-label="Testimonials page {{ $index + 1 }}"></button>
+                        @endforeach
+                    </div>
+
+                    <button type="button" data-t-next aria-label="More testimonials"
+                        class="flex h-9 w-9 items-center justify-center rounded-full border border-[#0a2550]/20 text-[#0a2550] transition hover:bg-[#0a2550] hover:text-white">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -582,6 +616,50 @@
         }
 
         show(0);
+
+        // Testimonials: three quotes per slide, paged automatically.
+        var tSlides = document.querySelectorAll('[data-t-slide]');
+        var tDots = document.querySelectorAll('[data-t-dot]');
+        var tIndex = 0;
+        var tTimer = null;
+
+        function showTestimonials(index) {
+            if (!tSlides.length) return;
+
+            tIndex = (index + tSlides.length) % tSlides.length;
+
+            tSlides.forEach(function (slide, i) {
+                slide.classList.toggle('active', i === tIndex);
+            });
+            tDots.forEach(function (dot, i) {
+                dot.classList.toggle('active', i === tIndex);
+            });
+        }
+
+        function startTestimonials() {
+            if (tSlides.length < 2 || tTimer) return;
+            tTimer = setInterval(function () { showTestimonials(tIndex + 1); }, 7000);
+        }
+
+        tDots.forEach(function (dot, i) {
+            dot.addEventListener('click', function () { showTestimonials(i); });
+        });
+
+        var tPrev = document.querySelector('[data-t-prev]');
+        var tNext = document.querySelector('[data-t-next]');
+        if (tPrev) tPrev.addEventListener('click', function () { showTestimonials(tIndex - 1); });
+        if (tNext) tNext.addEventListener('click', function () { showTestimonials(tIndex + 1); });
+
+        var slider = document.getElementById('testimonial-slider');
+        if (slider) {
+            slider.addEventListener('mouseenter', function () {
+                if (tTimer) { clearInterval(tTimer); tTimer = null; }
+            });
+            slider.addEventListener('mouseleave', startTestimonials);
+        }
+
+        showTestimonials(0);
+        startTestimonials();
     })();
 </script>
 </body>

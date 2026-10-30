@@ -25,7 +25,7 @@ class Testimonial extends Model
     ];
 
     public const STATUS_BADGES = [
-        self::STATUS_PENDING => 'bg-amber-100 text-amber-800',
+        self::STATUS_PENDING => 'bg-sun-light text-sun-ink',
         self::STATUS_APPROVED => 'bg-green-100 text-green-800',
         self::STATUS_REJECTED => 'bg-orange-100 text-orange-800',
     ];

@@ -54,27 +54,30 @@
             ],
         ];
 
+        // Finance: the CEO verifies payments; administrators join in for the
+        // school bank details parents transfer into.
+        $financeItems = [];
+
         if ($user->isCeo()) {
-            $navSections[] = [
-                'title' => 'Finance',
-                'icon' => 'fa-money-bill-wave',
-                'items' => [
-                    ['label' => 'Payments', 'icon' => 'fa-receipt', 'route' => 'admin.payments.index', 'match' => 'admin.payments.*', 'hint' => 'CEO'],
-                    ['label' => 'Bank accounts', 'icon' => 'fa-building-columns', 'route' => 'admin.payment-accounts.index', 'match' => 'admin.payment-accounts.*', 'hint' => 'CEO'],
-                ],
-            ];
+            $financeItems[] = ['label' => 'Payments', 'icon' => 'fa-receipt', 'route' => 'admin.payments.index', 'match' => 'admin.payments.*', 'hint' => 'CEO'];
         }
+
+        $financeItems[] = ['label' => 'Bank accounts', 'icon' => 'fa-building-columns', 'route' => 'admin.payment-accounts.index', 'match' => 'admin.payment-accounts.*'];
+
+        $navSections[] = [
+            'title' => 'Finance',
+            'icon' => 'fa-money-bill-wave',
+            'items' => $financeItems,
+        ];
 
         $communicationItems = [
             ['label' => 'Messages', 'icon' => 'fa-comment-dots', 'route' => 'messages.index', 'badge' => $navUnreadMessages],
             ['label' => 'Broadcasts', 'icon' => 'fa-bullhorn', 'route' => 'admin.messages.index'],
             ['label' => 'Notifications', 'icon' => 'fa-bell', 'route' => 'admin.notifications.index', 'badge' => $navUnreadNotifications],
             ['label' => 'Affirmations', 'icon' => 'fa-sun', 'route' => 'admin.affirmations.index', 'match' => 'admin.affirmations.*'],
+            // Administrators and the CEO both review and polish testimonials.
+            ['label' => 'Testimonials', 'icon' => 'fa-star', 'route' => 'admin.testimonials.index', 'match' => 'admin.testimonials.*'],
         ];
-
-        if ($user->isCeo()) {
-            $communicationItems[] = ['label' => 'Testimonials', 'icon' => 'fa-star', 'route' => 'admin.testimonials.index', 'match' => 'admin.testimonials.*'];
-        }
 
         $navSections[] = [
             'title' => 'Communication',

@@ -12,9 +12,11 @@ use App\Models\User;
 use App\Services\PaystackService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Parents record the payments they have made (a parent usually pays for two or
@@ -66,7 +68,6 @@ class PaymentController extends Controller
             'cardReady' => PaystackService::configured(),
             'selectedLearner' => (string) $request->query('learner_id'),
             'selectedTerm' => (string) $request->query('term'),
-            'selectedClass' => (string) $request->query('class_id'),
         ]);
     }
 
@@ -76,13 +77,12 @@ class PaymentController extends Controller
         $children = $this->children($parentUser->parent);
         $childIds = $children->pluck('id')->all();
 
-        $validated = $request->validate([
+        $batch = $request->has('class_ids');
+
+        $rules = [
             'learner_id' => ['required', Rule::in($childIds)],
             'payment_type' => 'required|in:tuition,registration,material,other',
             'term' => 'nullable|string|max:50',
-            'class_id' => 'nullable|exists:classes,id',
-            'amount' => 'required|numeric|min:1',
-            'total_fee' => 'nullable|numeric|min:0',
             'payment_method' => ['required', Rule::in(Payment::PARENT_METHODS)],
             'payment_account_id' => [
                 'nullable',
@@ -91,11 +91,33 @@ class PaymentController extends Controller
                 }),
                 'exists:payment_accounts,id',
             ],
-            'reference' => 'nullable|string|max:100|unique:payments,reference',
+            // A batch shares one bank reference across its installments.
+            'reference' => $batch
+                ? 'nullable|string|max:100'
+                : 'nullable|string|max:100|unique:payments,reference',
             'payment_date' => 'required|date',
             'notes' => 'nullable|string|max:2000',
             'receipt' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
-        ], [
+        ];
+
+        // The form ticks the classes a transfer covered; a single-installment
+        // post (old links, API callers) still sends class_id/amount/total_fee.
+        $rules += $batch
+            ? [
+                'class_ids' => 'required|array|min:1',
+                'class_ids.*' => 'integer|min:0',
+                'amounts' => 'required|array',
+                'amounts.*' => 'nullable|numeric|min:0',
+                'total_fees' => 'nullable|array',
+                'total_fees.*' => 'nullable|numeric|min:0',
+            ]
+            : [
+                'class_id' => 'nullable|exists:classes,id',
+                'amount' => 'required|numeric|min:1',
+                'total_fee' => 'nullable|numeric|min:0',
+            ];
+
+        $validated = $request->validate($rules, [
             'learner_id.in' => 'Choose one of the children linked to your account.',
             'payment_method.required' => 'Choose how you paid.',
             'payment_method.in' => 'Card payments are coming soon. Please pay by bank transfer or cash for now.',
@@ -104,64 +126,126 @@ class PaymentController extends Controller
         ]);
 
         $learner = $children->firstWhere('id', (int) $validated['learner_id']);
-
-        // A payment can only be allocated to a class the child actually attends.
-        if (! empty($validated['class_id'])
-            && ! $learner->classes()->whereKey($validated['class_id'])->exists()) {
-            return back()
-                ->withInput()
-                ->withErrors(['class_id' => 'That class is not on this child\'s timetable.']);
-        }
-
-        // A single installment can never be larger than the whole fee.
-        if (! empty($validated['total_fee']) && $validated['amount'] > $validated['total_fee']) {
-            return back()
-                ->withInput()
-                ->withErrors(['amount' => 'A single installment cannot be more than the total fee.']);
-        }
+        $lines = $this->installments($validated, $learner, $batch);
 
         // Only a transfer carries a school account; cash happens at the office.
         $account = $validated['payment_method'] === Payment::METHOD_TRANSFER
             ? PaymentAccount::find($validated['payment_account_id'] ?? null)
             : null;
 
-        $data = [
-            'user_id' => $parentUser->id,
-            'learner_id' => $learner->id,
-            'payment_type' => $validated['payment_type'],
-            'term' => $validated['term'] ?? null,
-            'class_id' => $validated['class_id'] ?? null,
-            'amount' => $validated['amount'],
-            'total_fee' => $validated['total_fee'] ?? null,
-            'payment_method' => $validated['payment_method'],
-            'payment_account_id' => $account ? $account->id : null,
-            // Snapshot: deleting or renaming the account later keeps this record honest.
-            'paid_into' => $account ? $account->displayLabel() : null,
-            'reference' => $validated['reference'] ?? null,
-            // Parents can never mark their own payment as verified.
-            'status' => Payment::STATUS_PENDING,
-            'payment_date' => $validated['payment_date'],
-            'notes' => $validated['notes'] ?? null,
-        ];
-
+        // The receipt is the same document for every class in the transfer.
+        $receipt = [];
         if ($request->hasFile('receipt')) {
             $file = $request->file('receipt');
-            $data['receipt_path'] = $file->store('receipts', 'public');
-            $data['receipt_name'] = $file->getClientOriginalName();
+            $receipt = [
+                'receipt_path' => $file->store('receipts', 'public'),
+                'receipt_name' => $file->getClientOriginalName(),
+            ];
         }
 
-        $payment = Payment::create($data);
+        $payments = DB::transaction(function () use ($parentUser, $learner, $lines, $validated, $account, $receipt) {
+            return collect($lines)->map(function (array $line) use ($parentUser, $learner, $validated, $account, $receipt) {
+                return Payment::create(array_merge([
+                    'user_id' => $parentUser->id,
+                    'learner_id' => $learner->id,
+                    'payment_type' => $validated['payment_type'],
+                    'term' => $validated['term'] ?? null,
+                    'class_id' => $line['class_id'],
+                    'amount' => $line['amount'],
+                    'total_fee' => $line['total_fee'],
+                    'payment_method' => $validated['payment_method'],
+                    'payment_account_id' => $account ? $account->id : null,
+                    // Snapshot: deleting or renaming the account later keeps this record honest.
+                    'paid_into' => $account ? $account->displayLabel() : null,
+                    'reference' => $validated['reference'] ?? null,
+                    // Parents can never mark their own payment as verified.
+                    'status' => Payment::STATUS_PENDING,
+                    'payment_date' => $validated['payment_date'],
+                    'notes' => $validated['notes'] ?? null,
+                ], $receipt));
+            });
+        });
 
-        $this->notifyCeos($payment, $learner);
+        $this->notifyCeos($payments, $learner, $validated['payment_method']);
+
+        $summary = $payments->count() === 1
+            ? '1 installment'
+            : $payments->count() . ' installments';
 
         return redirect()
             ->route('parent.payments.index')
             ->with(
                 'success',
-                $payment->isCash()
-                    ? 'Cash payment submitted. The school will check the cash book and your child\'s balance will update.'
-                    : 'Transfer submitted. The school will check the bank and your child\'s balance will update.'
+                $summary . ' submitted. The school will check the '
+                    . ($validated['payment_method'] === Payment::METHOD_CASH ? 'cash book' : 'bank')
+                    . ' and the balance will update.'
             );
+    }
+
+    /**
+     * Turn the ticked classes into the installments to record.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<int, array{class_id: int|null, amount: float, total_fee: float|null}>
+     */
+    private function installments(array $validated, Learner $learner, bool $batch): array
+    {
+        if (! $batch) {
+            $amount = (float) $validated['amount'];
+            $total = isset($validated['total_fee']) ? (float) $validated['total_fee'] : null;
+
+            $this->guardLine((int) ($validated['class_id'] ?? 0), $amount, $total, $learner, 'amount', 'class_id');
+
+            return [['class_id' => $validated['class_id'] ?? null, 'amount' => $amount, 'total_fee' => $total]];
+        }
+
+        $amounts = $validated['amounts'] ?? [];
+        $fees = $validated['total_fees'] ?? [];
+        $lines = [];
+
+        foreach (array_unique($validated['class_ids']) as $key) {
+            $key = (int) $key;
+            $amount = (float) ($amounts[$key] ?? 0);
+
+            // A ticked class with no amount is simply not part of this transfer.
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $total = $fees[$key] ?? null;
+            $total = ($total === null || $total === '') ? null : (float) $total;
+
+            $this->guardLine($key, $amount, $total, $learner, 'amounts.' . $key, 'class_ids.' . $key);
+
+            $lines[] = ['class_id' => $key ?: null, 'amount' => $amount, 'total_fee' => $total];
+        }
+
+        if ($lines === []) {
+            throw ValidationException::withMessages([
+                'amounts' => 'Enter the amount you paid against at least one class.',
+            ]);
+        }
+
+        return $lines;
+    }
+
+    /**
+     * A line may only point at the child's own class, and an installment can
+     * never be larger than the whole fee.
+     */
+    private function guardLine(int $classId, float $amount, ?float $total, Learner $learner, string $amountKey, string $classKey): void
+    {
+        if ($classId > 0 && ! $learner->classes()->whereKey($classId)->exists()) {
+            throw ValidationException::withMessages([
+                $classKey => 'That class is not on this child\'s timetable.',
+            ]);
+        }
+
+        if ($total !== null && $amount > $total) {
+            throw ValidationException::withMessages([
+                $amountKey => 'A single installment cannot be more than the total fee.',
+            ]);
+        }
     }
 
     /**
@@ -227,19 +311,32 @@ class PaymentController extends Controller
 
     /**
      * Lets the CEO know there is money to check against the bank or cash book.
+     * One submission can cover several classes, so the note summarises them.
+     *
+     * @param  Collection<int, Payment>  $payments
      */
-    private function notifyCeos(Payment $payment, Learner $learner): void
+    private function notifyCeos(Collection $payments, Learner $learner, string $method): void
     {
+        $payment = $payments->first();
+
+        if (! $payment) {
+            return;
+        }
+
+        $count = $payments->count();
+        $classes = $payments->pluck('class_id')->filter()->count();
+
         $message = sprintf(
-            '%s submitted %s%s for %s (%s) by %s%s. %s',
+            '%s submitted %s%s for %s (%s%s) by %s%s. %s',
             auth()->user()->name,
-            number_format($payment->amount, 2),
+            number_format((float) $payments->sum('amount'), 2),
             $payment->currency ? ' ' . $payment->currency : '',
             $learner->user->name ?? 'a learner',
-            $payment->feeLabel(),
-            strtolower($payment->methodLabel()),
+            $count === 1 ? '1 installment' : $count . ' installments',
+            $count > 1 && $classes < $count ? ' incl. a general payment' : '',
+            strtolower(Payment::METHODS[$method] ?? $method),
             $payment->paid_into ? ' into ' . $payment->paid_into : '',
-            $payment->isCash()
+            $method === Payment::METHOD_CASH
                 ? 'Check the cash book and verify it.'
                 : 'Check the bank and verify it.'
         );

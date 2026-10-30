@@ -297,9 +297,10 @@
                 @else
                     <p class="text-gray-600 mb-6">
                         As an <strong>Administrator</strong> you have full control over the platform: you manage users,
-                        classes, schedules, oversight and notifications. <strong>Payments</strong> and
-                        <strong>Bank accounts</strong> stay with the CEO, so they are not part of your menu. Your dashboard
-                        gives you an overview of key platform statistics.
+                        classes, schedules, oversight and notifications. You also keep the school's
+                        <strong>Bank accounts</strong> up to date, and you review member <strong>Testimonials</strong>.
+                        Verifying payments stays with the CEO, so <strong>Payments</strong> is not part of your menu.
+                        Your dashboard gives you an overview of key platform statistics.
                     </p>
                 @endif
                 <div class="info-box mb-6">
@@ -681,14 +682,16 @@
                 @if($guideIsCeo)
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-star text-orange-700 mr-2"></i>Testimonials <span class="text-xs font-bold text-orange-700 align-middle">(CEO ONLY)</span>
+                        <i class="fas fa-star text-orange-700 mr-2"></i>Testimonials <span class="text-xs font-bold text-orange-700 align-middle">(ADMIN &amp; CEO)</span>
                     </h3>
                     <p class="text-gray-600 mb-2">
-                        Members write testimonials from <strong>My profile</strong>. Review them in <strong>Communication &rarr; Testimonials</strong>
+                        Members send testimonials either from <strong>Messages</strong> (choose the <em>Testimonial</em> message type)
+                        or from <strong>My profile</strong>. Review them in <strong>Communication &rarr; Testimonials</strong>
                         (tabs: Waiting / Approved / Rejected / All).
                     </p>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        <li><strong>Approve for the website</strong> — the testimonial appears on the public landing page, with the member's photo only if they allowed it.</li>
+                        <li><strong>Edit the wording</strong> — open the quote in the review card and save a tidier version; an approved quote stays approved.</li>
+                        <li><strong>Approve for the website</strong> — the testimonial appears on the public landing page three at a time in a slider, with the member's photo only if they allowed it.</li>
                         <li><strong>Reject</strong> — add a reason; the member sees it on their profile.</li>
                         <li>Only approved testimonials are public. Typical testimonials are written by parents, tutors and learners.</li>
                     </ul>
@@ -1170,7 +1173,11 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">2.</span>
-                            <span class="text-gray-600">Choose the <strong>child</strong>, the <strong>term</strong> and — if it applies — the <strong>class</strong>. Only your own children and their classes are offered.</span>
+                            <span class="text-gray-600">
+                                Tick <strong>every class</strong> the payment covers (plus <em>General payment</em> for registration or
+                                materials) and type what you paid against each one. One balance is kept per class, so a single transfer
+                                can clear two or three subjects at once. Only your own children's classes are offered.
+                            </span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>

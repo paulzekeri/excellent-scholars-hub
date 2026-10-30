@@ -45,9 +45,9 @@ class Notification extends Model
             'label' => 'Reminder',
             'description' => 'A nudge about something still to be done, usually with a deadline.',
             'icon' => 'fa-clock',
-            'badge' => 'bg-amber-100 text-amber-800',
-            'accent' => 'border-amber-500',
-            'icon_class' => 'text-amber-600',
+            'badge' => 'bg-sun-light text-sun-ink',
+            'accent' => 'border-sun',
+            'icon_class' => 'text-sun-ink',
         ],
         self::TYPE_ALERT => [
             'label' => 'Alert',

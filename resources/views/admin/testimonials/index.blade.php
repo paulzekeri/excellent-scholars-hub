@@ -14,7 +14,10 @@
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-800">Testimonials</h1>
-        <p class="text-gray-600 mt-1">Members write these from <strong>My profile</strong>. Only the ones you approve appear on the landing page.</p>
+        <p class="text-gray-600 mt-1">
+            Members send these from <strong>Messages</strong> (choose the <em>Testimonial</em> type) or from <strong>My profile</strong>.
+            Fix the wording if needed, then approve — only approved testimonials appear on the landing page, three at a time.
+        </p>
     </div>
 
     <div class="flex flex-wrap gap-2 mb-6">
@@ -59,6 +62,30 @@
                 </div>
 
                 <blockquote class="mt-4 text-gray-700 border-l-4 border-orange-200 pl-4">{{ $testimonial->body }}</blockquote>
+
+                <details class="mt-3 group">
+                    <summary class="cursor-pointer text-sm font-semibold text-blue-700 hover:text-blue-900 list-none">
+                        <i class="fas fa-pen-to-square mr-1"></i> Edit the wording
+                    </summary>
+                    <form action="{{ route('admin.testimonials.update', $testimonial) }}" method="POST" class="mt-3 rounded-lg border border-blue-100 bg-[#EAF2FB]/60 p-4">
+                        @csrf
+                        @method('PATCH')
+                        <label for="body_{{ $testimonial->id }}" class="block text-xs font-semibold uppercase tracking-wide text-[#0a2550]">Published text</label>
+                        <textarea id="body_{{ $testimonial->id }}" name="body" rows="3" maxlength="1000" required
+                            class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('body', $testimonial->body) }}</textarea>
+                        <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+                            <label class="flex items-center gap-2 text-xs text-gray-600">
+                                <input type="hidden" name="publish_photo" value="0">
+                                <input type="checkbox" name="publish_photo" value="1" class="h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                                    @checked($testimonial->publish_photo)>
+                                Publish this member's photo with the quote
+                            </label>
+                            <button type="submit" class="bg-[#0a2550] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#0d3070]">
+                                <i class="fas fa-save mr-1"></i> Save wording
+                            </button>
+                        </div>
+                    </form>
+                </details>
 
                 <div class="mt-4 flex flex-col sm:flex-row sm:items-end gap-3">
                     @if($testimonial->status !== \App\Models\Testimonial::STATUS_APPROVED)

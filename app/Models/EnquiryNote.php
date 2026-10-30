@@ -33,7 +33,7 @@ class EnquiryNote extends Model
         self::TYPE_NOTE => 'bg-gray-100 text-gray-700',
         self::TYPE_CALL => 'bg-blue-100 text-blue-800',
         self::TYPE_WHATSAPP => 'bg-green-100 text-green-800',
-        self::TYPE_STATUS => 'bg-amber-100 text-amber-800',
+        self::TYPE_STATUS => 'bg-sun-light text-sun-ink',
     ];
 
     protected $fillable = ['enquiry_id', 'user_id', 'type', 'body'];

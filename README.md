@@ -134,6 +134,20 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### v1 wrap-up — bank details, multi-class payments, testimonials from messages (30 October 2026)
+
+| Area | What changed |
+|---|---|
+| **School bank accounts** | Administrators can now add, edit, switch off and delete the accounts parents transfer into (previously CEO-only). Verification of payments stays CEO-only. The parent payment page lists bank name, account name and number with a copy button |
+| **Multi-class payments** | The parent payment form ticks every class a transfer covered (plus a *general* row) and records **one installment per class in a single submission**, each with its own amount and optional total fee. Rows are filtered to the chosen child, typing an amount ticks its row, and a live total is shown. One transfer reference may now appear on several rows (migration `2026_10_30_000006` turns the unique index into a lookup index); the receipt is shared by the batch and the CEO gets one notification summarising it |
+| **Testimonials through messaging** | The compose form has a **Message type** dropdown (*General message* / *Testimonial — may be published*) for parents, tutors and learners. Choosing testimonial files it in the review queue, notifies administrators and the CEO, and keeps one testimonial per member |
+| **Review and polish** | Administrators **and** the CEO open *Communication → Testimonials*, can **edit the wording** (an approved quote stays approved), toggle photo publication, approve or reject with a reason |
+| **Landing slider** | Approved testimonials publish **three at a time** in an auto-rotating slider (dots + previous/next, pauses on hover) instead of one long grid |
+| **Quotation** | `CLIENT_QUOTATION 2.md` now shows subtotal ₦260,000 + VAT ₦40,000 = **₦300,000**, matching the 2 × ₦150,000 milestones, and lists every client-requested addition as delivered at no extra cost |
+
+Migrations added: `2026_10_30_000006_allow_shared_references_on_payments_table`, `2026_10_30_000007_add_type_to_messages_table`.
+Tests: `PaymentBatchTest` (9) and five new cases in `TestimonialTest` — full suite **217 passing**.
+
 ### LMS palette pass — sun semantics, calm surfaces (30 October 2026)
 
 The public site matched the flyer; the signed-in app was still grey-dominant (2,192 `gray-*` utilities

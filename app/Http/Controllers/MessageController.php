@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Message;
 use App\Models\Notification;
+use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -86,6 +88,10 @@ class MessageController extends Controller
 
     /**
      * Send a message and notify the recipient in their notification centre.
+     *
+     * A member may also mark the message as a testimonial: the same text is
+     * filed as a testimonial for the school to approve (and polish) before it
+     * can appear on the landing page.
      */
     public function store(Request $request, User $user)
     {
@@ -93,12 +99,20 @@ class MessageController extends Controller
 
         $validated = $request->validate([
             'body' => 'required|string|max:2000',
+            'type' => 'nullable|in:general,testimonial',
         ]);
+
+        $type = $validated['type'] ?? Message::TYPE_GENERAL;
+
+        // Only members write testimonials about the school, never the school itself.
+        $isTestimonial = $type === Message::TYPE_TESTIMONIAL
+            && ! auth()->user()->isAdministrator();
 
         Message::create([
             'sender_id' => auth()->id(),
             'receiver_id' => $user->id,
             'body' => $validated['body'],
+            'type' => $isTestimonial ? Message::TYPE_TESTIMONIAL : Message::TYPE_GENERAL,
         ]);
 
         Notification::create([
@@ -112,7 +126,67 @@ class MessageController extends Controller
             'sent_at' => now(),
         ]);
 
-        return redirect()->route('messages.show', $user)->with('success', 'Message sent.');
+        if ($isTestimonial) {
+            $this->fileTestimonial($validated['body']);
+        }
+
+        return redirect()->route('messages.show', $user)->with(
+            'success',
+            $isTestimonial
+                ? 'Message sent. Your testimonial is with the school for review — they may tidy the wording before publishing it.'
+                : 'Message sent.'
+        );
+    }
+
+    /**
+     * Keep one testimonial per member: sending a new one replaces the text and
+     * puts it back in the review queue.
+     */
+    private function fileTestimonial(string $body): void
+    {
+        $me = auth()->user();
+
+        Testimonial::updateOrCreate(
+            ['user_id' => $me->id],
+            [
+                'body' => $body,
+                'status' => Testimonial::STATUS_PENDING,
+                'approved_by' => null,
+                'approved_at' => null,
+                'review_note' => null,
+                'publish_photo' => (bool) $me->photo_path,
+            ]
+        );
+
+        ActivityLog::create([
+            'user_id' => $me->id,
+            'action' => 'testimonial.submitted',
+            'description' => $me->name . ' sent a testimonial through messages.',
+            'model_type' => Testimonial::class,
+            'model_id' => optional(Testimonial::where('user_id', $me->id)->first())->id,
+        ]);
+
+        // Every reviewer (administrators and the CEO) gets a nudge.
+        $reviewers = User::whereHas('role', function ($query) {
+            $query->whereIn('slug', ['admin', 'ceo']);
+        })->where('is_active', true)->get();
+
+        foreach ($reviewers as $reviewer) {
+            if ($reviewer->id === $me->id) {
+                continue;
+            }
+
+            Notification::create([
+                'user_id' => $reviewer->id,
+                'type' => Notification::TYPE_REMINDER,
+                'title' => 'New testimonial to review',
+                'message' => Str::limit($me->name . ' (' . strtolower(optional($me->role)->slug ?? 'member') . '): ' . $body, 240),
+                'channel' => 'in_app',
+                'is_read' => false,
+                'status' => 'sent',
+                'sent_at' => now(),
+            ]);
+        }
     }
 
     private function contactQuery(?string $category = null)

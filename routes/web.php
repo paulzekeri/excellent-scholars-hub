@@ -181,16 +181,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:ceo'])->group(
     Route::post('/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('payments.verify');
     Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
     Route::get('/payments/{payment}/receipt', [AdminPaymentController::class, 'receipt'])->name('payments.receipt');
+});
 
-    // The school bank accounts parents transfer into (add / edit / disable / delete).
+// School bank accounts and member testimonials: administrators and the CEO
+// share these (payment verification itself stays CEO-only).
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->group(function () {
     Route::get('/payment-accounts', [AdminPaymentAccountController::class, 'index'])->name('payment-accounts.index');
     Route::post('/payment-accounts', [AdminPaymentAccountController::class, 'store'])->name('payment-accounts.store');
     Route::patch('/payment-accounts/{paymentAccount}', [AdminPaymentAccountController::class, 'update'])->name('payment-accounts.update');
     Route::patch('/payment-accounts/{paymentAccount}/toggle', [AdminPaymentAccountController::class, 'toggle'])->name('payment-accounts.toggle');
     Route::delete('/payment-accounts/{paymentAccount}', [AdminPaymentAccountController::class, 'destroy'])->name('payment-accounts.destroy');
 
-    // Testimonials the CEO approves for the landing page (note 10).
+    // Testimonials: review, polish the wording, approve for the landing page.
     Route::get('/testimonials', [AdminTestimonialController::class, 'index'])->name('testimonials.index');
+    Route::patch('/testimonials/{testimonial}', [AdminTestimonialController::class, 'update'])->name('testimonials.update');
     Route::post('/testimonials/{testimonial}/approve', [AdminTestimonialController::class, 'approve'])->name('testimonials.approve');
     Route::post('/testimonials/{testimonial}/reject', [AdminTestimonialController::class, 'reject'])->name('testimonials.reject');
 });

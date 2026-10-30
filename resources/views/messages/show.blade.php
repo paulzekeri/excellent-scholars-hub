@@ -45,6 +45,25 @@
             @error('body')
                 <p class="text-sm text-orange-700 mb-2">{{ $message }}</p>
             @enderror
+            @error('type')
+                <p class="text-sm text-orange-700 mb-2">{{ $message }}</p>
+            @enderror
+
+            @unless(auth()->user()->isAdministrator())
+                <div class="mb-3">
+                    <label for="type" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Message type</label>
+                    <select id="type" name="type"
+                        class="mt-1 w-full sm:w-80 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="general" @selected(old('type', 'general') === 'general')>General message</option>
+                        <option value="testimonial" @selected(old('type') === 'testimonial')>Testimonial — may be published on the website</option>
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Choose <strong>Testimonial</strong> to share a sentence or two about the school. It goes to the school for review;
+                        they may tidy the wording, and it only appears on the public site once approved.
+                    </p>
+                </div>
+            @endunless
+
             <div class="flex items-end gap-3">
                 <textarea name="body" rows="2" required maxlength="2000" placeholder="Type your message..."
                     class="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-blue-500 focus:border-blue-500">{{ old('body') }}</textarea>

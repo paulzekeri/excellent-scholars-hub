@@ -24,8 +24,17 @@ class Message extends Model
         self::AUDIENCE_CLASS => 'A single class',
     ];
 
+    /** What the member says the message is about. */
+    public const TYPE_GENERAL = 'general';
+    public const TYPE_TESTIMONIAL = 'testimonial';
+
+    public const TYPES = [
+        self::TYPE_GENERAL => 'General message',
+        self::TYPE_TESTIMONIAL => 'Testimonial (may be published)',
+    ];
+
     protected $fillable = [
-        'sender_id', 'receiver_id', 'body', 'audience', 'class_id', 'batch',
+        'sender_id', 'receiver_id', 'body', 'type', 'audience', 'class_id', 'batch',
         'is_read', 'read_at',
     ];
 
