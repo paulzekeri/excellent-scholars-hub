@@ -172,13 +172,13 @@
                         </div>
                     </div>
                     <div class="relative mx-auto w-full max-w-md lg:max-w-lg">
-                        <div class="relative rounded-[2rem] border border-blue-100 bg-white p-6 shadow-xl">
+                        <div class="relative rounded-[2rem] border border-[#D7E0EC] bg-[#E9EEF5] p-6 shadow-xl">
                             <div class="absolute -left-3 -top-5 z-10 rotate-[-6deg] rounded-sm bg-sun px-4 py-3 shadow-lg sm:-left-6">
                                 <p class="font-script text-2xl leading-none text-[#0a2550]">Bigger goals<br>brighter future</p>
                             </div>
 
                             <svg aria-hidden="true" viewBox="0 0 520 420" class="h-auto w-full" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="300" cy="190" r="150" fill="#EAF2FB"/>
+                                <circle cx="300" cy="190" r="150" fill="#F8FBFE"/>
                                 <path d="M150 120c10-10 20-10 30 0M430 90c8-8 16-8 24 0M420 210c8-8 16-8 24 0"
                                     stroke="#F26B21" stroke-width="6" stroke-linecap="round"/>
                                 <polygon points="250,86 330,64 410,86 330,108" fill="#0A2550"/>
