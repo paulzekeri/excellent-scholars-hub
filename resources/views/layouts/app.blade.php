@@ -119,7 +119,7 @@
             // Mobile off-canvas drawer.
             function openDrawer() {
                 if (!sidebar) return;
-                sidebar.classList.remove('-trangray-x-full');
+                sidebar.classList.remove('-translate-x-full');
                 overlay && overlay.classList.remove('hidden');
                 body.classList.add('overflow-hidden');
                 drawerToggle && drawerToggle.setAttribute('aria-expanded', 'true');
@@ -127,7 +127,7 @@
 
             function closeDrawer() {
                 if (!sidebar) return;
-                sidebar.classList.add('-trangray-x-full');
+                sidebar.classList.add('-translate-x-full');
                 overlay && overlay.classList.add('hidden');
                 body.classList.remove('overflow-hidden');
                 drawerToggle && drawerToggle.setAttribute('aria-expanded', 'false');

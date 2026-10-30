@@ -189,7 +189,7 @@
 @endphp
 
 <aside id="esh-sidebar"
-       class="esh-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -trangray-x-full flex-col bg-gradient-to-b from-[#0a2550] via-[#0d3070] to-[#0a2550] text-blue-50 shadow-2xl transition-transform duration-200 lg:trangray-x-0">
+       class="esh-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col bg-gradient-to-b from-[#0a2550] via-[#0d3070] to-[#0a2550] text-blue-50 shadow-2xl transition-transform duration-200 lg:translate-x-0">
 
     <!-- Brand -->
     <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-4">
