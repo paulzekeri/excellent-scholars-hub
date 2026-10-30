@@ -59,12 +59,6 @@ Route::get('/', function () {
             ->orderBy('name')
             ->take(6)
             ->get(),
-        'stats' => [
-            'classes' => \App\Models\Classes::where('is_active', true)->count(),
-            'tutors' => \App\Models\Tutor::count(),
-            'learners' => \App\Models\Learner::count(),
-            'parents' => \App\Models\ParentModel::count(),
-        ],
         // Approved member testimonials (note 10); the view falls back to samples.
         'testimonials' => Testimonial::with('user.role')
             ->where('status', Testimonial::STATUS_APPROVED)

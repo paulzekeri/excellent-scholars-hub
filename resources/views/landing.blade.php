@@ -234,28 +234,6 @@
     </div>
 </section>
 
-<!-- Quick stats -->
-<section class="bg-[#EAF2FB]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-        <div>
-            <p class="font-display text-3xl font-extrabold text-[#0a2550]">{{ $stats['classes'] }}</p>
-            <p class="text-sm text-gray-600 mt-1">Active classes</p>
-        </div>
-        <div>
-            <p class="font-display text-3xl font-extrabold text-[#0a2550]">{{ $stats['tutors'] }}</p>
-            <p class="text-sm text-gray-600 mt-1">Tutors</p>
-        </div>
-        <div>
-            <p class="font-display text-3xl font-extrabold text-[#0a2550]">{{ $stats['learners'] }}</p>
-            <p class="text-sm text-gray-600 mt-1">Learners</p>
-        </div>
-        <div>
-            <p class="font-display text-3xl font-extrabold text-orange-700">{{ $stats['parents'] }}</p>
-            <p class="text-sm text-gray-600 mt-1">Parents on board</p>
-        </div>
-    </div>
-</section>
-
 <!-- Programmes -->
 <section id="programmes" class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
