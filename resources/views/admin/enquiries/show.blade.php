@@ -48,7 +48,7 @@
     </div>
 
     @if($enquiry->declined_reason)
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 rounded-lg mb-6">
+        <div class="bg-orange-50 border-l-4 border-orange-500 text-orange-900 p-4 rounded-lg mb-6">
             <p class="font-semibold">Declined</p>
             <p class="text-sm">{{ $enquiry->declined_reason }}</p>
         </div>
@@ -56,7 +56,7 @@
 
     @if(session('conversion_credentials'))
         <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
-            <p class="font-semibold text-gray-800"><i class="fas fa-id-card text-orange-500 mr-1"></i> Login details to hand over</p>
+            <p class="font-semibold text-gray-800"><i class="fas fa-id-card text-orange-700 mr-1"></i> Login details to hand over</p>
             <p class="text-sm text-gray-600 mt-1">
                 Email delivery is not configured on this installation, so share these privately. Each person chooses
                 their own password at first sign-in.
@@ -103,7 +103,7 @@
                 </dl>
                 <div class="mt-4 flex flex-wrap gap-2">
                     <a href="https://wa.me/{{ $waNumber }}?text={{ $waMessage }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-emerald-700">
+                        class="inline-flex items-center bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
                         <i class="fab fa-whatsapp mr-2"></i> WhatsApp {{ $enquiry->guardian_name }}
                     </a>
                     @if($enquiry->guardian_email)
@@ -117,7 +117,7 @@
 
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">
-                    <i class="fas fa-child text-orange-500 mr-2"></i>The child
+                    <i class="fas fa-child text-orange-700 mr-2"></i>The child
                 </h2>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
@@ -176,7 +176,7 @@
                                         @if($assessment->isScheduled())
                                             <form action="{{ route('admin.assessments.cancel', $assessment) }}" method="POST" onsubmit="return confirm('Cancel this assessment?')">
                                                 @csrf
-                                                <button type="submit" class="text-xs text-red-600 hover:text-red-800">Cancel</button>
+                                                <button type="submit" class="text-xs text-orange-700 hover:text-orange-900">Cancel</button>
                                             </form>
                                         @endif
                                     </div>
@@ -186,7 +186,7 @@
                                     <p class="mt-2 text-xs text-gray-500 break-all">{{ $assessment->meeting_link }}</p>
                                     <a href="https://wa.me/{{ $waNumber }}?text={{ rawurlencode('Hello ' . $enquiry->guardian_name . ', the assessment for ' . $enquiry->child_name . ' is booked for ' . $assessment->scheduleLabel() . ' (' . $assessment->platformLabel() . '). Join here: ' . $assessment->meeting_link) }}"
                                         target="_blank" rel="noopener"
-                                        class="mt-2 inline-flex items-center bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-700">
+                                        class="mt-2 inline-flex items-center bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-green-700">
                                         <i class="fab fa-whatsapp mr-1"></i> Send the link on WhatsApp
                                     </a>
                                 @endif
@@ -265,7 +265,7 @@
 
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">
-                    <i class="fas fa-clock-rotate-left text-purple-500 mr-2"></i>Timeline
+                    <i class="fas fa-clock-rotate-left text-orange-700 mr-2"></i>Timeline
                 </h2>
                 @if($enquiry->timeline->isEmpty())
                     <p class="text-sm text-gray-500">Nothing recorded yet. Log the first call or message so the next person has context.</p>
@@ -324,7 +324,7 @@
 
             <div class="bg-white rounded-xl shadow-md p-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-3">
-                    <i class="fas fa-pen text-orange-500 mr-2"></i>Add to the timeline
+                    <i class="fas fa-pen text-orange-700 mr-2"></i>Add to the timeline
                 </h2>
                 <form action="{{ route('admin.enquiries.notes.store', $enquiry) }}" method="POST" class="space-y-3">
                     @csrf

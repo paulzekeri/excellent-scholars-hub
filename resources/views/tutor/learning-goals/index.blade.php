@@ -42,7 +42,7 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $goal->term ?? '—' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 @if($goal->file_path)
-                                    <a href="{{ route('tutor.learning-goals.download', $goal) }}" class="text-orange-600 hover:text-orange-800"><i class="fas fa-download mr-1"></i> File</a>
+                                    <a href="{{ route('tutor.learning-goals.download', $goal) }}" class="text-orange-700 hover:text-orange-800"><i class="fas fa-download mr-1"></i> File</a>
                                 @else
                                     <span class="text-gray-400 text-xs">None</span>
                                 @endif
@@ -62,7 +62,7 @@
                                 <form action="{{ route('tutor.learning-goals.destroy', $goal) }}" method="POST" onsubmit="return confirm('Remove this learning goal?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800 text-sm"><i class="fas fa-trash"></i></button>
+                                    <button type="submit" class="text-orange-700 hover:text-orange-900 text-sm"><i class="fas fa-trash"></i></button>
                                 </form>
                             </td>
                         </tr>
@@ -95,7 +95,7 @@
                         </p>
                     </div>
                     @if($goal->file_path)
-                        <a href="{{ route('tutor.learning-goals.download', $goal) }}" class="text-orange-600 hover:text-orange-800 text-sm self-start"><i class="fas fa-download mr-1"></i> Download</a>
+                        <a href="{{ route('tutor.learning-goals.download', $goal) }}" class="text-orange-700 hover:text-orange-800 text-sm self-start"><i class="fas fa-download mr-1"></i> Download</a>
                     @endif
                 </div>
             @empty

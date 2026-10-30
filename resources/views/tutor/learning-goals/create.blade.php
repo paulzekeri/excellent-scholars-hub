@@ -9,7 +9,7 @@
 
         <form action="{{ route('tutor.learning-goals.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">@csrf
             <div>
-                <label class="block text-sm font-medium text-gray-700">Goal <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700">Goal <span class="text-orange-700">*</span></label>
                 <input type="text" name="title" value="{{ old('title') }}" required maxlength="255" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. Read one chapter aloud each week">
             </div>
 

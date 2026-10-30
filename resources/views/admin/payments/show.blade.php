@@ -26,7 +26,7 @@
                     by <strong>{{ strtolower($payment->methodLabel()) }}</strong>@if($payment->paid_into) into {{ $payment->paid_into }}@endif.
                     @if($payment->reference) Reference: <strong>{{ $payment->reference }}</strong>. @endif
                 </p>
-                <p class="text-sm text-gray-700 mt-1"><i class="fas fa-circle-info mr-1 text-orange-600"></i>{{ $payment->verificationHint() }}</p>
+                <p class="text-sm text-gray-700 mt-1"><i class="fas fa-circle-info mr-1 text-orange-700"></i>{{ $payment->verificationHint() }}</p>
                 <div class="mt-4 flex flex-wrap items-start gap-3">
                     <form method="POST" action="{{ route('admin.payments.verify', $payment) }}">
                         @csrf
@@ -35,14 +35,14 @@
                         </button>
                     </form>
                     <details class="rounded-lg bg-white/70 px-4 py-2">
-                        <summary class="cursor-pointer text-sm font-medium text-red-700 select-none">
+                        <summary class="cursor-pointer text-sm font-medium text-orange-800 select-none">
                             <i class="fas fa-ban mr-1"></i> Cannot match it in the bank?
                         </summary>
                         <form method="POST" action="{{ route('admin.payments.reject', $payment) }}" class="mt-3 space-y-2">
                             @csrf
                             <label class="block text-xs font-medium text-gray-600">Tell the parent why</label>
-                            <input type="text" name="reason" required maxlength="500" placeholder="e.g. No transfer of this amount on 27 Oct" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500">
-                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 transition">Reject payment</button>
+                            <input type="text" name="reason" required maxlength="500" placeholder="e.g. No transfer of this amount on 27 Oct" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-orange-500 focus:border-orange-500">
+                            <button type="submit" class="bg-orange-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-800 transition">Reject payment</button>
                         </form>
                     </details>
                 </div>
@@ -98,7 +98,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-sm">
             <div><p class="text-gray-500">Total fee</p><p class="text-xl font-bold text-gray-800">₦{{ number_format($summary['due'], 2) }}</p></div>
             <div><p class="text-gray-500">Paid so far</p><p class="text-xl font-bold text-green-700">₦{{ number_format($summary['paid'], 2) }}</p></div>
-            <div><p class="text-gray-500">Balance</p><p class="text-xl font-bold {{ $summary['balance'] > 0 ? 'text-red-600' : 'text-gray-800' }}">₦{{ number_format($summary['balance'], 2) }}</p></div>
+            <div><p class="text-gray-500">Balance</p><p class="text-xl font-bold {{ $summary['balance'] > 0 ? 'text-orange-700' : 'text-gray-800' }}">₦{{ number_format($summary['balance'], 2) }}</p></div>
         </div>
         @if($summary['percent'] !== null)
             <div class="w-full bg-gray-100 rounded-full h-3">
@@ -116,11 +116,11 @@
     </div>
 
     <div class="bg-white rounded-xl shadow-md p-8 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-3"><i class="fas fa-paperclip text-orange-500 mr-2"></i>Receipt</h2>
+        <h2 class="text-lg font-semibold text-gray-800 mb-3"><i class="fas fa-paperclip text-orange-700 mr-2"></i>Receipt</h2>
         @if($payment->receipt_path)
             <div class="flex flex-wrap items-center gap-3 text-sm">
                 <span class="text-gray-700"><i class="fas fa-file-lines mr-1"></i>{{ $payment->receipt_name ?? basename($payment->receipt_path) }}</span>
-                <a href="{{ route('admin.payments.receipt', $payment) }}" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"><i class="fas fa-download mr-1"></i> Download receipt</a>
+                <a href="{{ route('admin.payments.receipt', $payment) }}" class="bg-orange-500 text-blue-950 px-4 py-2 rounded-lg hover:bg-orange-400 transition"><i class="fas fa-download mr-1"></i> Download receipt</a>
             </div>
         @else
             <p class="text-sm text-gray-500">No receipt uploaded for this installment.</p>
@@ -149,7 +149,7 @@
                             <td class="px-6 py-3">{{ $installment->statusLabel() }}</td>
                             <td class="px-6 py-3">
                                 @if($installment->receipt_path)
-                                    <a href="{{ route('admin.payments.receipt', $installment) }}" class="text-orange-600 hover:text-orange-800"><i class="fas fa-download"></i></a>
+                                    <a href="{{ route('admin.payments.receipt', $installment) }}" class="text-orange-700 hover:text-orange-800"><i class="fas fa-download"></i></a>
                                 @else
                                     —
                                 @endif

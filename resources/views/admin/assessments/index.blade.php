@@ -62,7 +62,7 @@
                             <td class="px-6 py-4">
                                 <span class="font-medium text-gray-800">{{ $assessment->scheduleLabel() }}</span>
                                 @if($assessment->isToday())
-                                    <span class="ml-2 px-2 py-0.5 text-[10px] rounded-full bg-orange-100 text-orange-800">Today</span>
+                                    <span class="ml-2 px-2 py-0.5 text-[10px] rounded-full bg-yellow-200 text-yellow-900">Today</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4">

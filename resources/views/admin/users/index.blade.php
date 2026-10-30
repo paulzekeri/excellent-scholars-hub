@@ -17,7 +17,7 @@
     @if(session('provisioned_credentials'))
         @php $provisioned = session('provisioned_credentials'); @endphp
         <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
-            <p class="font-semibold text-gray-800"><i class="fas fa-id-card text-orange-500 mr-1"></i> Login details for {{ $provisioned['name'] }}</p>
+            <p class="font-semibold text-gray-800"><i class="fas fa-id-card text-orange-700 mr-1"></i> Login details for {{ $provisioned['name'] }}</p>
             <p class="text-sm text-gray-600 mt-1">
                 Email delivery is not configured on this installation @if($provisioned['sent_to'])(target: {{ $provisioned['sent_to'] }}) @endif
                 so hand these over privately. The owner will be asked to choose their own password at first sign-in.
@@ -37,7 +37,7 @@
 
     @if(session('password_reset_link'))
         <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
-            <p class="font-semibold text-gray-800"><i class="fas fa-key text-orange-500 mr-1"></i> One-time reset link for {{ session('password_reset_user') }}</p>
+            <p class="font-semibold text-gray-800"><i class="fas fa-key text-orange-700 mr-1"></i> One-time reset link for {{ session('password_reset_user') }}</p>
             <p class="text-sm text-gray-600 mt-1">Send this to the user privately. It works once and expires in 60 minutes, so do not post it in a group chat.</p>
             <div class="mt-3 flex flex-col sm:flex-row gap-2">
                 <input id="password-reset-link" type="text" readonly value="{{ session('password_reset_link') }}" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-xs font-mono bg-gray-50">
@@ -91,8 +91,8 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $user->phone ?? 'N/A' }}</td>
                             <td class="px-6 py-4">
                                 <span class="px-2 py-1 text-xs rounded-full 
-                                    @if($user->role->slug == 'ceo') bg-purple-100 text-purple-800
-                                    @elseif($user->role->slug == 'admin') bg-red-100 text-red-800
+                                    @if($user->role->slug == 'ceo') bg-orange-100 text-orange-800
+                                    @elseif($user->role->slug == 'admin') bg-orange-100 text-orange-900
                                     @elseif($user->role->slug == 'tutor') bg-green-100 text-green-800
                                     @elseif($user->role->slug == 'learner') bg-blue-100 text-blue-800
                                     @else bg-yellow-100 text-yellow-800 @endif">
@@ -118,7 +118,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                <span class="px-2 py-1 text-xs rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                <span class="px-2 py-1 text-xs rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-900' }}">
                                     {{ $user->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                                 @if($user->must_change_password)
@@ -133,11 +133,11 @@
                                 </a>
                                 <form action="{{ route('admin.users.password-reset', $user) }}" method="POST" class="inline mr-3" onsubmit="return confirm('Send a one-time password reset link for this user?')">
                                     @csrf
-                                    <button type="submit" class="text-orange-600 hover:text-orange-800"><i class="fas fa-key"></i> Reset password</button>
+                                    <button type="submit" class="text-orange-700 hover:text-orange-800"><i class="fas fa-key"></i> Reset password</button>
                                 </form>
                                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i> Delete</button>
+                                    <button type="submit" class="text-orange-700 hover:text-orange-900"><i class="fas fa-trash"></i> Delete</button>
                                 </form>
                             </td>
                         </tr>

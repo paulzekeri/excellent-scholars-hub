@@ -31,7 +31,7 @@ class AssessmentSession extends Model
 
     public const PLATFORM_BADGES = [
         self::PLATFORM_GOOGLE_MEET => 'bg-blue-100 text-blue-800',
-        self::PLATFORM_ZOOM => 'bg-indigo-100 text-indigo-800',
+        self::PLATFORM_ZOOM => 'bg-blue-100 text-blue-800',
         self::PLATFORM_PHONE => 'bg-gray-100 text-gray-700',
         self::PLATFORM_IN_PERSON => 'bg-amber-100 text-amber-800',
     ];
@@ -54,7 +54,7 @@ class AssessmentSession extends Model
     public const STATUS_BADGES = [
         self::STATUS_SCHEDULED => 'bg-blue-100 text-blue-800',
         self::STATUS_COMPLETED => 'bg-green-100 text-green-800',
-        self::STATUS_NO_SHOW => 'bg-red-100 text-red-800',
+        self::STATUS_NO_SHOW => 'bg-orange-100 text-orange-800',
         self::STATUS_CANCELLED => 'bg-gray-100 text-gray-700',
     ];
 
@@ -72,7 +72,7 @@ class AssessmentSession extends Model
     public const OUTCOME_BADGES = [
         self::OUTCOME_READY => 'bg-green-100 text-green-800',
         self::OUTCOME_NEEDS_SUPPORT => 'bg-amber-100 text-amber-800',
-        self::OUTCOME_NOT_READY => 'bg-red-100 text-red-800',
+        self::OUTCOME_NOT_READY => 'bg-orange-100 text-orange-800',
     ];
 
     protected $fillable = [

@@ -6,7 +6,7 @@
         'scheduled' => 'bg-blue-100 text-blue-800',
         'ongoing' => 'bg-yellow-100 text-yellow-800',
         'completed' => 'bg-green-100 text-green-800',
-        'cancelled' => 'bg-red-100 text-red-800',
+        'cancelled' => 'bg-orange-100 text-orange-900',
     ];
     $statusStyle = $statusStyles[$schedule->status] ?? 'bg-gray-100 text-gray-800';
     $platformLabels = ['google_meet' => 'Google Meet', 'zoom' => 'Zoom'];
@@ -25,7 +25,7 @@
                 <div class="flex flex-wrap items-center gap-3 mb-2">
                     <span class="px-3 py-1 text-xs font-medium rounded-full {{ $statusStyle }}">{{ ucfirst($schedule->status) }}</span>
                     @if($schedule->start_time->isToday())
-                        <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-red-600 text-white">Today</span>
+                        <span class="px-3 py-1 text-xs font-bold uppercase rounded-full bg-yellow-400 text-blue-950">Today</span>
                     @endif
                     @if($platformLabel)
                         <span class="text-xs text-gray-500"><i class="fas fa-video mr-1"></i> {{ $platformLabel }}</span>
@@ -44,7 +44,7 @@
                     @endif
                     <span class="text-gray-400 mx-1">|</span> Tutor: <strong>{{ $schedule->tutor->user->name ?? 'N/A' }}</strong>
                 </p>
-                <p class="mt-1 {{ $schedule->start_time->isToday() ? 'text-red-600 font-semibold' : 'text-gray-600' }}">
+                <p class="mt-1 {{ $schedule->start_time->isToday() ? 'text-yellow-800 font-semibold' : 'text-gray-600' }}">
                     <i class="far fa-calendar-alt mr-1"></i> {{ $schedule->start_time->format('D, M d, Y') }}
                     <span class="text-gray-400 mx-1">|</span>
                     <i class="far fa-clock mr-1"></i> {{ $schedule->start_time->format('h:i A') }} - {{ $schedule->end_time->format('h:i A') }}
@@ -123,7 +123,7 @@
                     <div class="flex flex-wrap gap-2 text-xs">
                         <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">Present {{ $attendanceSummary['present'] }}</span>
                         <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Late {{ $attendanceSummary['late'] }}</span>
-                        <span class="px-2 py-1 rounded-full bg-red-100 text-red-800">Absent {{ $attendanceSummary['absent'] }}</span>
+                        <span class="px-2 py-1 rounded-full bg-orange-100 text-orange-900">Absent {{ $attendanceSummary['absent'] }}</span>
                         <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">Excused {{ $attendanceSummary['excused'] }}</span>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
                                         @if($row['record'])
                                             <span class="px-2 py-1 text-xs rounded-full font-medium
                                                 @if($row['record']->status == 'present') bg-green-100 text-green-800
-                                                @elseif($row['record']->status == 'absent') bg-red-100 text-red-800
+                                                @elseif($row['record']->status == 'absent') bg-orange-100 text-orange-900
                                                 @elseif($row['record']->status == 'late') bg-yellow-100 text-yellow-800
                                                 @elseif($row['record']->status == 'excused') bg-blue-100 text-blue-800
                                                 @else bg-gray-100 text-gray-800 @endif">
@@ -245,7 +245,7 @@
                     </li>
                     <li>
                         <a href="{{ route('admin.oversight.attendance.class', $class->id) }}" class="flex items-center justify-between text-gray-700 hover:text-blue-600">
-                            <span><i class="fas fa-user-check mr-2 text-purple-600 w-4"></i> Class attendance</span>
+                            <span><i class="fas fa-user-check mr-2 text-orange-700 w-4"></i> Class attendance</span>
                             <i class="fas fa-chevron-right text-xs text-gray-400"></i>
                         </a>
                     </li>

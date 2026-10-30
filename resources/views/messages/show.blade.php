@@ -43,7 +43,7 @@
         <form action="{{ route('messages.store', $user) }}" method="POST" class="border-t border-gray-200 p-4 bg-white">
             @csrf
             @error('body')
-                <p class="text-sm text-red-600 mb-2">{{ $message }}</p>
+                <p class="text-sm text-orange-700 mb-2">{{ $message }}</p>
             @enderror
             <div class="flex items-end gap-3">
                 <textarea name="body" rows="2" required maxlength="2000" placeholder="Type your message..."

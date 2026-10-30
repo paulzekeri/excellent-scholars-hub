@@ -12,7 +12,7 @@
                 <i class="fas fa-building-columns"></i> Bank accounts
                 <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-800">{{ $accounts['active'] }}</span>
             </a>
-            <a href="{{ route('admin.payments.index', ['status' => 'pending']) }}" class="inline-flex items-center gap-2 bg-orange-500 text-white px-5 py-2 rounded-lg hover:bg-orange-600 transition">
+            <a href="{{ route('admin.payments.index', ['status' => 'pending']) }}" class="inline-flex items-center gap-2 bg-orange-500 text-blue-950 px-5 py-2 rounded-lg hover:bg-orange-400 transition">
                 <i class="fas fa-clock"></i> Awaiting verification
                 @if($totals['pending_count'] > 0)
                     <span class="bg-white text-orange-700 text-xs font-bold rounded-full px-2 py-0.5">{{ $totals['pending_count'] }}</span>
@@ -35,7 +35,7 @@
             <p class="text-2xl font-bold text-gray-800">₦{{ number_format($totals['pending'], 2) }}</p>
             <p class="text-xs text-gray-500 mt-1">{{ $totals['pending_count'] }} submission{{ $totals['pending_count'] === 1 ? '' : 's' }} to check</p>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-500">
+        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-orange-500">
             <p class="text-gray-500 text-sm">Outstanding</p>
             <p class="text-2xl font-bold text-gray-800">₦{{ number_format($totals['outstanding'], 2) }}</p>
             <p class="text-xs text-gray-500 mt-1">Balance left across every fee</p>
@@ -119,7 +119,7 @@
                     @forelse($payments as $payment)
                     <tr class="hover:bg-blue-50/40">
                         <td class="px-6 py-4 text-sm font-medium">
-                            <a href="{{ route('admin.payments.show', $payment) }}" class="text-blue-700 hover:text-orange-600">
+                            <a href="{{ route('admin.payments.show', $payment) }}" class="text-blue-700 hover:text-orange-700">
                                 {{ $payment->reference ?? 'PAY-' . str_pad($payment->id, 5, '0', STR_PAD_LEFT) }}
                             </a>
                             <span class="block text-xs text-gray-500">{{ ucfirst($payment->payment_type) }}</span>
@@ -148,7 +148,7 @@
                         <td class="px-6 py-4 text-sm">{{ $payment->payment_date->format('M d, Y') }}</td>
                         <td class="px-6 py-4 text-sm">
                             @if($payment->receipt_path)
-                                <a href="{{ route('admin.payments.receipt', $payment) }}" class="text-orange-600 hover:text-orange-800" title="{{ $payment->receipt_name }}">
+                                <a href="{{ route('admin.payments.receipt', $payment) }}" class="text-orange-700 hover:text-orange-800" title="{{ $payment->receipt_name }}">
                                     <i class="fas fa-file-invoice mr-1"></i> Download
                                 </a>
                             @else
@@ -166,7 +166,7 @@
                                         <i class="fas fa-check mr-1"></i> Payment received
                                     </button>
                                 </form>
-                                <a href="{{ route('admin.payments.show', $payment) }}" class="ml-2 text-xs text-gray-600 hover:text-red-600">Review</a>
+                                <a href="{{ route('admin.payments.show', $payment) }}" class="ml-2 text-xs text-gray-600 hover:text-orange-700">Review</a>
                             @elseif($payment->verified_at)
                                 <span class="block text-xs text-gray-600">by {{ $payment->verifiedBy->name ?? 'CEO' }}</span>
                                 <span class="block text-xs text-gray-400">{{ $payment->verified_at->format('M d, Y') }}</span>

@@ -8,7 +8,7 @@
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">{{ session('success') }}</div>
     @endif
     @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">{{ session('error') }}</div>
+        <div class="bg-orange-100 border border-orange-400 text-orange-800 px-4 py-3 rounded-lg mb-4">{{ session('error') }}</div>
     @endif
 
     <!-- Class Info -->
@@ -54,7 +54,7 @@
                                 <td class="px-6 py-4 text-sm">
                                     <form action="{{ route('admin.classes.unenroll', [$class, $learner]) }}" method="POST" class="inline" onsubmit="return confirm('Unenroll this learner?')">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 text-xs"><i class="fas fa-user-minus mr-1"></i> Remove</button>
+                                        <button type="submit" class="text-orange-700 hover:text-orange-900 text-xs"><i class="fas fa-user-minus mr-1"></i> Remove</button>
                                     </form>
                                 </td>
                             </tr>

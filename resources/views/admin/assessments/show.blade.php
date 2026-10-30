@@ -100,7 +100,7 @@
                     <h2 class="text-sm font-semibold text-gray-700 mb-2">Need to call it off?</h2>
                     <form action="{{ route('admin.assessments.cancel', $assessment) }}" method="POST" onsubmit="return confirm('Cancel this assessment?')">
                         @csrf
-                        <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                        <button type="submit" class="text-sm text-orange-700 hover:text-orange-900">
                             <i class="fas fa-ban mr-1"></i> Cancel assessment
                         </button>
                     </form>

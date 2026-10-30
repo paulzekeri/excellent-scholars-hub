@@ -27,7 +27,7 @@ class Testimonial extends Model
     public const STATUS_BADGES = [
         self::STATUS_PENDING => 'bg-amber-100 text-amber-800',
         self::STATUS_APPROVED => 'bg-green-100 text-green-800',
-        self::STATUS_REJECTED => 'bg-red-100 text-red-800',
+        self::STATUS_REJECTED => 'bg-orange-100 text-orange-800',
     ];
 
     protected $fillable = [

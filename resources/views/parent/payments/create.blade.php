@@ -36,17 +36,17 @@
         <form action="{{ route('parent.payments.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">@csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="learner_id" class="block text-sm font-medium text-gray-700">Child <span class="text-red-500">*</span></label>
+                    <label for="learner_id" class="block text-sm font-medium text-gray-700">Child <span class="text-orange-700">*</span></label>
                     <select id="learner_id" name="learner_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select child</option>
                         @foreach($children as $learner)
                             <option value="{{ $learner->id }}" @selected((string) old('learner_id', $selectedLearner) === (string) $learner->id)>{{ $learner->user->name }}</option>
                         @endforeach
                     </select>
-                    @error('learner_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('learner_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label for="payment_type" class="block text-sm font-medium text-gray-700">Payment Type <span class="text-red-500">*</span></label>
+                    <label for="payment_type" class="block text-sm font-medium text-gray-700">Payment Type <span class="text-orange-700">*</span></label>
                     <select id="payment_type" name="payment_type" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         @foreach(['tuition', 'registration', 'material', 'other'] as $type)
                             <option value="{{ $type }}" @selected(old('payment_type', 'tuition') === $type)>{{ ucfirst($type) }}</option>
@@ -72,12 +72,12 @@
                         @endforeach
                     </select>
                     <p class="text-xs text-gray-500 mt-1">Only classes your child attends are listed.</p>
-                    @error('class_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('class_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
             </div>
 
             <div>
-                <p class="block text-sm font-medium text-gray-700 mb-2">How did you pay? <span class="text-red-500">*</span></p>
+                <p class="block text-sm font-medium text-gray-700 mb-2">How did you pay? <span class="text-orange-700">*</span></p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <label data-method-card="transfer" class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-blue-300 {{ $accounts->isEmpty() ? 'cursor-not-allowed opacity-60' : '' }}">
                         <input type="radio" name="payment_method" value="{{ \App\Models\Payment::METHOD_TRANSFER }}" class="sr-only" @checked($chosenMethod === \App\Models\Payment::METHOD_TRANSFER) @disabled($accounts->isEmpty())>
@@ -90,7 +90,7 @@
 
                     <label data-method-card="cash" class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-blue-300">
                         <input type="radio" name="payment_method" value="{{ \App\Models\Payment::METHOD_CASH }}" class="sr-only" @checked($chosenMethod === \App\Models\Payment::METHOD_CASH)>
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><i class="fas fa-money-bill-wave"></i></span>
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700"><i class="fas fa-money-bill-wave"></i></span>
                         <span class="min-w-0">
                             <span class="block text-sm font-semibold text-gray-800">Cash</span>
                             <span class="block text-xs text-gray-500">Pay at the school office</span>
@@ -106,7 +106,7 @@
                         </span>
                     </label>
                 </div>
-                @error('payment_method')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                @error('payment_method')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
 
                 @if($accounts->isEmpty())
                     <p class="mt-2 rounded-lg bg-orange-50 px-3 py-2 text-xs text-orange-800">
@@ -145,23 +145,23 @@
                     </div>
 
                     <div class="mt-4">
-                        <label for="payment_account_id" class="block text-sm font-medium text-gray-700">Which account did you pay into? <span class="text-red-500">*</span></label>
+                        <label for="payment_account_id" class="block text-sm font-medium text-gray-700">Which account did you pay into? <span class="text-orange-700">*</span></label>
                         <select id="payment_account_id" name="payment_account_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select the account you transferred to</option>
                             @foreach($accounts as $account)
                                 <option value="{{ $account->id }}" @selected((string) old('payment_account_id') === (string) $account->id)>{{ $account->fullLabel() }}</option>
                             @endforeach
                         </select>
-                        @error('payment_account_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                        @error('payment_account_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                     </div>
                 </div>
             </div>
 
             {{-- Cash: paid at the office --}}
             <div data-method-panel="cash" class="{{ $chosenMethod === \App\Models\Payment::METHOD_CASH ? '' : 'hidden' }}">
-                <div class="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
-                    <h2 class="text-sm font-semibold text-emerald-900"><i class="fas fa-money-bill-wave mr-1"></i>Paying in cash</h2>
-                    <ul class="mt-2 space-y-1 text-xs text-emerald-900 list-disc list-inside">
+                <div class="rounded-xl border border-green-200 bg-green-50/70 p-4">
+                    <h2 class="text-sm font-semibold text-green-900"><i class="fas fa-money-bill-wave mr-1"></i>Paying in cash</h2>
+                    <ul class="mt-2 space-y-1 text-xs text-green-900 list-disc list-inside">
                         <li>Pay at the school office (bursar's desk) during working hours.</li>
                         <li>Collect the bursar's receipt — take a photo of it for the upload below.</li>
                         <li>Record it here straight away; the payment stays <strong>Pending</strong> until the CEO checks the cash book.</li>
@@ -175,12 +175,12 @@
                     <label for="total_fee" class="block text-sm font-medium text-gray-700">Total Fee</label>
                     <input type="number" step="0.01" min="0" id="total_fee" name="total_fee" value="{{ old('total_fee') }}" placeholder="e.g. 120000" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-xs text-gray-500 mt-1">The whole fee for this term/class, if you know it. It lets the school show your balance.</p>
-                    @error('total_fee')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('total_fee')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount Paid Now <span class="text-red-500">*</span></label>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount Paid Now <span class="text-orange-700">*</span></label>
                     <input type="number" step="0.01" min="1" id="amount" name="amount" value="{{ old('amount') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                    @error('amount')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('amount')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="reference" id="reference-label" class="block text-sm font-medium text-gray-700">{{ $chosenMethod === \App\Models\Payment::METHOD_CASH ? 'Bursar receipt number (optional)' : 'Transfer reference / narration' }}</label>
@@ -190,12 +190,12 @@
                             ? 'If the school office gave you a receipt number, put it here.'
                             : 'The reference or narration on the transfer — this is what the school looks for on the statement.' }}
                     </p>
-                    @error('reference')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('reference')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
                 <div>
-                    <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date <span class="text-red-500">*</span></label>
+                    <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date <span class="text-orange-700">*</span></label>
                     <input type="date" id="payment_date" name="payment_date" value="{{ old('payment_date', date('Y-m-d')) }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                    @error('payment_date')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    @error('payment_date')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
             </div>
 
@@ -208,7 +208,7 @@
                         : 'Attach the bank teller or transfer receipt if you have one (PDF or image, max 5 MB).' }}</span>
                     Only you and the school can download it.
                 </p>
-                @error('receipt')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                @error('receipt')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
             </div>
 
             <div>

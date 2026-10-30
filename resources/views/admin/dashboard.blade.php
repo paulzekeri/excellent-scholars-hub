@@ -23,14 +23,14 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-700">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Total Tutors</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $totalTutors }}</p>
                 </div>
-                <div class="bg-green-100 p-3 rounded-full">
-                    <i class="fas fa-chalkboard-teacher text-green-600 text-xl"></i>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-chalkboard-teacher text-blue-700 text-xl"></i>
                 </div>
             </div>
         </div>
@@ -59,40 +59,40 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Schedules</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $totalSchedules }}</p>
                 </div>
-                <div class="bg-purple-100 p-3 rounded-full">
-                    <i class="fas fa-calendar text-purple-600 text-xl"></i>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-calendar text-orange-700 text-xl"></i>
                 </div>
             </div>
         </div>
 
         @if(auth()->user()->canManagePayments())
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Payments</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $totalPayments }}</p>
                 </div>
-                <div class="bg-pink-100 p-3 rounded-full">
-                    <i class="fas fa-money-bill text-pink-600 text-xl"></i>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-money-bill text-orange-700 text-xl"></i>
                 </div>
             </div>
         </div>
         @endif
 
-        <a href="{{ route('messages.index') }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-teal-500 hover:bg-teal-50 transition">
+        <a href="{{ route('messages.index') }}" class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:bg-blue-50 transition">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-gray-500 text-sm">Unread Messages</p>
                     <p class="text-3xl font-bold text-gray-800">{{ $unreadMessages }}</p>
                 </div>
-                <div class="bg-teal-100 p-3 rounded-full">
-                    <i class="fas fa-comments text-teal-600 text-xl"></i>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-comments text-blue-600 text-xl"></i>
                 </div>
             </div>
         </a>
@@ -233,8 +233,8 @@
                                 <td class="px-4 py-3 text-sm text-gray-800">{{ $user->name }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-600">{{ $user->email }}</td>
                                 <td class="px-4 py-3"><span class="px-2 py-1 text-xs rounded-full 
-                                    @if($user->role->slug == 'ceo') bg-purple-100 text-purple-800
-                                    @elseif($user->role->slug == 'admin') bg-red-100 text-red-800
+                                    @if($user->role->slug == 'ceo') bg-orange-100 text-orange-800
+                                    @elseif($user->role->slug == 'admin') bg-orange-100 text-orange-900
                                     @elseif($user->role->slug == 'tutor') bg-green-100 text-green-800
                                     @elseif($user->role->slug == 'learner') bg-blue-100 text-blue-800
                                     @else bg-yellow-100 text-yellow-800 @endif">

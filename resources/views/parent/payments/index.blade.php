@@ -25,7 +25,7 @@
     <div class="bg-white rounded-xl shadow-md p-5 mb-6">
         <div class="flex flex-wrap items-center justify-between gap-2">
             <h2 class="text-lg font-semibold text-gray-800"><i class="fas fa-building-columns text-blue-600 mr-2"></i>How to pay the school</h2>
-            <a href="{{ route('parent.payments.create') }}" class="text-sm font-semibold text-blue-700 hover:text-orange-600"><i class="fas fa-arrow-right mr-1"></i> Record a payment</a>
+            <a href="{{ route('parent.payments.create') }}" class="text-sm font-semibold text-blue-700 hover:text-orange-700"><i class="fas fa-arrow-right mr-1"></i> Record a payment</a>
         </div>
 
         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -49,8 +49,8 @@
                 </div>
             @endforelse
 
-            <div class="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3">
-                <p class="text-sm font-semibold text-gray-800"><i class="fas fa-money-bill-wave text-emerald-700 mr-1"></i> Cash</p>
+            <div class="rounded-lg border border-green-200 bg-green-50/60 p-3">
+                <p class="text-sm font-semibold text-gray-800"><i class="fas fa-money-bill-wave text-green-700 mr-1"></i> Cash</p>
                 <p class="text-xs text-gray-600 mt-1">Pay at the school office (bursar's desk) and keep the receipt. Record it here so the CEO can confirm it.</p>
             </div>
         </div>
@@ -71,7 +71,7 @@
             <p class="text-2xl font-bold text-gray-800">₦{{ number_format($summary['pending'], 2) }}</p>
             <p class="text-xs text-gray-500 mt-1">{{ $summary['pending_count'] }} submission{{ $summary['pending_count'] === 1 ? '' : 's' }} with the school</p>
         </div>
-        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-red-500">
+        <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-orange-500">
             <p class="text-gray-500 text-sm">Outstanding</p>
             <p class="text-2xl font-bold text-gray-800">₦{{ number_format($summary['balance'], 2) }}</p>
             <p class="text-xs text-gray-500 mt-1">Balance left across every fee</p>
@@ -105,7 +105,7 @@
                     @if($childTotals['balance'] <= 0 && $childTotals['due'] > 0)
                         <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800"><i class="fas fa-circle-check mr-1"></i>Fees complete</span>
                     @elseif($childTotals['balance'] > 0)
-                        <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-800">₦{{ number_format($childTotals['balance'], 2) }} outstanding</span>
+                        <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-900">₦{{ number_format($childTotals['balance'], 2) }} outstanding</span>
                     @endif
                     @if($childTotals['pending_count'])
                         <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800">{{ $childTotals['pending_count'] }} pending</span>
@@ -131,10 +131,10 @@
                                 @if($fee['due'] > 0 && $fee['balance'] <= 0)
                                     <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800"><i class="fas fa-check mr-1"></i>Payment complete</span>
                                 @elseif($fee['balance'] > 0)
-                                    <span class="text-sm font-semibold text-red-600">₦{{ number_format($fee['balance'], 2) }} left</span>
+                                    <span class="text-sm font-semibold text-orange-700">₦{{ number_format($fee['balance'], 2) }} left</span>
                                 @endif
                                 @if($fee['pending_count'])
-                                    <span class="mt-1 block text-xs text-orange-600">₦{{ number_format($fee['pending'], 2) }} awaiting verification</span>
+                                    <span class="mt-1 block text-xs text-orange-700">₦{{ number_format($fee['pending'], 2) }} awaiting verification</span>
                                 @endif
                             </div>
                         </div>
@@ -147,7 +147,7 @@
                         @endif
 
                         <a href="{{ route('parent.payments.create', ['learner_id' => $child->id, 'term' => $fee['term'], 'class_id' => $fee['class_id']]) }}"
-                           class="mt-3 inline-block text-xs font-semibold text-blue-700 hover:text-orange-600">
+                           class="mt-3 inline-block text-xs font-semibold text-blue-700 hover:text-orange-700">
                             <i class="fas fa-plus-circle mr-1"></i> Add a part payment to this fee
                         </a>
                     </div>
@@ -172,7 +172,7 @@
         </div>
     @endforelse
 
-    <h2 class="text-lg font-semibold text-gray-800 mt-8 mb-3"><i class="fas fa-clock-rotate-left text-orange-500 mr-2"></i>Your payment submissions</h2>
+    <h2 class="text-lg font-semibold text-gray-800 mt-8 mb-3"><i class="fas fa-clock-rotate-left text-orange-700 mr-2"></i>Your payment submissions</h2>
 
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
@@ -209,7 +209,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 @if($payment->receipt_path)
-                                    <a href="{{ route('parent.payments.receipt', $payment) }}" class="text-orange-600 hover:text-orange-800" title="{{ $payment->receipt_name }}">
+                                    <a href="{{ route('parent.payments.receipt', $payment) }}" class="text-orange-700 hover:text-orange-800" title="{{ $payment->receipt_name }}">
                                         <i class="fas fa-file-invoice mr-1"></i> Download
                                     </a>
                                 @else
@@ -222,7 +222,7 @@
                                     <span class="mt-1 block text-xs text-gray-500">{{ $payment->pendingNote() }}</span>
                                 @endif
                                 @if($payment->status === \App\Models\Payment::STATUS_FAILED && $payment->notes)
-                                    <span class="mt-1 block text-xs text-red-600">{{ \Illuminate\Support\Str::limit($payment->notes, 90) }}</span>
+                                    <span class="mt-1 block text-xs text-orange-700">{{ \Illuminate\Support\Str::limit($payment->notes, 90) }}</span>
                                 @endif
                                 @if($payment->verified_at && $payment->verifiedBy)
                                     <span class="mt-1 block text-xs text-gray-500">by {{ $payment->verifiedBy->name }} on {{ $payment->verified_at->format('M d, Y') }}</span>

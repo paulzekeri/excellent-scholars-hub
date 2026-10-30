@@ -67,7 +67,7 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4"><i class="fas fa-quote-left text-orange-500 mr-2"></i>Your testimonial</h2>
+            <h2 class="text-lg font-semibold text-gray-800 mb-4"><i class="fas fa-quote-left text-orange-700 mr-2"></i>Your testimonial</h2>
 
             @if($testimonial)
                 <div class="mb-4 rounded-lg bg-gray-50 border border-gray-200 p-4">
@@ -82,7 +82,7 @@
                     </div>
                     <p class="text-sm text-gray-700 whitespace-pre-line">{{ $testimonial->body }}</p>
                     @if($testimonial->review_note)
-                        <p class="mt-2 text-xs text-red-600"><strong>CEO note:</strong> {{ $testimonial->review_note }}</p>
+                        <p class="mt-2 text-xs text-orange-700"><strong>CEO note:</strong> {{ $testimonial->review_note }}</p>
                     @endif
                 </div>
             @endif
@@ -108,7 +108,7 @@
                     </span>
                 </label>
 
-                <button type="submit" class="bg-orange-500 text-white px-5 py-2.5 rounded-lg hover:bg-orange-600 transition">
+                <button type="submit" class="bg-orange-500 text-blue-950 px-5 py-2.5 rounded-lg hover:bg-orange-400 transition">
                     <i class="fas fa-paper-plane mr-1"></i> Send to the CEO
                 </button>
                 <p class="text-xs text-gray-500">Editing an approved testimonial sends it back for approval.</p>

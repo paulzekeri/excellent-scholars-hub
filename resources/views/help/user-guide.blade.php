@@ -130,7 +130,7 @@
                         <i class="fas fa-bell mr-2"></i>Notifications
                     </a>
                     <a href="#whats-new" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
-                        <i class="fas fa-star mr-2 text-orange-500"></i>What's New
+                        <i class="fas fa-star mr-2 text-orange-700"></i>What's New
                     </a>
                     @if($guideIsParent || $guideIsCeo)
                     <a href="#payments" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
@@ -285,7 +285,7 @@
             @if($guideIsAdmin)
             <section id="for-admins" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-user-shield text-red-500 mr-2"></i>For Administrators{{ $guideIsCeo ? ' & CEO' : '' }}
+                    <i class="fas fa-user-shield text-orange-700 mr-2"></i>For Administrators{{ $guideIsCeo ? ' & CEO' : '' }}
                 </h2>
                 @if($guideIsCeo)
                     <p class="text-gray-600 mb-6">
@@ -445,7 +445,7 @@
                 <!-- Manage Schedules -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-calendar text-purple-600 mr-2"></i>4. Managing Schedules
+                        <i class="fas fa-calendar text-orange-700 mr-2"></i>4. Managing Schedules
                     </h3>
                     <p class="text-gray-600 mb-3">Schedule class sessions with dates, times, and optional meeting links.</p>
                     <ol class="space-y-2">
@@ -479,7 +479,7 @@
                 @if($guideIsCeo)
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-money-bill text-pink-600 mr-2"></i>5. Verifying Fees <span class="text-xs font-bold text-pink-600 align-middle">(CEO ONLY)</span>
+                        <i class="fas fa-money-bill text-orange-700 mr-2"></i>5. Verifying Fees <span class="text-xs font-bold text-orange-700 align-middle">(CEO ONLY)</span>
                     </h3>
                     <div class="info-box mb-3">
                         <p class="text-sm text-gray-700">
@@ -587,7 +587,7 @@
                     </ol>
 
                     <h4 class="font-medium text-gray-700 mb-2">
-                        <i class="fas fa-tasks text-orange-500 mr-1"></i> Viewing Assignments & Submissions
+                        <i class="fas fa-tasks text-orange-700 mr-1"></i> Viewing Assignments & Submissions
                     </h4>
                     <ol class="space-y-2 mb-4">
                         <li class="flex items-start gap-2 text-sm">
@@ -637,7 +637,7 @@
                     </ol>
 
                     <h4 class="font-medium text-gray-700 mb-2">
-                        <i class="fas fa-folder text-purple-500 mr-1"></i> Viewing Learning Materials
+                        <i class="fas fa-folder text-orange-700 mr-1"></i> Viewing Learning Materials
                     </h4>
                     <ol class="space-y-2 mb-3">
                         <li class="flex items-start gap-2 text-sm">
@@ -665,7 +665,7 @@
 
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-sun text-orange-500 mr-2"></i>Affirmations
+                        <i class="fas fa-sun text-orange-700 mr-2"></i>Affirmations
                     </h3>
                     <p class="text-gray-600 mb-2">
                         Open <strong>Communication &rarr; Affirmations</strong> to publish the weekly motivation (up to 500 characters).
@@ -681,7 +681,7 @@
                 @if($guideIsCeo)
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-star text-orange-500 mr-2"></i>Testimonials <span class="text-xs font-bold text-pink-600 align-middle">(CEO ONLY)</span>
+                        <i class="fas fa-star text-orange-700 mr-2"></i>Testimonials <span class="text-xs font-bold text-orange-700 align-middle">(CEO ONLY)</span>
                     </h3>
                     <p class="text-gray-600 mb-2">
                         Members write testimonials from <strong>My profile</strong>. Review them in <strong>Communication &rarr; Testimonials</strong>
@@ -744,7 +744,7 @@
                 <!-- Schedules -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-calendar text-purple-600 mr-2"></i>2. Managing Schedules
+                        <i class="fas fa-calendar text-orange-700 mr-2"></i>2. Managing Schedules
                     </h3>
                     <p class="text-gray-600 mb-3">Create and manage your class sessions.</p>
                     <ol class="space-y-2 mb-3">
@@ -788,7 +788,7 @@
                     </ol>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1 mb-3 ml-4">
                         <li><span class="text-green-600 font-medium">Present</span> — Learner attended the session</li>
-                        <li><span class="text-red-600 font-medium">Absent</span> — Learner was absent</li>
+                        <li><span class="text-orange-700 font-medium">Absent</span> — Learner was absent</li>
                         <li><span class="text-yellow-600 font-medium">Late</span> — Learner arrived late</li>
                         <li><span class="text-blue-600 font-medium">Excused</span> — Absence was pre-approved/excused</li>
                     </ul>
@@ -807,7 +807,7 @@
                 <!-- Assignments -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-tasks text-orange-600 mr-2"></i>4. Creating & Grading Assignments
+                        <i class="fas fa-tasks text-orange-700 mr-2"></i>4. Creating & Grading Assignments
                     </h3>
 
                     <p class="font-medium text-gray-700 mb-2">To create an assignment:</p>
@@ -1011,7 +1011,7 @@
                 <!-- Join Virtual Class -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-video text-red-600 mr-2"></i>5. Joining a Virtual Class
+                        <i class="fas fa-video text-orange-700 mr-2"></i>5. Joining a Virtual Class
                     </h3>
                     <p class="text-gray-600 mb-3">When a tutor schedules a class with a meeting link:</p>
                     <ol class="space-y-2">
@@ -1036,7 +1036,7 @@
                 <!-- Learning Goals -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mt-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-bullseye text-orange-500 mr-2"></i>6. Learning Goals
+                        <i class="fas fa-bullseye text-orange-700 mr-2"></i>6. Learning Goals
                     </h3>
                     <p class="text-gray-600 mb-2">
                         Goals your tutor set — and the school shared with you — appear on your dashboard under
@@ -1087,9 +1087,9 @@
                             <strong>Assignments Completed</strong> and <strong>Materials Shared</strong></li>
                         <li>An <strong>attendance rate</strong> with the number of sessions attended</li>
                         <li>A <strong>fees line</strong> — verified amount, outstanding balance and any pending submissions — that opens <strong>Fees &amp; Payments</strong></li>
-                        <li>A red <strong>"N missed"</strong> badge whenever a tutor has marked your child absent</li>
+                        <li>An orange <strong>"N missed"</strong> badge whenever a tutor has marked your child absent</li>
                         <li>A <strong>"View Full Details"</strong> button that opens the child's report</li>
-                        <li>A <strong>"Message the School"</strong> button (with a red badge when the school has replied unread)</li>
+                        <li>A <strong>"Message the School"</strong> button (with an orange badge when the school has replied unread)</li>
                     </ul>
                     <div class="tip-box">
                         <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Tap any counter to jump straight to that list — for example, tap <strong>Assignments Pending</strong> to see exactly which assignments are outstanding.</p>
@@ -1115,19 +1115,19 @@
                                 <span class="text-green-600">Present</span>, 
                                 <span class="text-yellow-600">Late</span>, 
                                 <span class="text-blue-600">Excused</span>, or 
-                                <span class="text-red-600">Absent</span>.
+                                <span class="text-orange-700">Absent</span>.
                             </p>
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
                                 <i class="fas fa-tasks text-green-500 mr-2"></i>Assignments
                             </h4>
-                            <p class="text-sm text-gray-600">Two tabs: <strong>Pending</strong> (not submitted yet — overdue ones in red)
+                            <p class="text-sm text-gray-600">Two tabs: <strong>Pending</strong> (not submitted yet — overdue ones in orange)
                                 and <strong>Completed</strong> (submitted date, score, status and the tutor's feedback).</p>
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                                <i class="fas fa-calendar text-purple-500 mr-2"></i>Upcoming Classes
+                                <i class="fas fa-calendar text-orange-700 mr-2"></i>Upcoming Classes
                             </h4>
                             <p class="text-sm text-gray-600">A list of upcoming scheduled sessions for your child, with the 
                                 session title, class name, date, and time.</p>
@@ -1141,23 +1141,23 @@
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                                <i class="fas fa-calendar-times text-red-500 mr-2"></i>Missed Classes
+                                <i class="fas fa-calendar-times text-orange-700 mr-2"></i>Missed Classes
                             </h4>
-                            <p class="text-sm text-gray-600">Sessions your child was marked <span class="text-red-600">Absent</span>
+                            <p class="text-sm text-gray-600">Sessions your child was marked <span class="text-orange-700">Absent</span>
                                 for, with the class, date and any tutor note. Past sessions the tutor has not marked yet are shown
                                 separately, so unrecorded sessions are never counted as missed.</p>
                         </div>
                     </div>
 
                     <div class="tip-box">
-                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you have multiple children, each one has their own report. A red <strong>"N missed"</strong> badge on the dashboard means a tutor has marked that child absent — open the <strong>Attendance</strong> tab to see exactly which sessions were missed.</p>
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you have multiple children, each one has their own report. An orange <strong>"N missed"</strong> badge on the dashboard means a tutor has marked that child absent — open the <strong>Attendance</strong> tab to see exactly which sessions were missed.</p>
                     </div>
                 </div>
 
                 <!-- Parent Fees & Payments -->
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mt-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <i class="fas fa-file-invoice-dollar text-orange-500 mr-2"></i>3. Fees &amp; Payments
+                        <i class="fas fa-file-invoice-dollar text-orange-700 mr-2"></i>3. Fees &amp; Payments
                     </h3>
                     <p class="text-gray-600 mb-3">
                         You record the payments you have made; the school checks the bank and confirms them. A parent paying
@@ -1218,7 +1218,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
-                            <span class="text-gray-600">Replies appear in the same conversation thread. A red <strong>"n new"</strong> badge shows unread replies, and the school also receives a notification in their bell menu.</span>
+                            <span class="text-gray-600">Replies appear in the same conversation thread. An orange <strong>"n new"</strong> badge shows unread replies, and the school also receives a notification in their bell menu.</span>
                         </li>
                     </ol>
                     <div class="tip-box">
@@ -1242,7 +1242,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="bg-gray-50 border rounded-lg p-4">
                         <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                            <i class="fas fa-users text-orange-600 mr-2"></i> Who can message
+                            <i class="fas fa-users text-orange-700 mr-2"></i> Who can message
                         </h4>
                         <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
                             @if($guideIsParent)
@@ -1262,7 +1262,7 @@
                         </h4>
                         <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>Every message creates a notification for the recipient.</li>
-                            <li>The <strong>Messages</strong> menu item shows a red unread count badge.</li>
+                            <li>The <strong>Messages</strong> menu item shows an orange unread count badge.</li>
                             <li>Opening a conversation marks incoming messages as read.</li>
                         </ul>
                     </div>
@@ -1277,7 +1277,7 @@
                     </li>
                     <li class="flex items-start gap-2 text-sm">
                         <span class="text-blue-600 font-bold">2.</span>
-                        <span class="text-gray-600">Choose the <strong>CEO</strong> (purple badge) or an <strong>administrator</strong> (red badge) from <strong>"School Administration"</strong>.</span>
+                        <span class="text-gray-600">Choose the <strong>CEO</strong> (yellow badge) or an <strong>administrator</strong> (orange badge) from <strong>"School Administration"</strong>.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
                         <span class="text-blue-600 font-bold">3.</span>
@@ -1291,7 +1291,7 @@
                 <ol class="space-y-2 mb-6">
                     <li class="flex items-start gap-2 text-sm">
                         <span class="text-blue-600 font-bold">1.</span>
-                        <span class="text-gray-600">Click <strong>"Messages"</strong> in the menu — the red badge shows unread replies.</span>
+                        <span class="text-gray-600">Click <strong>"Messages"</strong> in the menu — the orange badge shows unread replies.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
                         <span class="text-blue-600 font-bold">2.</span>
@@ -1309,7 +1309,7 @@
                 <ol class="space-y-2 mb-4">
                     <li class="flex items-start gap-2 text-sm">
                         <span class="text-blue-600 font-bold">1.</span>
-                        <span class="text-gray-600">Click <strong>"Messages"</strong> in the admin menu — a red badge shows how many unread parent messages you have.</span>
+                        <span class="text-gray-600">Click <strong>"Messages"</strong> in the admin menu — an orange badge shows how many unread parent messages you have.</span>
                     </li>
                     <li class="flex items-start gap-2 text-sm">
                         <span class="text-blue-600 font-bold">2.</span>
@@ -1348,7 +1348,7 @@
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
                     <li><strong>Information</strong> (<i class="fas fa-info-circle text-blue-600"></i> blue badge) &mdash; general news the recipient should know. No action required.</li>
                     <li><strong>Reminder</strong> (<i class="fas fa-clock text-amber-600"></i> amber badge) &mdash; a nudge about something still to be done, usually with a deadline.</li>
-                    <li><strong>Alert</strong> (<i class="fas fa-exclamation-triangle text-red-600"></i> red badge) &mdash; urgent or exceptional news that needs immediate attention.</li>
+                    <li><strong>Alert</strong> (<i class="fas fa-exclamation-triangle text-orange-700"></i> orange badge) &mdash; urgent or exceptional news that needs immediate attention.</li>
                     <li><strong>Message</strong> (grey badge) &mdash; created automatically when someone sends you a direct message; administrators cannot pick it.</li>
                 </ul>
 
@@ -1362,7 +1362,7 @@
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Managing Your Notifications</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2 mb-4">
-                    <li><strong>Unread notifications</strong> are highlighted with a coloured left border that matches the type (blue, amber or red)</li>
+                    <li><strong>Unread notifications</strong> are highlighted with a coloured left border that matches the type (blue, amber or orange)</li>
                     <li>Use the <strong>All</strong>, <strong>Information</strong>, <strong>Reminder</strong> and <strong>Alert</strong> tabs at the top of the page to show only one type</li>
                     <li>Click <strong>"Mark read"</strong> on individual notifications to dismiss them</li>
                     <li>Use <strong>"Mark all as read"</strong> to clear all notifications at once</li>
@@ -1371,7 +1371,7 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">Message Notifications</h3>
                 <ul class="list-disc list-inside text-gray-600 space-y-2">
                     <li>When a parent messages the school (or the school replies), the recipient gets a notification titled <strong>"New message from …"</strong> with a preview of the first 140 characters.</li>
-                    <li>The <strong>Messages</strong> menu item separately shows a red count of unread conversations.</li>
+                    <li>The <strong>Messages</strong> menu item separately shows an orange count of unread conversations.</li>
                     <li>The two counters are independent: opening a thread clears the Messages badge, while the notification itself is cleared with <strong>"Mark read"</strong> or <strong>"Mark all as read"</strong> in your Notifications page.</li>
                 </ul>
             </section>
@@ -1379,7 +1379,7 @@
             <!-- ========== WHAT'S NEW ========== -->
             <section id="whats-new" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-star text-orange-500 mr-2"></i>What's new in this release
+                    <i class="fas fa-star text-orange-700 mr-2"></i>What's new in this release
                 </h2>
                 <p class="text-gray-600 mb-6">
                     Everything below was added after the last review meeting. Each item links to the detailed section
@@ -1505,7 +1505,7 @@
             @if($guideIsParent || $guideIsCeo)
             <section id="payments" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-file-invoice-dollar text-orange-500 mr-2"></i>Payments, part payments &amp; receipts
+                    <i class="fas fa-file-invoice-dollar text-orange-700 mr-2"></i>Payments, part payments &amp; receipts
                 </h2>
                 <div class="warning-box">
                     @if($guideIsParent)
@@ -1604,7 +1604,7 @@
             @if($guideIsAdmin || $guideIsTutor || $guideIsParent || $guideIsLearner)
             <section id="learning-goals" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-bullseye text-orange-500 mr-2"></i>Learning goals
+                    <i class="fas fa-bullseye text-orange-700 mr-2"></i>Learning goals
                 </h2>
                 <p class="text-gray-600 mb-4">
                     @if($guideIsParent)
@@ -1681,7 +1681,7 @@
             @if($guideIsAdmin)
             <section id="broadcasts" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-bullhorn text-orange-500 mr-2"></i>Categorised messages (broadcasts)
+                    <i class="fas fa-bullhorn text-orange-700 mr-2"></i>Categorised messages (broadcasts)
                 </h2>
                 <p class="text-gray-600 mb-4">
                     Instead of writing to one parent at a time, administrators and the CEO can send the same message to a
@@ -1725,7 +1725,7 @@
             <!-- ========== DASHBOARD EXTRAS ========== -->
             <section id="dashboard-extras" class="guide-section bg-white rounded-xl shadow-md p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-sun text-orange-500 mr-2"></i>Dashboard extras
+                    <i class="fas fa-sun text-orange-700 mr-2"></i>Dashboard extras
                 </h2>
 
                 @if($guideIsLearner)
@@ -1760,9 +1760,10 @@
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Colours</h3>
                 <p class="text-gray-600">
-                    The platform uses the school colours: <strong class="text-blue-700">blue</strong> for navigation and main actions,
-                    <strong>white</strong> for cards and content, and <strong class="text-orange-600">orange</strong> for highlights,
-                    secondary actions and "live now" alerts. Red is reserved for today's classes, warnings and errors.
+                    The platform uses the school colours: <strong>deep navy and royal blue</strong> for structure and main
+                    actions, <strong>white</strong> for cards and content, <strong class="text-orange-700">orange</strong> for
+                    actions, warnings and attention, and <strong class="text-yellow-700">sun-yellow</strong> for highlights and
+                    today's classes. <strong>Red is not used anywhere in the interface.</strong>
                 </p>
             </section>
 

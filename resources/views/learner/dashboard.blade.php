@@ -49,7 +49,7 @@
             </div>
             @if($focusSession && $focusSession->meeting_link && $focusSession->status == 'scheduled')
                 <a href="{{ route('learner.class.join', $focusSession) }}" target="_blank"
-                   class="inline-flex items-center justify-center {{ $isLive ? 'bg-white text-orange-600 hover:bg-orange-50' : 'bg-orange-500 text-white hover:bg-orange-600' }} px-6 py-3 rounded-lg font-semibold transition">
+                   class="inline-flex items-center justify-center {{ $isLive ? 'bg-white text-orange-700 hover:bg-orange-50' : 'bg-orange-500 text-blue-950 hover:bg-orange-400' }} px-6 py-3 rounded-lg font-semibold transition">
                     <i class="fas fa-video mr-2"></i> Join class
                 </a>
             @elseif($focusSession)
@@ -132,16 +132,16 @@
             <div class="space-y-4">
                 @forelse($upcomingClasses as $schedule)
                     @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
-                    <div class="border-l-4 {{ $isToday ? 'border-red-500 bg-red-50' : 'border-blue-500 bg-blue-50' }} p-4 rounded-r-lg">
+                    <div class="border-l-4 {{ $isToday ? 'border-yellow-500 bg-yellow-50' : 'border-blue-500 bg-blue-50' }} p-4 rounded-r-lg">
                         <div class="flex justify-between items-start">
                             <div>
-                                <p class="font-semibold {{ $isToday ? 'text-red-700' : 'text-gray-800' }}">{{ $schedule->title }}@if($isToday) <span class="ml-1 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-red-600 text-white">Today</span>@endif</p>
+                                <p class="font-semibold {{ $isToday ? 'text-yellow-900' : 'text-gray-800' }}">{{ $schedule->title }}@if($isToday) <span class="ml-1 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-yellow-400 text-blue-950">Today</span>@endif</p>
                                 <p class="text-sm text-gray-600">{{ $schedule->class->name }}</p>
-                                <p class="text-xs {{ $isToday ? 'text-red-600 font-semibold' : 'text-gray-500' }}">
+                                <p class="text-xs {{ $isToday ? 'text-yellow-800 font-semibold' : 'text-gray-500' }}">
                                     <i class="far fa-calendar-alt mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('D, M d, Y') }}
                                 </p>
-                                <p class="text-xs {{ $isToday ? 'text-red-600' : 'text-gray-500' }}">
+                                <p class="text-xs {{ $isToday ? 'text-yellow-800' : 'text-gray-500' }}">
                                     <i class="far fa-clock mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}
                                 </p>
@@ -171,9 +171,9 @@
     <div class="bg-white rounded-xl shadow-md p-6 mt-8">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-semibold text-gray-800">
-                <i class="fas fa-bullseye text-orange-500 mr-2"></i>Goals shared with you
+                <i class="fas fa-bullseye text-orange-700 mr-2"></i>Goals shared with you
                 @if($sharedGoalsCount > 0)
-                    <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700">{{ $sharedGoalsCount }}</span>
+                    <span class="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-yellow-800">{{ $sharedGoalsCount }}</span>
                 @endif
             </h2>
             <a href="{{ route('learner.learning-goals.index') }}" class="text-sm text-blue-600 hover:text-blue-800">View all <i class="fas fa-arrow-right ml-1"></i></a>
@@ -198,7 +198,7 @@
                             <p class="text-sm text-gray-600 mt-1">{{ \Illuminate\Support\Str::limit($goal->description, 140) }}</p>
                         @endif
                         @if($goal->file_path)
-                            <a href="{{ route('learner.learning-goals.download', $goal) }}" class="mt-2 inline-block text-xs text-orange-600 hover:text-orange-800">
+                            <a href="{{ route('learner.learning-goals.download', $goal) }}" class="mt-2 inline-block text-xs text-orange-700 hover:text-yellow-900">
                                 <i class="fas fa-download mr-1"></i> Attachment
                             </a>
                         @endif

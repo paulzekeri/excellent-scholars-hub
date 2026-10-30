@@ -116,8 +116,8 @@
       attachment downloads
 - [x] **Categorised messaging** — broadcasts to parents / tutors / students / everyone / one class, fan-out
       `messages` + notifications, broadcast report, inbox for every role, category filters for administrators
-- [x] **Blue / white / orange branding** — indigo removed from all 38 affected views, orange accents, red kept for
-      "today" and errors
+- [x] **Blue / white / orange branding** — navy/blue structure with orange actions and **sun-yellow highlights**;
+      indigo, purple and red removed from every view (orange now carries warnings and attention too)
 - [x] **Affirmation of the day** — rotation card on all four dashboards
 - [x] **Public landing page** — hero slider, live programmes, how-it-works, testimonials, about/contact and
       register CTA at `/` for guests (signed-in users still redirect to their dashboard)

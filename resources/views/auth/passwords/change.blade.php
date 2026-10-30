@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="text-center mb-6">
-        <div class="mx-auto h-12 w-12 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+        <div class="mx-auto h-12 w-12 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center">
             <i class="fas fa-lock text-xl"></i>
         </div>
         <h1 class="mt-4 text-xl font-bold text-gray-800">Choose your own password</h1>
@@ -28,14 +28,14 @@
         <div>
             <label for="current_password" class="block text-sm font-medium text-gray-700">Temporary password</label>
             <input id="current_password" type="password" name="current_password" required autocomplete="current-password" autofocus
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('current_password') border-red-500 @enderror"
+                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('current_password') border-orange-500 @enderror"
                 placeholder="Enter the password from your email">
         </div>
 
         <div>
             <label for="password" class="block text-sm font-medium text-gray-700">New password</label>
             <input id="password" type="password" name="password" required autocomplete="new-password"
-                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror"
+                class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('password') border-orange-500 @enderror"
                 placeholder="At least 8 characters">
         </div>
 

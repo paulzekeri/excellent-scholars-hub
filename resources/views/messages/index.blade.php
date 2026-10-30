@@ -86,15 +86,15 @@
                             <p class="font-medium text-gray-800 flex items-center flex-wrap gap-2">
                                 {{ $contact->name }}
                                 <span class="px-2 py-0.5 text-xs rounded-full
-                                    @if($contact->isCeo()) bg-purple-100 text-purple-800
-                                    @elseif($contact->isAdmin()) bg-red-100 text-red-800
+                                    @if($contact->isCeo()) bg-yellow-100 text-yellow-800
+                                    @elseif($contact->isAdmin()) bg-orange-100 text-orange-900
                                     @elseif($contact->isTutor()) bg-blue-100 text-blue-800
                                     @elseif($contact->isLearner()) bg-green-100 text-green-800
                                     @else bg-orange-100 text-orange-800 @endif">
                                     {{ ucfirst($contact->role->name) }}
                                 </span>
                                 @if($unread > 0)
-                                    <span class="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $unread }} new</span>
+                                    <span class="bg-orange-500 text-blue-950 text-xs rounded-full px-2 py-0.5">{{ $unread }} new</span>
                                 @endif
                             </p>
                             <p class="text-sm text-gray-500 truncate">

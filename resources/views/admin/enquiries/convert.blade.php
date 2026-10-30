@@ -29,7 +29,7 @@
                 <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">The child</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="child_username" class="block text-sm font-medium text-gray-700">Username <span class="text-red-500">*</span></label>
+                        <label for="child_username" class="block text-sm font-medium text-gray-700">Username <span class="text-orange-700">*</span></label>
                         <input id="child_username" type="text" name="child_username" required
                             value="{{ old('child_username', $suggestedUsername) }}"
                             class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500">
@@ -55,7 +55,7 @@
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="parent_username" class="block text-sm font-medium text-gray-700">Guardian username <span class="text-red-500">*</span></label>
+                            <label for="parent_username" class="block text-sm font-medium text-gray-700">Guardian username <span class="text-orange-700">*</span></label>
                             <input id="parent_username" type="text" name="parent_username" required
                                 value="{{ old('parent_username', $suggestedParentUsername) }}"
                                 class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500">
@@ -73,7 +73,7 @@
             <div class="space-y-3 border-t border-gray-100 pt-4">
                 <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500">Placement</h2>
                 <div>
-                    <label for="class_id" class="block text-sm font-medium text-gray-700">Class to enrol in <span class="text-red-500">*</span></label>
+                    <label for="class_id" class="block text-sm font-medium text-gray-700">Class to enrol in <span class="text-orange-700">*</span></label>
                     <select id="class_id" name="class_id" required
                         class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Choose a class</option>

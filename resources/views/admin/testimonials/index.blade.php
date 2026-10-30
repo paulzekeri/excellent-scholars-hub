@@ -79,7 +79,7 @@
                                     class="mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                     placeholder="Optional">
                             </div>
-                            <button type="submit" class="text-sm border border-red-300 text-red-700 px-4 py-2 rounded-lg hover:bg-red-50">
+                            <button type="submit" class="text-sm border border-orange-300 text-orange-800 px-4 py-2 rounded-lg hover:bg-orange-50">
                                 <i class="fas fa-times mr-1"></i> Reject
                             </button>
                         </form>

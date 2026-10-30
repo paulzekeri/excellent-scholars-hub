@@ -22,7 +22,7 @@
                         <td class="px-6 py-4 text-sm">{{ $material->created_at->format('M d, Y') }}</td>
                         <td class="px-6 py-4 text-sm">
                             <a href="{{ asset('storage/' . $material->file_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-download"></i> Download</a>
-                            <form action="{{ route('tutor.materials.destroy', $material) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></form>
+                            <form action="{{ route('tutor.materials.destroy', $material) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">@csrf @method('DELETE')<button type="submit" class="text-orange-700 hover:text-orange-900"><i class="fas fa-trash"></i></button></form>
                         </td>
                     </tr>
                     @endforeach

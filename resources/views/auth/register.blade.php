@@ -3,8 +3,8 @@
 @section('title', 'Register')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a2550] via-[#0d3070] to-[#1d4ed8] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 border-t-4 border-orange-500">
         <div class="text-center mb-8">
             <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="mx-auto h-20 w-auto">
             <p class="text-gray-500 mt-2">Create your account</p>
@@ -16,35 +16,35 @@
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
                 <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('name') border-red-500 @enderror"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('name') border-orange-500 @enderror"
                     placeholder="Enter your full name">
                 @error('name')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700">
-                    Username <span id="username-required-mark" class="text-red-500 {{ old('role_id') && \App\Models\Role::find(old('role_id'))?->slug === 'learner' ? '' : 'hidden' }}">*</span>
+                    Username <span id="username-required-mark" class="text-orange-700 {{ old('role_id') && \App\Models\Role::find(old('role_id'))?->slug === 'learner' ? '' : 'hidden' }}">*</span>
                 </label>
                 <input id="username" type="text" name="username" value="{{ old('username') }}"
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('username') border-red-500 @enderror"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('username') border-orange-500 @enderror"
                     placeholder="e.g. tolu_okafor">
                 @error('username')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                 @enderror
                 <p class="text-xs text-gray-500 mt-1">Letters, numbers, dashes and underscores. This is what you sign in with — useful when there is no email.</p>
             </div>
 
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">
-                    Email address <span id="email-required-mark" class="text-red-500 {{ old('role_id') && \App\Models\Role::find(old('role_id'))?->slug === 'learner' ? 'hidden' : '' }}">*</span>
+                    Email address <span id="email-required-mark" class="text-orange-700 {{ old('role_id') && \App\Models\Role::find(old('role_id'))?->slug === 'learner' ? 'hidden' : '' }}">*</span>
                 </label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}"
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('email') border-orange-500 @enderror"
                     placeholder="Enter your email">
                 @error('email')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                 @enderror
                 <p class="text-xs text-gray-500 mt-1">Optional for a learner with no email — your parent/guardian's email is used instead.</p>
             </div>
@@ -59,14 +59,14 @@
             <div>
                 <label for="role_id" class="block text-sm font-medium text-gray-700">I am a</label>
                 <select id="role_id" name="role_id" required
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('role_id') border-red-500 @enderror">
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('role_id') border-orange-500 @enderror">
                     <option value="">Select your role</option>
                     @foreach($roles as $role)
                         <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
                     @endforeach
                 </select>
                 @error('role_id')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -79,20 +79,20 @@
                     <div>
                         <label for="parent_name" class="block text-sm font-medium text-gray-700">Parent/Guardian Name</label>
                         <input id="parent_name" type="text" name="parent_name" value="{{ old('parent_name') }}"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('parent_name') border-red-500 @enderror"
+                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('parent_name') border-orange-500 @enderror"
                             placeholder="Enter parent's full name">
                         @error('parent_name')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
                         <label for="parent_email" class="block text-sm font-medium text-gray-700">Parent/Guardian Email</label>
                         <input id="parent_email" type="email" name="parent_email" value="{{ old('parent_email') }}"
-                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('parent_email') border-red-500 @enderror"
+                            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('parent_email') border-orange-500 @enderror"
                             placeholder="Enter parent's email address">
                         @error('parent_email')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -101,10 +101,10 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                 <input id="password" type="password" name="password" required
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('password') border-orange-500 @enderror"
                     placeholder="Create a password (min 8 characters)">
                 @error('password')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
 

@@ -32,7 +32,7 @@
                     <p class="text-xs text-gray-500 mt-1">Required for parents and learners — the login field accepts it or the email.</p>
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email <span id="email-required-mark" class="text-red-500 {{ $selectedRoleSlug === 'learner' ? 'hidden' : '' }}">*</span></label>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email <span id="email-required-mark" class="text-orange-700 {{ $selectedRoleSlug === 'learner' ? 'hidden' : '' }}">*</span></label>
                     <input id="email" type="email" name="email" value="{{ $user->email }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-xs text-gray-500 mt-1">Optional for a child with no email — the guardian's address is used instead.</p>
                 </div>

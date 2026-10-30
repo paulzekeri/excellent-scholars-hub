@@ -22,7 +22,7 @@
                     <input id="name" type="text" name="name" value="{{ old('name') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">Username <span class="text-red-500">*</span></label>
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username <span class="text-orange-700">*</span></label>
                     <div class="mt-1 flex gap-2">
                         <input id="username" type="text" name="username" value="{{ old('username') }}"
                             class="block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"
@@ -32,7 +32,7 @@
                     <p class="text-xs text-gray-500 mt-1">Letters, numbers, dashes and underscores. Required for parents and learners — it is how they sign in.</p>
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email <span id="email-required-mark" class="text-red-500">*</span></label>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email <span id="email-required-mark" class="text-orange-700">*</span></label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                     <p class="text-xs text-gray-500 mt-1">Required for staff and parents. <strong>Optional for a child</strong> with no email — the guardian's address is used instead.</p>
                 </div>

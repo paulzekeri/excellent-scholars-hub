@@ -134,6 +134,35 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Brand palette alignment — navy / blue / orange, no red (30 October 2026)
+
+The interface now matches the school flyer: **navy structure, royal-blue actions, orange for actions/warnings,
+sun-yellow highlights and no red anywhere**. Legacy purple auth screens and the scattered purple/pink/teal/indigo/
+slate accents were removed too.
+
+| Token | Hex | Used for |
+|------|-----|----------|
+| Navy | `#0A2550` | Sidebar, top bar, auth/plain background, footer |
+| Blue | `#1D4ED8` | Structure, links, primary non-destructive buttons |
+| Orange | `#F26B21` | Primary actions, warnings, attention, delete/reject |
+| Sun | `#F7C94B` | Highlights, "Today" chips (always with navy text) |
+| Paper | white / `#F8FAFC` | Cards and content |
+
+Rules applied across the app:
+
+- **Red removed entirely** (152 class usages + 8 model badge maps): validation and flash errors are orange with a
+  warning icon, destructive actions are orange, declined/rejected/no-show statuses are orange tints, unread
+  counters are orange, "Today" is sun-yellow with navy text, required asterisks are orange.
+- **Purple auth gradients replaced** with navy → blue (login, register, forgot and reset), and auth cards carry an
+  orange top border.
+- **Non-brand families removed** from views and models (purple/pink/teal/indigo/violet/fuchsia/rose/cyan/sky →
+  blue or orange; emerald/lime → green; slate → gray). Green is kept only for success/verified.
+- **Contrast fixes**: solid orange buttons now use navy labels (≈5:1, previously white-on-orange 2.8:1),
+  orange text on white uses `orange-700` (5.2:1), and orange-500 icons are darkened.
+- **Tokens** `esh.navy / esh.blue / esh.orange / esh.sun / esh.ink` are defined in the app, plain and landing
+  Tailwind setup for future components.
+- Still outstanding: replace `logo.jpg` (130×88) with the client's vector logo.
+
 ### Learning goals shared with learners (note 7 follow-up, 30 October 2026)
 
 The meeting note asked for goals to reach learners as well as parents and tutors. That last audience is now
@@ -290,7 +319,7 @@ sitting, then the school only confirms the money arrived.
 | Dashboards | Monthly classes-per-tutor ranking with a month picker + six-month trend; "affirmation of the day" card on all dashboards | `Admin\DashboardController`, `partials/affirmation` |
 | Learning goals | Tutors upload goals (optionally with a file); admins/CEO share them with parent and/or tutor; parents get a Learning Goals tab | `learning_goals`, `Tutor\LearningGoalController`, `Admin\LearningGoalController` |
 | Messaging | Categorised broadcasts, inbox for every role, administrator category filters | `Admin\MessageController`, `MessageController` |
-| Branding | Blue / white / orange palette (indigo removed, orange accents, red kept for "today" and errors) | all Blade views |
+| Branding | Navy / royal blue / orange palette with **sun-yellow highlights** (no red anywhere; orange carries actions, warnings and attention) | all Blade views |
 | Website | Public landing page with hero slider, live programmes, how-it-works, testimonials, about/contact and registration CTA | `routes/web.php` (`/`), `landing.blade.php` |
 | Docs & tests | In-app user guide updated for every change; `tests/Feature/ClientAdditionsTest.php` | `help/user-guide.blade.php`, `PLAN_CLIENT_ADDITIONS.md` |
 

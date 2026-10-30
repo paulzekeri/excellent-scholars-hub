@@ -9,7 +9,7 @@
     </div>
 
     <div>
-        <label for="child_name" class="block text-sm font-medium text-gray-700">Child's name <span class="text-red-500">*</span></label>
+        <label for="child_name" class="block text-sm font-medium text-gray-700">Child's name <span class="text-orange-700">*</span></label>
         <input id="child_name" type="text" name="child_name" value="{{ old('child_name', $enquiry->child_name) }}" required
             class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
     </div>
@@ -28,7 +28,7 @@
     </div>
 
     <div>
-        <label for="source" class="block text-sm font-medium text-gray-700">Where did they come from? <span class="text-red-500">*</span></label>
+        <label for="source" class="block text-sm font-medium text-gray-700">Where did they come from? <span class="text-orange-700">*</span></label>
         <select id="source" name="source" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
             @foreach(\App\Models\Enquiry::SOURCES as $value => $label)
                 <option value="{{ $value }}" {{ $selectedSource === $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -41,13 +41,13 @@
     </div>
 
     <div>
-        <label for="guardian_name" class="block text-sm font-medium text-gray-700">Guardian's name <span class="text-red-500">*</span></label>
+        <label for="guardian_name" class="block text-sm font-medium text-gray-700">Guardian's name <span class="text-orange-700">*</span></label>
         <input id="guardian_name" type="text" name="guardian_name" value="{{ old('guardian_name', $enquiry->guardian_name) }}" required
             class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
     </div>
 
     <div>
-        <label for="guardian_phone" class="block text-sm font-medium text-gray-700">Phone (WhatsApp) <span class="text-red-500">*</span></label>
+        <label for="guardian_phone" class="block text-sm font-medium text-gray-700">Phone (WhatsApp) <span class="text-orange-700">*</span></label>
         <input id="guardian_phone" type="text" name="guardian_phone" value="{{ old('guardian_phone', $enquiry->guardian_phone) }}" required
             class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"
             placeholder="e.g. 0803 123 4567">

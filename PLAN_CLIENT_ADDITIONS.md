@@ -116,8 +116,8 @@ guide, sidebar). This is the honest picture of all 14 notes:
       from Schedules; the tick records `completed_at` / `completed_by` and an `activity_logs` row. The
       monthly report and trend now count **completed** classes and show "completed of scheduled" per tutor,
       so the number matches what a tutor is paid for.
-- [x] Palette: indigo → blue, orange accents, white surfaces (red stays reserved for
-      "today" and errors).
+- [x] Palette: navy → blue, orange accents, sun-yellow highlights, white surfaces; **red removed entirely**
+      (orange carries actions, warnings and attention).
 - [x] `partials/affirmation` card (deterministic per day) on all four dashboards.
 
 ## Phase 6 — Learning goals (note 11)

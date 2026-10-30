@@ -32,7 +32,7 @@ class EnquiryNote extends Model
     public const TYPE_BADGES = [
         self::TYPE_NOTE => 'bg-gray-100 text-gray-700',
         self::TYPE_CALL => 'bg-blue-100 text-blue-800',
-        self::TYPE_WHATSAPP => 'bg-emerald-100 text-emerald-800',
+        self::TYPE_WHATSAPP => 'bg-green-100 text-green-800',
         self::TYPE_STATUS => 'bg-amber-100 text-amber-800',
     ];
 

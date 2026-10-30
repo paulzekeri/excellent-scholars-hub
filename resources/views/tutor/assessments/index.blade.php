@@ -32,7 +32,7 @@
                     @else
                         <ul class="space-y-3">
                             @foreach($section['items'] as $assessment)
-                                <li class="border border-gray-200 rounded-lg p-4 {{ $assessment->isToday() && $assessment->isScheduled() ? 'border-orange-300 bg-orange-50/40' : '' }}">
+                                <li class="border border-gray-200 rounded-lg p-4 {{ $assessment->isToday() && $assessment->isScheduled() ? 'border-yellow-300 bg-yellow-50/40' : '' }}">
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                         <div>
                                             <p class="font-medium text-gray-800">{{ $assessment->scheduleLabel() }}</p>

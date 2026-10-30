@@ -91,7 +91,7 @@
             <p class="text-sm font-medium text-gray-700">Upload Material</p>
         </a>
         <a href="{{ route('tutor.schedules.index') }}" class="bg-white rounded-xl shadow-md p-4 text-center hover:shadow-lg transition">
-            <i class="fas fa-calendar-check text-purple-600 text-2xl mb-2"></i>
+            <i class="fas fa-calendar-check text-orange-700 text-2xl mb-2"></i>
             <p class="text-sm font-medium text-gray-700">View Schedule</p>
         </a>
     </div>

@@ -91,7 +91,7 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $goal->tutor->user->name ?? '—' }}</td>
                             <td class="px-6 py-4 text-sm">
                                 @if($goal->file_path)
-                                    <a href="{{ route('admin.learning-goals.download', $goal) }}" class="text-orange-600 hover:text-orange-800"><i class="fas fa-download mr-1"></i> File</a>
+                                    <a href="{{ route('admin.learning-goals.download', $goal) }}" class="text-orange-700 hover:text-orange-800"><i class="fas fa-download mr-1"></i> File</a>
                                 @else
                                     <span class="text-gray-400 text-xs">None</span>
                                 @endif

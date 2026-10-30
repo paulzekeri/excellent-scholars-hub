@@ -3,8 +3,8 @@
 @section('title', 'Forgot Password')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a2550] via-[#0d3070] to-[#1d4ed8] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 border-t-4 border-orange-500">
         <div class="text-center mb-8">
             <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="mx-auto h-20 w-auto">
             <p class="text-gray-500 mt-2">Excellent Scholars Hub</p>
@@ -19,7 +19,7 @@
         @endif
 
         @if($errors->any())
-            <div class="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 text-sm text-red-800" role="alert">
+            <div class="mb-6 rounded-lg border-l-4 border-orange-500 bg-orange-50 p-4 text-sm text-orange-900" role="alert">
                 <p class="font-semibold"><i class="fas fa-triangle-exclamation mr-1"></i> Please check the form</p>
                 <ul class="mt-1 list-disc list-inside">
                     @foreach($errors->all() as $error)
@@ -35,10 +35,10 @@
             <div>
                 <label for="login" class="block text-sm font-medium text-gray-700">Email or username</label>
                 <input id="login" type="text" name="login" value="{{ old('login') }}" required autocomplete="username" autofocus
-                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('login') border-red-500 @enderror"
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('login') border-orange-500 @enderror"
                     placeholder="Email address or username">
                 @error('login')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>
 

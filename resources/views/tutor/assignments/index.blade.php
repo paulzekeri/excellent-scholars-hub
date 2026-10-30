@@ -31,7 +31,7 @@
                         <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($assignment->due_date)->format('M d, Y') }}</td>
                         <td class="px-6 py-4 text-sm">{{ $assignment->total_points }}</td>
                         <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($assignment->status == 'active') bg-green-100 text-green-800 @else bg-gray-100 text-gray-800 @endif">{{ ucfirst($assignment->status) }}</span></td>
-                        <td class="px-6 py-4 text-sm"><a href="{{ route('tutor.assignments.submissions', $assignment) }}" class="text-blue-700 hover:text-orange-600"><i class="fas fa-eye"></i> View ({{ $assignment->submissions->count() }})</a></td>
+                        <td class="px-6 py-4 text-sm"><a href="{{ route('tutor.assignments.submissions', $assignment) }}" class="text-blue-700 hover:text-orange-700"><i class="fas fa-eye"></i> View ({{ $assignment->submissions->count() }})</a></td>
                     </tr>
                     @endforeach
                 </tbody>

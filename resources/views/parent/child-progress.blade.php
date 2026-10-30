@@ -19,13 +19,13 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
                 @if($stats['attendanceRate'] !== null)
-                    <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $stats['attendanceRate'] >= 75 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $stats['attendanceRate'] >= 75 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-800' }}">
                         <i class="fas fa-user-check mr-1"></i>{{ $stats['attendanceRate'] }}% attendance
                     </span>
                 @endif
                 @if($stats['missedClasses'] > 0)
                     <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'attendance']) }}"
-                       class="px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition">
+                       class="px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-800 hover:bg-orange-200 transition">
                         <i class="fas fa-exclamation-triangle mr-1"></i>{{ $stats['missedClasses'] }} class{{ $stats['missedClasses'] === 1 ? '' : 'es' }} missed
                     </a>
                 @endif
@@ -34,13 +34,13 @@
     </div>
 
     @if($missedClasses->isNotEmpty())
-        <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 mb-6">
+        <div class="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4 mb-6">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div>
-                    <p class="font-semibold text-red-700">
+                    <p class="font-semibold text-orange-800">
                         <i class="fas fa-calendar-times mr-2"></i>{{ $missedClasses->count() }} missed class{{ $missedClasses->count() === 1 ? '' : 'es' }}
                     </p>
-                    <p class="text-sm text-red-600 mt-1">
+                    <p class="text-sm text-orange-700 mt-1">
                         @foreach($missedClasses->take(3) as $record)
                             {{ $record->classSchedule->class->name ?? 'Class' }} on {{ \Carbon\Carbon::parse($record->classSchedule->start_time)->format('M d, Y') }}@if(! $loop->last), @endif
                         @endforeach
@@ -50,7 +50,7 @@
                     </p>
                 </div>
                 <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'attendance']) }}"
-                   class="text-sm text-red-700 font-semibold hover:underline whitespace-nowrap">
+                   class="text-sm text-orange-800 font-semibold hover:underline whitespace-nowrap">
                     View attendance <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
@@ -95,7 +95,7 @@
             'count' => $stats['missedClasses'],
             'label' => 'Classes Missed',
             'icon' => 'fa-calendar-times',
-            'iconClass' => $stats['missedClasses'] > 0 ? 'text-red-500' : 'text-gray-400',
+            'iconClass' => $stats['missedClasses'] > 0 ? 'text-orange-700' : 'text-gray-400',
             'active' => $tab === 'attendance',
         ])
         @include('parent.partials.stat-card', [
@@ -103,7 +103,7 @@
             'count' => $stats['goals'],
             'label' => 'Learning Goals',
             'icon' => 'fa-bullseye',
-            'iconClass' => 'text-orange-500',
+            'iconClass' => 'text-orange-700',
             'active' => $tab === 'goals',
         ])
     </div>
@@ -166,7 +166,7 @@
                             <div class="flex items-start justify-between gap-2">
                                 <p class="font-medium text-gray-800 text-sm">{{ $assignment->title }}</p>
                                 @if($assignment->due_date->isPast())
-                                    <span class="px-2 py-0.5 text-xs rounded-full bg-red-100 text-red-700 whitespace-nowrap">Overdue</span>
+                                    <span class="px-2 py-0.5 text-xs rounded-full bg-orange-100 text-orange-800 whitespace-nowrap">Overdue</span>
                                 @endif
                             </div>
                             <p class="text-xs text-gray-500 mt-1">
@@ -254,7 +254,7 @@
                                 <td class="px-4 py-3">
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($schedule->status === 'ongoing') bg-green-100 text-green-800
-                                        @elseif($schedule->status === 'cancelled') bg-red-100 text-red-800
+                                        @elseif($schedule->status === 'cancelled') bg-orange-100 text-orange-900
                                         @elseif($schedule->status === 'completed') bg-gray-100 text-gray-700
                                         @else bg-blue-100 text-blue-800 @endif">
                                         {{ ucfirst($schedule->status) }}
@@ -305,13 +305,13 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">{{ $assignment->class->name ?? 'Class' }}</td>
-                                <td class="px-4 py-3 text-sm {{ $assignment->due_date->isPast() ? 'text-red-600 font-medium' : 'text-gray-600' }}">
+                                <td class="px-4 py-3 text-sm {{ $assignment->due_date->isPast() ? 'text-orange-700 font-medium' : 'text-gray-600' }}">
                                     {{ $assignment->due_date->format('M d, Y h:i A') }}
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-600">{{ $assignment->total_points }}</td>
                                 <td class="px-4 py-3">
                                     @if($assignment->due_date->isPast())
-                                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Overdue</span>
+                                        <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-900">Overdue</span>
                                     @elseif($assignment->status === 'closed')
                                         <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">Closed</span>
                                     @else
@@ -368,7 +368,7 @@
                                 </td>
                                 <td class="px-4 py-3 text-sm font-semibold">
                                     @if($submission->score !== null && $assignment)
-                                        <span class="{{ $submission->score >= ($assignment->total_points / 2) ? 'text-green-600' : 'text-red-600' }}">
+                                        <span class="{{ $submission->score >= ($assignment->total_points / 2) ? 'text-green-600' : 'text-orange-700' }}">
                                             {{ $submission->score }} / {{ $assignment->total_points }}
                                         </span>
                                     @elseif($submission->status === 'graded')
@@ -475,11 +475,11 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-times text-red-500 mr-2"></i>Classes Missed
+                        <i class="fas fa-calendar-times text-orange-700 mr-2"></i>Classes Missed
                     </h2>
                     <p class="text-sm text-gray-500">Sessions {{ $learner->user->name }} was marked absent for</p>
                 </div>
-                <span class="px-3 py-1 rounded-full text-sm font-semibold self-start {{ $missedClasses->count() > 0 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                <span class="px-3 py-1 rounded-full text-sm font-semibold self-start {{ $missedClasses->count() > 0 ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-700' }}">
                     {{ $missedClasses->count() }} missed
                 </span>
             </div>
@@ -487,7 +487,7 @@
             @if($missedClasses->isNotEmpty())
                 <div class="space-y-2">
                     @foreach($missedClasses as $record)
-                        <div class="border-l-4 border-red-500 bg-red-50 p-3 rounded-r-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div class="border-l-4 border-orange-500 bg-orange-50 p-3 rounded-r-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <div>
                                 <p class="font-medium text-gray-800">{{ $record->classSchedule->class->name ?? 'Class' }}</p>
                                 <p class="text-xs text-gray-600">
@@ -495,7 +495,7 @@
                                     · {{ $record->classSchedule->title ?? 'Session' }}
                                 </p>
                             </div>
-                            <span class="text-xs text-red-700">{{ $record->notes ?: 'Marked absent' }}</span>
+                            <span class="text-xs text-orange-800">{{ $record->notes ?: 'Marked absent' }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -543,7 +543,7 @@
                     </p>
                 </div>
                 @if($stats['attendanceRate'] !== null)
-                    <span class="px-3 py-1 rounded-full text-sm font-semibold self-start {{ $stats['attendanceRate'] >= 75 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                    <span class="px-3 py-1 rounded-full text-sm font-semibold self-start {{ $stats['attendanceRate'] >= 75 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-800' }}">
                         {{ $stats['attendanceRate'] }}% attendance
                     </span>
                 @endif
@@ -583,7 +583,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-bullseye text-orange-500 mr-2"></i>Learning Goals shared with you
+                        <i class="fas fa-bullseye text-orange-700 mr-2"></i>Learning Goals shared with you
                     </h2>
                     <p class="text-sm text-gray-500">Goals {{ $learner->user->name }}'s tutors set and the school approved for parents</p>
                 </div>

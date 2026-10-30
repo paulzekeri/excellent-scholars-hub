@@ -42,7 +42,7 @@
                class="relative rounded-lg p-2 text-blue-100 transition hover:bg-white/10 hover:text-white">
                 <i class="fas fa-comments text-lg"></i>
                 @if($navUnreadMessages > 0)
-                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-white">{{ $navUnreadMessages > 9 ? '9+' : $navUnreadMessages }}</span>
+                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-blue-950">{{ $navUnreadMessages > 9 ? '9+' : $navUnreadMessages }}</span>
                 @endif
             </a>
 
@@ -50,7 +50,7 @@
                class="relative rounded-lg p-2 text-blue-100 transition hover:bg-white/10 hover:text-white">
                 <i class="fas fa-bell text-lg"></i>
                 @if($navUnreadNotifications > 0)
-                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-white">{{ $navUnreadNotifications > 9 ? '9+' : $navUnreadNotifications }}</span>
+                    <span class="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-blue-950">{{ $navUnreadNotifications > 9 ? '9+' : $navUnreadNotifications }}</span>
                 @endif
             </a>
 
@@ -75,7 +75,7 @@
             <form method="POST" action="{{ route('logout') }}" class="ml-1">
                 @csrf
                 <button type="submit" title="Logout" aria-label="Logout"
-                        class="flex items-center gap-2 rounded-lg bg-orange-500 px-2.5 py-2 text-sm font-semibold text-white transition hover:bg-orange-600 sm:px-3">
+                        class="flex items-center gap-2 rounded-lg bg-orange-500 px-2.5 py-2 text-sm font-semibold text-blue-950 transition hover:bg-orange-400 sm:px-3">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="hidden sm:inline">Logout</span>
                 </button>

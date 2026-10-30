@@ -32,7 +32,7 @@
                 @if($submission->feedback)<p class="text-xs text-gray-600 mt-1">Feedback: {{ $submission->feedback }}</p>@endif
                 </div>
             @else
-                <a href="{{ route('learner.assignments.submit', $assignment) }}" class="mt-4 inline-flex items-center text-blue-700 hover:text-orange-600"><i class="fas fa-upload mr-1"></i> Submit Assignment</a>
+                <a href="{{ route('learner.assignments.submit', $assignment) }}" class="mt-4 inline-flex items-center text-blue-700 hover:text-orange-700"><i class="fas fa-upload mr-1"></i> Submit Assignment</a>
             @endif
         </div>
         @empty

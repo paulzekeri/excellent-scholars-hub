@@ -41,9 +41,9 @@ class Payment extends Model
     /** Tailwind chip classes per method (literal so the CDN build keeps them). */
     public const METHOD_BADGES = [
         self::METHOD_TRANSFER => 'bg-blue-100 text-blue-800',
-        self::METHOD_CASH => 'bg-emerald-100 text-emerald-800',
-        self::METHOD_CARD => 'bg-purple-100 text-purple-800',
-        self::METHOD_POS => 'bg-slate-100 text-slate-700',
+        self::METHOD_CASH => 'bg-green-100 text-green-800',
+        self::METHOD_CARD => 'bg-orange-100 text-orange-800',
+        self::METHOD_POS => 'bg-gray-100 text-gray-700',
     ];
 
     /** Gateway name stored on card payments once Paystack is wired up. */
@@ -75,7 +75,7 @@ class Payment extends Model
     public const STATUS_BADGES = [
         self::STATUS_PENDING => 'bg-orange-100 text-orange-800',
         self::STATUS_COMPLETED => 'bg-green-100 text-green-800',
-        self::STATUS_FAILED => 'bg-red-100 text-red-800',
+        self::STATUS_FAILED => 'bg-orange-100 text-orange-800',
         self::STATUS_REFUNDED => 'bg-gray-100 text-gray-800',
     ];
 

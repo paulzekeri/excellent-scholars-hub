@@ -9,7 +9,7 @@
 
         <form action="{{ route('admin.messages.store') }}" method="POST" class="space-y-6">@csrf
             <div>
-                <p class="text-sm font-medium text-gray-700 mb-2">Send to <span class="text-red-500">*</span></p>
+                <p class="text-sm font-medium text-gray-700 mb-2">Send to <span class="text-orange-700">*</span></p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @foreach($audiences as $value => $label)
                         <label class="border rounded-lg p-4 cursor-pointer hover:border-blue-500 hover:bg-blue-50/40 transition {{ old('audience') === $value ? 'border-blue-600 bg-blue-50' : 'border-gray-200' }}">
@@ -41,7 +41,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Message <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-medium text-gray-700">Message <span class="text-orange-700">*</span></label>
                 <textarea name="body" rows="6" required maxlength="2000" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Write your announcement...">{{ old('body') }}</textarea>
                 <p class="text-xs text-gray-500 mt-1">Maximum 2,000 characters.</p>
             </div>

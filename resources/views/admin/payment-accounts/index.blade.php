@@ -13,7 +13,7 @@
     </div>
 
     @if($errors->any())
-        <div class="mb-6 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 text-sm text-red-800">
+        <div class="mb-6 rounded-lg border-l-4 border-orange-500 bg-orange-50 p-4 text-sm text-orange-900">
             <p class="font-semibold"><i class="fas fa-triangle-exclamation mr-1"></i> Please check the form</p>
             <ul class="mt-1 list-disc list-inside">
                 @foreach($errors->all() as $error)
@@ -85,7 +85,7 @@
                                   onsubmit="return confirm('Delete {{ $account->bank_name }} {{ $account->account_number }}? Payments already recorded keep the account name and number.');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="rounded-lg border border-red-300 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 transition">
+                                <button type="submit" class="rounded-lg border border-orange-300 px-3 py-1.5 text-xs font-semibold text-orange-800 hover:bg-orange-50 transition">
                                     <i class="fas fa-trash mr-1"></i> Delete
                                 </button>
                             </form>
@@ -138,15 +138,15 @@
                 <form method="POST" action="{{ route('admin.payment-accounts.store') }}" class="space-y-3">
                     @csrf
                     <div>
-                        <label for="bank_name" class="block text-sm font-medium text-gray-700">Bank <span class="text-red-500">*</span></label>
+                        <label for="bank_name" class="block text-sm font-medium text-gray-700">Bank <span class="text-orange-700">*</span></label>
                         <input type="text" id="bank_name" name="bank_name" value="{{ old('bank_name') }}" required maxlength="100" placeholder="e.g. GTBank" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="account_name" class="block text-sm font-medium text-gray-700">Account name <span class="text-red-500">*</span></label>
+                        <label for="account_name" class="block text-sm font-medium text-gray-700">Account name <span class="text-orange-700">*</span></label>
                         <input type="text" id="account_name" name="account_name" value="{{ old('account_name', 'Excellent Scholars Academy') }}" required maxlength="150" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="account_number" class="block text-sm font-medium text-gray-700">Account number <span class="text-red-500">*</span></label>
+                        <label for="account_number" class="block text-sm font-medium text-gray-700">Account number <span class="text-orange-700">*</span></label>
                         <input type="text" id="account_number" name="account_number" value="{{ old('account_number') }}" required inputmode="numeric" maxlength="20" placeholder="e.g. 0123456789" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-blue-500 focus:border-blue-500">
                         <p class="text-xs text-gray-500 mt-1">Digits only; spaces and dashes are removed automatically.</p>
                     </div>

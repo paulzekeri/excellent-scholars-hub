@@ -37,7 +37,7 @@
         : now()->format('l, F j, Y');
 @endphp
 
-<div class="relative overflow-hidden rounded-xl shadow-md p-6 text-white bg-gradient-to-r from-orange-500 via-orange-400 to-blue-600">
+<div class="relative overflow-hidden rounded-xl shadow-md p-6 text-white bg-gradient-to-r from-[#0a2550] via-[#0d3070] to-[#1d4ed8]">
     <div class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10"></div>
     <div class="pointer-events-none absolute -bottom-8 -left-4 h-20 w-20 rounded-full bg-white/10"></div>
 

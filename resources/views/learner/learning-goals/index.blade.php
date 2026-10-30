@@ -41,7 +41,7 @@
 
                 @if($goal->file_path)
                     <a href="{{ route('learner.learning-goals.download', $goal) }}"
-                        class="mt-3 inline-flex items-center text-sm text-orange-600 hover:text-orange-800">
+                        class="mt-3 inline-flex items-center text-sm text-orange-700 hover:text-orange-800">
                         <i class="fas fa-download mr-1"></i> Download attachment
                     </a>
                 @endif

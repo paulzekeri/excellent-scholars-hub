@@ -26,7 +26,7 @@
                         <td class="px-6 py-4 text-sm">
                             <a href="{{ route('admin.classes.show', $class) }}" class="text-green-600 hover:text-green-800 mr-3" title="Manage Students"><i class="fas fa-users"></i></a>
                             <a href="{{ route('admin.classes.edit', $class) }}" class="text-blue-600 hover:text-blue-800 mr-3" title="Edit"><i class="fas fa-edit"></i></a>
-                            <form action="{{ route('admin.classes.destroy', $class) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">@csrf @method('DELETE')<button type="submit" class="text-red-600 hover:text-red-800" title="Delete"><i class="fas fa-trash"></i></button></form>
+                            <form action="{{ route('admin.classes.destroy', $class) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">@csrf @method('DELETE')<button type="submit" class="text-orange-700 hover:text-orange-900" title="Delete"><i class="fas fa-trash"></i></button></form>
                         </td>
                     </tr>
                     @endforeach

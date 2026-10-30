@@ -12,8 +12,8 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { DEFAULT: '#1d4ed8', dark: '#1e3a8a', light: '#dbeafe' },
-                        accent: { DEFAULT: '#f97316', dark: '#ea580c', light: '#ffedd5' },
+                        brand: { DEFAULT: '#1d4ed8', dark: '#0a2550', light: '#dbeafe' },
+                        accent: { DEFAULT: '#F26B21', dark: '#D95A14', light: '#FFF1E6' }, sun: { DEFAULT: '#F7C94B', light: '#FFF7DB' },
                     },
                 },
             },
@@ -29,7 +29,7 @@
         .slide { display: none; }
         .slide.active { display: block; animation: fade 0.6s ease-in-out; }
         @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .dot.active { background-color: #f97316; }
+        .dot.active { background-color: #F26B21; }
     </style>
 </head>
 <body class="bg-white text-gray-800 antialiased">
@@ -41,7 +41,7 @@
                 <img src="{{ asset('images/logo.jpg') }}" alt="Excellent Scholars Hub logo" class="h-9 w-auto shrink-0 sm:h-11">
                 <span class="min-w-0 font-bold text-base leading-tight text-brand-dark sm:text-lg">
                     <span class="block truncate">Excellent</span>
-                    <span class="block truncate text-accent">Scholars Hub</span>
+                    <span class="block truncate text-orange-700">Scholars Hub</span>
                 </span>
             </a>
 
@@ -57,7 +57,7 @@
 
             <div class="ml-auto flex shrink-0 items-center gap-2 lg:ml-8">
                 <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center text-brand font-semibold px-3 py-2 sm:px-4 rounded-lg border border-brand-light hover:bg-brand-light transition">Log in</a>
-                <a href="{{ route('register') }}" class="inline-flex items-center bg-accent hover:bg-accent-dark text-white font-semibold px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg transition shadow">
+                <a href="{{ route('register') }}" class="inline-flex items-center bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg transition shadow">
                     <i class="fas fa-user-plus mr-2 hidden sm:inline"></i>Register
                 </a>
 
@@ -83,7 +83,7 @@
 
 @if(session('success') || session('error'))
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="rounded-xl border-l-4 p-4 {{ session('success') ? 'border-green-500 bg-green-50 text-green-800' : 'border-red-500 bg-red-50 text-red-800' }}" role="alert">
+        <div class="rounded-xl border-l-4 p-4 {{ session('success') ? 'border-green-500 bg-green-50 text-green-800' : 'border-orange-500 bg-orange-50 text-orange-900' }}" role="alert">
             {{ session('success') ?: session('error') }}
         </div>
     </div>
@@ -113,7 +113,7 @@
     ];
 @endphp
 
-<section class="relative overflow-hidden bg-gradient-to-br from-brand-dark via-brand to-blue-400">
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0a2550] via-[#0d3070] to-[#1d4ed8]">
     <div class="absolute inset-0 opacity-20 pointer-events-none">
         <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-white"></div>
         <div class="absolute -bottom-24 right-0 h-96 w-96 rounded-full bg-accent"></div>
@@ -132,7 +132,7 @@
                             <a href="#book-assessment" class="bg-white text-brand-dark hover:bg-brand-light font-semibold px-6 py-3 rounded-lg transition shadow-lg">
                                 <i class="fas fa-video mr-2"></i>Book a free assessment
                             </a>
-                            <a href="{{ route('register') }}" class="bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition shadow-lg">
+                            <a href="{{ route('register') }}" class="bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-6 py-3 rounded-lg transition shadow-lg">
                                 <i class="fas fa-arrow-right mr-2"></i>Register for classes
                             </a>
                             <a href="{{ route('login') }}" class="bg-white/10 border border-white/40 hover:bg-white/20 text-white font-semibold px-6 py-3 rounded-lg transition">
@@ -173,7 +173,7 @@
             <p class="text-sm text-gray-600 mt-1">Learners</p>
         </div>
         <div>
-            <p class="text-3xl font-extrabold text-accent">{{ $stats['parents'] }}</p>
+            <p class="text-3xl font-extrabold text-orange-700">{{ $stats['parents'] }}</p>
             <p class="text-sm text-gray-600 mt-1">Parents on board</p>
         </div>
     </div>
@@ -183,7 +183,7 @@
 <section id="programmes" class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto">
-            <p class="text-sm uppercase tracking-widest text-accent font-bold">Programmes</p>
+            <p class="text-sm uppercase tracking-widest text-orange-700 font-bold">Programmes</p>
             <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900">Classes open for registration</h2>
             <p class="mt-3 text-gray-600">Small groups, subject specialists and a clear term-by-term plan for every learner.</p>
         </div>
@@ -193,7 +193,7 @@
                 <div class="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg transition p-6">
                     <div class="flex items-center justify-between">
                         <span class="bg-brand-light text-brand-dark text-xs font-semibold px-3 py-1 rounded-full">{{ $programme->subject ?? 'General' }}</span>
-                        <i class="fas fa-chalkboard text-accent text-xl"></i>
+                        <i class="fas fa-chalkboard text-orange-700 text-xl"></i>
                     </div>
                     <h3 class="mt-4 text-xl font-bold text-gray-900">{{ $programme->name }}</h3>
                     <p class="text-sm text-gray-500 mt-1">{{ $programme->grade_level ?? 'All levels' }}</p>
@@ -222,7 +222,7 @@
 <section id="how" class="bg-gray-50 py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto">
-            <p class="text-sm uppercase tracking-widest text-accent font-bold">How it works</p>
+            <p class="text-sm uppercase tracking-widest text-orange-700 font-bold">How it works</p>
             <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900">From registration to results in four steps</h2>
         </div>
         <div class="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -233,7 +233,7 @@
                 ['icon' => 'fa-chart-line', 'title' => 'Track progress', 'text' => 'Grades, attendance and shared learning goals in one place.'],
             ] as $step)
                 <div class="bg-white rounded-2xl shadow-sm p-6 text-center">
-                    <div class="mx-auto h-12 w-12 rounded-full bg-accent-light text-accent flex items-center justify-center">
+                    <div class="mx-auto h-12 w-12 rounded-full bg-accent-light text-orange-700 flex items-center justify-center">
                         <i class="fas {{ $step['icon'] }}"></i>
                     </div>
                     <h3 class="mt-4 font-bold text-gray-900">{{ $step['title'] }}</h3>
@@ -248,7 +248,7 @@
 <section id="testimonials" class="py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto">
-            <p class="text-sm uppercase tracking-widest text-accent font-bold">Testimonials</p>
+            <p class="text-sm uppercase tracking-widest text-orange-700 font-bold">Testimonials</p>
             <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900">What our school community says</h2>
         </div>
         @php
@@ -272,7 +272,7 @@
         <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
             @foreach($items as $testimonial)
                 <figure class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <div class="text-accent"><i class="fas fa-quote-left text-2xl"></i></div>
+                    <div class="text-orange-700"><i class="fas fa-quote-left text-2xl"></i></div>
                     <blockquote class="mt-4 text-gray-700">{{ $testimonial['quote'] }}</blockquote>
                     <figcaption class="mt-4 flex items-center gap-3 text-sm text-gray-500">
                         @if($testimonial['photo'])
@@ -292,7 +292,7 @@
 <section id="book-assessment" class="py-16 bg-brand-light">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-start">
         <div>
-            <p class="text-sm uppercase tracking-widest text-accent font-bold">Free assessment</p>
+            <p class="text-sm uppercase tracking-widest text-orange-700 font-bold">Free assessment</p>
             <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900">Book a video-call assessment</h2>
             <p class="mt-4 text-gray-700">
                 Before we place a child in a class, a tutor meets them on a short video call to understand
@@ -312,7 +312,7 @@
             <p class="text-sm text-gray-500 mt-1">We reply within one working day to agree the time.</p>
 
             @if($errors->any())
-                <div class="mt-4 rounded-lg border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-800" role="alert">
+                <div class="mt-4 rounded-lg border-l-4 border-orange-500 bg-orange-50 p-3 text-sm text-orange-900" role="alert">
                     <ul class="list-disc list-inside">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -367,7 +367,7 @@
                         placeholder="e.g. Year 5, needs help with maths">{{ old('notes') }}</textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition shadow">
+                <button type="submit" class="w-full bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-6 py-3 rounded-lg transition shadow">
                     <i class="fas fa-video mr-2"></i>Request assessment
                 </button>
                 <p class="text-xs text-gray-500">By requesting a slot you agree to be contacted about your child's assessment.</p>
@@ -380,7 +380,7 @@
 <section id="about" class="bg-brand-dark py-16 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
         <div>
-            <p class="text-sm uppercase tracking-widest text-accent font-bold">About us</p>
+            <p class="text-sm uppercase tracking-widest text-orange-700 font-bold">About us</p>
             <h2 class="mt-2 text-3xl sm:text-4xl font-bold">Excellent Scholars Hub</h2>
             <p class="mt-4 text-blue-100">
                 We are a learning centre built on one belief: every child can excel when teaching, feedback and
@@ -392,20 +392,20 @@
                 progress in real time, and the school keeps every record in one place.
             </p>
             <ul class="mt-6 space-y-2 text-sm text-blue-50">
-                <li><i class="fas fa-check-circle text-accent mr-2"></i>Small-group live classes with qualified tutors</li>
-                <li><i class="fas fa-check-circle text-accent mr-2"></i>Termly reports, grades and shared learning goals</li>
-                <li><i class="fas fa-check-circle text-accent mr-2"></i>Transparent payment records and receipts</li>
+                <li><i class="fas fa-check-circle text-orange-700 mr-2"></i>Small-group live classes with qualified tutors</li>
+                <li><i class="fas fa-check-circle text-orange-700 mr-2"></i>Termly reports, grades and shared learning goals</li>
+                <li><i class="fas fa-check-circle text-orange-700 mr-2"></i>Transparent payment records and receipts</li>
             </ul>
         </div>
         <div class="bg-white/10 border border-white/20 rounded-3xl p-8">
             <h3 class="text-xl font-bold text-white">Visit or call us</h3>
             <ul class="mt-4 space-y-3 text-blue-50 text-sm">
-                <li><i class="fas fa-location-dot text-accent mr-3"></i>8, Alice Ogunsona Crescent, Kuti Street, Hilltop Estate, Radio, Ikorodu</li>
-                <li><i class="fas fa-phone text-accent mr-3"></i>+234 806 135 5032</li>
-                <li><i class="fas fa-envelope text-accent mr-3"></i>admin@lit-grp.com</li>
-                <li><i class="fas fa-clock text-accent mr-3"></i>Monday – Saturday, 8:00am – 6:00pm</li>
+                <li><i class="fas fa-location-dot text-orange-700 mr-3"></i>8, Alice Ogunsona Crescent, Kuti Street, Hilltop Estate, Radio, Ikorodu</li>
+                <li><i class="fas fa-phone text-orange-700 mr-3"></i>+234 806 135 5032</li>
+                <li><i class="fas fa-envelope text-orange-700 mr-3"></i>admin@lit-grp.com</li>
+                <li><i class="fas fa-clock text-orange-700 mr-3"></i>Monday – Saturday, 8:00am – 6:00pm</li>
             </ul>
-            <a href="{{ route('register') }}" class="mt-6 inline-flex items-center bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition">
+            <a href="{{ route('register') }}" class="mt-6 inline-flex items-center bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-6 py-3 rounded-lg transition">
                 <i class="fas fa-user-plus mr-2"></i>Register for classes
             </a>
         </div>
@@ -418,13 +418,13 @@
         <h2 class="text-3xl font-bold text-gray-900">Ready to join the next term?</h2>
         <p class="mt-3 text-gray-600">Create an account as a learner, parent or tutor — the school will place you in the right class.</p>
         <div class="mt-6 flex flex-wrap justify-center gap-3">
-            <a href="{{ route('register') }}" class="bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-lg transition shadow">Register now</a>
+            <a href="{{ route('register') }}" class="bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-6 py-3 rounded-lg transition shadow">Register now</a>
             <a href="{{ route('login') }}" class="bg-white border border-brand text-brand font-semibold px-6 py-3 rounded-lg hover:bg-brand-light transition">Log in</a>
         </div>
     </div>
 </section>
 
-<footer class="bg-gray-900 text-gray-400">
+<footer class="bg-[#0a2550] text-blue-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
         <p>&copy; {{ date('Y') }} Excellent Scholars Hub. All rights reserved.</p>
         <p>Built by LIT Dynamics LTD</p>

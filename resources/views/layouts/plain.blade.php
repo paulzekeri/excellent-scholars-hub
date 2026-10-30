@@ -11,9 +11,26 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        esh: {
+                            navy: '#0a2550',
+                            blue: '#1d4ed8',
+                            orange: '#F26B21',
+                            sun: '#F7C94B',
+                            ink: '#0f1f3a',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 font-sans antialiased">
+<body class="bg-gradient-to-br from-[#0a2550] via-[#0d3070] to-[#1d4ed8] font-sans antialiased">
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-md">
             <div class="text-center mb-6">
@@ -34,7 +51,7 @@
             @endif
 
             @if($errors->any())
-                <div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded" role="alert">
+                <div class="mb-4 bg-orange-100 border-l-4 border-orange-500 text-orange-900 p-4 rounded" role="alert">
                     <p class="font-semibold mb-1">Please fix the following:</p>
                     <ul class="list-disc list-inside text-sm">
                         @foreach($errors->all() as $error)

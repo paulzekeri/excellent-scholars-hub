@@ -13,7 +13,7 @@
             <i class="fas fa-comments mr-2"></i> Message the School
             @php $parentUnreadMessages = auth()->user()->unreadMessagesCount(); @endphp
             @if($parentUnreadMessages > 0)
-                <span class="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 ml-2">{{ $parentUnreadMessages }}</span>
+                <span class="bg-orange-500 text-blue-950 text-xs rounded-full px-2 py-0.5 ml-2">{{ $parentUnreadMessages }}</span>
             @endif
         </a>
     </div>
@@ -53,7 +53,7 @@
     @endif
 
     @if($totalMissedClasses > 0)
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 flex items-start">
+        <div class="bg-orange-50 border-l-4 border-orange-500 text-orange-800 p-4 rounded-lg mb-6 flex items-start">
             <i class="fas fa-exclamation-triangle mt-1 mr-3"></i>
             <div>
                 <p class="font-semibold">{{ $totalMissedClasses }} missed class{{ $totalMissedClasses === 1 ? '' : 'es' }} recorded</p>
@@ -76,7 +76,7 @@
                     </div>
                     @if($stats['missedClasses'] > 0)
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'attendance']) }}"
-                           class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap transition">
+                           class="bg-orange-500 hover:bg-orange-400 text-blue-950 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap transition">
                             <i class="fas fa-exclamation-circle mr-1"></i>{{ $stats['missedClasses'] }} missed
                         </a>
                     @endif
@@ -136,13 +136,13 @@
                        class="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-200 p-3 text-sm hover:border-orange-400 hover:bg-orange-50 transition"
                        title="Record a payment or check what the school has verified">
                         <span class="text-gray-700">
-                            <i class="fas fa-file-invoice-dollar text-orange-500 mr-2"></i>
+                            <i class="fas fa-file-invoice-dollar text-orange-700 mr-2"></i>
                             @if($stats['fees']['fees'] === 0)
                                 No fee recorded yet
                             @else
                                 Fees: <strong>₦{{ number_format($stats['fees']['paid'], 2) }}</strong> verified
                                 @if($stats['fees']['balance'] > 0)
-                                    · <span class="font-semibold text-red-600">₦{{ number_format($stats['fees']['balance'], 2) }} outstanding</span>
+                                    · <span class="font-semibold text-orange-700">₦{{ number_format($stats['fees']['balance'], 2) }} outstanding</span>
                                 @else
                                     · <span class="font-semibold text-green-600">fully paid</span>
                                 @endif
@@ -158,14 +158,14 @@
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'attendance']) }}" class="text-gray-600 hover:text-blue-600">
                             <i class="fas fa-user-check mr-1 text-green-600"></i> Attendance:
                             @if($stats['attendanceRate'] !== null)
-                                <span class="font-semibold {{ $stats['attendanceRate'] >= 75 ? 'text-green-600' : 'text-red-600' }}">{{ $stats['attendanceRate'] }}%</span>
+                                <span class="font-semibold {{ $stats['attendanceRate'] >= 75 ? 'text-green-600' : 'text-orange-700' }}">{{ $stats['attendanceRate'] }}%</span>
                                 <span class="text-gray-400">({{ $stats['attendanceAttended'] }}/{{ $stats['attendanceRecorded'] }} sessions)</span>
                             @else
                                 <span class="text-gray-400">No records yet</span>
                             @endif
                         </a>
                         @if($stats['missedClasses'] > 0)
-                            <span class="text-red-600 font-medium">
+                            <span class="text-orange-700 font-medium">
                                 <i class="fas fa-calendar-times mr-1"></i>{{ $stats['missedClasses'] }} class{{ $stats['missedClasses'] === 1 ? '' : 'es' }} missed
                             </span>
                         @else

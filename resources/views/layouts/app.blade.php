@@ -10,6 +10,23 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        esh: {
+                            navy: '#0a2550',
+                            blue: '#1d4ed8',
+                            orange: '#F26B21',
+                            sun: '#F7C94B',
+                            ink: '#0f1f3a',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @livewireStyles
 </head>
@@ -56,7 +73,7 @@
 
             @if(session('error'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
+                    <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-800 p-4 rounded" role="alert">
                         <p>{{ session('error') }}</p>
                     </div>
                 </div>
@@ -64,7 +81,7 @@
 
             @if($errors->any())
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded" role="alert">
+                    <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-800 p-4 rounded" role="alert">
                         <p class="font-medium mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Please fix the following errors:</p>
                         <ul class="list-disc list-inside text-sm">
                             @foreach($errors->all() as $error)
@@ -92,7 +109,7 @@
             // Mobile off-canvas drawer.
             function openDrawer() {
                 if (!sidebar) return;
-                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.remove('-trangray-x-full');
                 overlay && overlay.classList.remove('hidden');
                 body.classList.add('overflow-hidden');
                 drawerToggle && drawerToggle.setAttribute('aria-expanded', 'true');
@@ -100,7 +117,7 @@
 
             function closeDrawer() {
                 if (!sidebar) return;
-                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.add('-trangray-x-full');
                 overlay && overlay.classList.add('hidden');
                 body.classList.remove('overflow-hidden');
                 drawerToggle && drawerToggle.setAttribute('aria-expanded', 'false');

@@ -189,7 +189,7 @@
 @endphp
 
 <aside id="esh-sidebar"
-       class="esh-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col bg-gradient-to-b from-[#0a2550] via-[#0d3070] to-[#0a2550] text-blue-50 shadow-2xl transition-transform duration-200 lg:translate-x-0">
+       class="esh-sidebar fixed inset-y-0 left-0 z-50 flex w-64 -trangray-x-full flex-col bg-gradient-to-b from-[#0a2550] via-[#0d3070] to-[#0a2550] text-blue-50 shadow-2xl transition-transform duration-200 lg:trangray-x-0">
 
     <!-- Brand -->
     <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-4">
@@ -230,7 +230,7 @@
                             <i class="fas {{ $item['icon'] }} w-5 shrink-0 text-center text-[15px] {{ $active ? 'text-orange-300' : 'text-blue-200/70' }}"></i>
                             <span class="esh-label flex-1 truncate">{{ $item['label'] }}</span>
                             @if(!empty($item['badge']))
-                                <span class="esh-badge rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-bold text-white">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
+                                <span class="esh-badge rounded-full bg-orange-500 px-2 py-0.5 text-[11px] font-bold text-blue-950">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
                             @elseif(!empty($item['hint']))
                                 <span class="esh-label rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-orange-200">{{ $item['hint'] }}</span>
                             @endif
@@ -244,14 +244,14 @@
     <!-- Signed in as -->
     <div class="border-t border-white/10 p-3">
         <div class="flex items-center gap-3 rounded-lg bg-white/5 p-2">
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500 text-sm font-bold text-white">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-orange-500 text-sm font-bold text-blue-950">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
             <div class="esh-label min-w-0 flex-1 leading-tight">
                 <p class="truncate text-sm font-semibold text-white">{{ $user->name }}</p>
                 <p class="truncate text-[11px] text-blue-200/80">{{ $navRoleLabel }}</p>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="rounded-lg p-2 text-blue-100 hover:bg-red-500 hover:text-white" title="Logout">
+                <button type="submit" class="rounded-lg p-2 text-blue-100 hover:bg-orange-400 hover:text-blue-950" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </form>
@@ -259,5 +259,5 @@
     </div>
 </aside>
 
-<div id="esh-sidebar-overlay" class="fixed inset-0 z-40 hidden bg-slate-900/60 lg:hidden"></div>
+<div id="esh-sidebar-overlay" class="fixed inset-0 z-40 hidden bg-gray-900/60 lg:hidden"></div>
 
