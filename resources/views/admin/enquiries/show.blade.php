@@ -24,16 +24,52 @@
                 · {{ $enquiry->sourceLabel() }}
                 · captured {{ $enquiry->created_at->format('M j, Y') }}
             </p>
+            @if($enquiry->converted_learner_id && $enquiry->convertedLearner && $enquiry->convertedLearner->user)
+                <p class="text-sm text-green-700 mt-1">
+                    <i class="fas fa-user-graduate mr-1"></i> Enrolled as
+                    <strong>{{ $enquiry->convertedLearner->user->name }}</strong>
+                    (username {{ $enquiry->convertedLearner->user->username ?: '—' }})
+                    @if($enquiry->converted_at) on {{ $enquiry->converted_at->format('M j, Y') }} @endif
+                </p>
+            @endif
         </div>
         <a href="{{ route('admin.enquiries.edit', $enquiry) }}" class="inline-flex items-center justify-center bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
             <i class="fas fa-edit mr-2"></i> Edit details
         </a>
+        @if($enquiry->converted_learner_id && $enquiry->convertedLearner && $enquiry->convertedLearner->user)
+            <a href="{{ route('admin.users.edit', $enquiry->convertedLearner->user) }}" class="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <i class="fas fa-user-graduate mr-2"></i> View learner
+            </a>
+        @elseif($enquiry->status === \App\Models\Enquiry::STATUS_PLACED)
+            <a href="{{ route('admin.enquiries.convert', $enquiry) }}" class="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                <i class="fas fa-user-graduate mr-2"></i> Convert to learner
+            </a>
+        @endif
     </div>
 
     @if($enquiry->declined_reason)
         <div class="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 rounded-lg mb-6">
             <p class="font-semibold">Declined</p>
             <p class="text-sm">{{ $enquiry->declined_reason }}</p>
+        </div>
+    @endif
+
+    @if(session('conversion_credentials'))
+        <div class="bg-white rounded-xl shadow-md border-l-4 border-orange-500 p-5 mb-6">
+            <p class="font-semibold text-gray-800"><i class="fas fa-id-card text-orange-500 mr-1"></i> Login details to hand over</p>
+            <p class="text-sm text-gray-600 mt-1">
+                Email delivery is not configured on this installation, so share these privately. Each person chooses
+                their own password at first sign-in.
+            </p>
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                @foreach(session('conversion_credentials') as $account)
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                        <span class="block text-xs uppercase tracking-wide text-gray-500">{{ $account['name'] }}</span>
+                        <span class="font-mono text-gray-800">{{ $account['username'] }}</span>
+                        <span class="block font-mono text-gray-800">{{ $account['password'] }}</span>
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 
@@ -130,6 +166,7 @@
                                         </p>
                                     </div>
                                     <div class="flex items-center gap-3">
+                                        <a href="{{ route('admin.assessments.show', $assessment) }}" class="text-xs text-blue-700 hover:text-blue-900">Open / record result</a>
                                         @if($assessment->joinUrl())
                                             <a href="{{ $assessment->joinUrl() }}" target="_blank" rel="noopener"
                                                 class="inline-flex items-center bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700">

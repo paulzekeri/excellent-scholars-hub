@@ -93,8 +93,8 @@ class Enquiry extends Model
     public const STATUS_FLOW = [
         self::STATUS_NEW => [self::STATUS_CONTACTED, self::STATUS_DECLINED, self::STATUS_ARCHIVED],
         self::STATUS_CONTACTED => [self::STATUS_DECLINED, self::STATUS_ARCHIVED],
-        self::STATUS_ASSESSMENT_BOOKED => [self::STATUS_ARCHIVED],
-        self::STATUS_ASSESSED => [self::STATUS_ARCHIVED],
+        self::STATUS_ASSESSMENT_BOOKED => [self::STATUS_ASSESSED, self::STATUS_DECLINED, self::STATUS_ARCHIVED],
+        self::STATUS_ASSESSED => [self::STATUS_PLACED, self::STATUS_DECLINED, self::STATUS_ARCHIVED],
         self::STATUS_PLACED => [self::STATUS_ARCHIVED],
         self::STATUS_ENROLLED => [self::STATUS_ARCHIVED],
         self::STATUS_DECLINED => [self::STATUS_ARCHIVED],
@@ -140,10 +140,25 @@ class Enquiry extends Model
         return $this->hasMany(AssessmentSession::class)->orderBy('scheduled_at');
     }
 
+    /** Unordered collection used for lookups/guards. */
+    public function assessmentSessions()
+    {
+        return $this->hasMany(AssessmentSession::class);
+    }
+
     /** The most recent assessment session (if any). */
     public function latestAssessment()
     {
         return $this->hasOne(AssessmentSession::class)->latestOfMany();
+    }
+
+    /** The last assessment that produced a result, used by the pipeline guards. */
+    public function latestCompletedAssessment(): ?AssessmentSession
+    {
+        return $this->assessmentSessions()
+            ->where('status', AssessmentSession::STATUS_COMPLETED)
+            ->orderByDesc('completed_at')
+            ->first();
     }
 
     public function assignedTo()

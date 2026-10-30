@@ -87,6 +87,7 @@
                                 <span class="px-2 py-1 text-xs rounded-full {{ $assessment->statusBadge() }}">{{ $assessment->statusLabel() }}</span>
                             </td>
                             <td class="px-6 py-4 text-right">
+                                <a href="{{ route('admin.assessments.show', $assessment) }}" class="text-xs text-blue-700 hover:text-blue-900 mr-3">Open</a>
                                 @if($assessment->joinUrl())
                                     <a href="{{ $assessment->joinUrl() }}" target="_blank" rel="noopener"
                                         class="inline-flex items-center bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-700">

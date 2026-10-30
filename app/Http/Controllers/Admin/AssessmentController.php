@@ -10,9 +10,14 @@ use App\Models\Enquiry;
 use App\Models\EnquiryNote;
 use App\Models\Notification;
 use App\Models\Tutor;
+use App\Models\Classes;
+use App\Services\AssessmentResultService;
+use App\Http\Requests\AssessmentResultRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -119,6 +124,44 @@ class AssessmentController extends Controller
 
         return redirect()->route('admin.enquiries.show', $enquiry)
             ->with('success', 'Assessment booked for ' . $assessment->scheduleLabel() . '. The guardian has the join link.');
+    }
+
+    public function show(AssessmentSession $assessment)
+    {
+        $assessment->load(['enquiry', 'tutor.user', 'recommendedClass', 'conductedBy']);
+
+        return view('admin.assessments.show', [
+            'assessment' => $assessment,
+            'classes' => Classes::orderBy('name')->get(),
+        ]);
+    }
+
+    public function recordResult(AssessmentResultRequest $request, AssessmentSession $assessment, AssessmentResultService $results)
+    {
+        $validated = $request->validated();
+
+        try {
+            $results->record($assessment, $validated, $request->file('report'));
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.assessments.show', $assessment)
+            ->with('success', $validated['result'] === AssessmentSession::STATUS_COMPLETED
+                ? 'Assessment result saved.'
+                : 'Marked as a no-show. The enquiry is back in Contacted for rebooking.');
+    }
+
+    public function downloadReport(AssessmentSession $assessment)
+    {
+        $path = $assessment->attachment_path;
+
+        abort_unless($path && Storage::disk('public')->exists($path), 404, 'No report was uploaded for this assessment.');
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION) ?: 'pdf';
+        $name = 'assessment-' . (optional($assessment->enquiry)->reference ?: $assessment->id) . '.' . $extension;
+
+        return Storage::disk('public')->download($path, $name);
     }
 
     public function cancel(Request $request, AssessmentSession $assessment)

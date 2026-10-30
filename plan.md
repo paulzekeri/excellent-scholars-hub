@@ -169,9 +169,18 @@
       admin/CEO (`/admin/assessments`), the tutor (`/tutor/assessments`) and the parent all join from the
       same link; today's calls appear on both dashboards and cancelling returns the enquiry to
       *Contacted*. Tests: `AssessmentBookingTest` (13), full suite 147 passing
-- [ ] **Note 13 (phases 3–5)** — recording the assessment result, converting an enquiry into parent +
-      learner accounts and enrolment, then optional reminders and a guardian status page. See
-      `PLAN_LOGIN_AND_ADMISSIONS.md` §2 (P3–P5, decisions D1–D5/D7)
+- [x] **Note 13 (phase 3) — assessment result and placement** — the tutor or the school records the result
+      (completed/no-show, outcome, strengths, focus areas, recommended class/level, notes and an optional
+      PDF/image report). Completing moves the enquiry to *Assessed*; picking a recommended class moves it to
+      *Awaiting enrolment*; a no-show returns it to *Contacted* for rebooking. Reports download for the
+      school and the assigned tutor. Tests: `AssessmentResultTest` (11), full suite 158 passing
+- [x] **Note 13 (phase 4) — conversion wizard** — from *Awaiting enrolment*, **Convert to learner** creates
+      or reuses the parent account, creates the learner with a unique username and temporary password,
+      enrols them in the recommended class, marks the enquiry *Enrolled* and emails the logins (flashing
+      them when mail is off). Guards cover status, guardian email, staff emails, class capacity, duplicate
+      usernames and double submission. Tests: `EnquiryConversionTest` (10), full suite 168 passing
+- [ ] **Note 13 (phase 5)** — optional assessment reminders and a guardian status page. See
+      `PLAN_LOGIN_AND_ADMISSIONS.md` §2
 - [ ] Remaining gaps from the meeting note (see `PLAN_CLIENT_ADDITIONS.md`): admin "class completed"
       tick behind the monthly tutor report (note 5), admin-authored affirmations (note 8), dynamic
       slider + testimonials backend + social links (notes 9, 10), and the final quotation rewrite (note 14)

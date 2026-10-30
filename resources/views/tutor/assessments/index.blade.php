@@ -56,6 +56,7 @@
                                         </div>
 
                                         <div class="flex items-center gap-2">
+                                            <a href="{{ route('tutor.assessments.show', $assessment) }}" class="text-xs text-blue-700 hover:text-blue-900">Open</a>
                                             @if($assessment->joinUrl())
                                                 <a href="{{ $assessment->joinUrl() }}" target="_blank" rel="noopener"
                                                     class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">

@@ -94,7 +94,7 @@ class EnquiryController extends Controller
 
     public function show(Enquiry $enquiry)
     {
-        $enquiry->load(['timeline.user', 'assignedTo', 'createdBy', 'assessments.tutor.user']);
+        $enquiry->load(['timeline.user', 'assignedTo', 'createdBy', 'assessments.tutor.user', 'convertedLearner.user']);
 
         return view('admin.enquiries.show', [
             'enquiry' => $enquiry,
@@ -139,6 +139,23 @@ class EnquiryController extends Controller
 
         if (! $enquiry->canMoveTo($validated['status'])) {
             return back()->with('error', 'An enquiry cannot move from ' . $enquiry->statusLabel() . ' to that status.');
+        }
+
+        // The assessment result is the evidence for these two states.
+        if ($validated['status'] === Enquiry::STATUS_ASSESSED) {
+            $latest = $enquiry->latestCompletedAssessment();
+
+            if (! $latest || ! $latest->outcome) {
+                return back()->with('error', 'Record the assessment result before marking it Assessed.');
+            }
+        }
+
+        if ($validated['status'] === Enquiry::STATUS_PLACED) {
+            $latest = $enquiry->latestCompletedAssessment();
+
+            if (! $latest || ! $latest->recommended_class_id) {
+                return back()->with('error', 'Choose a recommended class on the assessment result before placing the child.');
+            }
         }
 
         if ($validated['status'] === Enquiry::STATUS_DECLINED && empty($validated['declined_reason'])) {

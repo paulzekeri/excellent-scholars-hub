@@ -244,8 +244,18 @@ Design: `PLAN_LOGIN_AND_ADMISSIONS.md` §2. Phase 1 shipped on 29 October 2026.
       No learner/parent account is created at any point.
 - [x] Tests: `tests/Feature/AssessmentBookingTest.php` (13) — public booking, honeypot, validation,
       booking guards, guardian email, tutor isolation, admin list, cancellation, dashboard panels.
-- [ ] **P3** — record the assessment result (outcome, recommended class, notes, optional report file).
-- [ ] **P4** — conversion wizard: parent + learner accounts (reusing note 12's provisioning and the
-      forced first-login change) and class enrolment, idempotent and transactional.
+- [x] **P3 — assessment result and placement**: `AssessmentResultService` records completed/no-show with
+      outcome, strengths, focus areas, internal notes, a recommended class + level and an optional
+      PDF/image report (5 MB, replaceable, downloadable by the school and the tutor). A completed result
+      moves the enquiry to **Assessed**; choosing a recommended class moves it straight to **Awaiting
+      enrolment**. A no-show returns the enquiry to **Contacted** for rebooking, and a no-show cannot be
+      edited into a completion. Manual status moves to those two states are guarded by the result.
+      Tests: `tests/Feature/AssessmentResultTest.php` (11).
+- [x] **P4 — conversion wizard**: from **Awaiting enrolment**, **Convert to learner** creates the parent
+      account (or reuses one matched by email) and the learner account with unique usernames and temporary
+      passwords, enrols the child in the recommended class, marks the enquiry **Enrolled**, records the
+      timeline/activity log and emails both sets of credentials (flashing them when mail is off). Guards:
+      placed only, guardian email present and not a staff/learner address, class capacity, duplicate
+      usernames refused, idempotent via a locked transaction. Tests: `EnquiryConversionTest` (10).
 - [ ] **P5** — optional cron reminders, guardian status page, automatic Meet/Zoom links.
 

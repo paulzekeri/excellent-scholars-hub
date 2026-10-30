@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\OversightController as AdminOversightController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\Admin\LearningGoalController as AdminLearningGoalController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
+use App\Http\Controllers\Admin\EnquiryConversionController as AdminEnquiryConversionController;
 use App\Http\Controllers\Admin\AssessmentController as AdminAssessmentController;
 use App\Http\Controllers\Tutor\AssessmentController as TutorAssessmentController;
 use App\Http\Controllers\Tutor\LearningGoalController as TutorLearningGoalController;
@@ -135,9 +136,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::post('/enquiries/{enquiry}/status', [AdminEnquiryController::class, 'updateStatus'])->name('enquiries.status');
     Route::post('/enquiries/{enquiry}/notes', [AdminEnquiryController::class, 'storeNote'])->name('enquiries.notes.store');
 
+    // Conversion wizard (phase 4): parent + learner accounts and class enrolment.
+    Route::get('/enquiries/{enquiry}/convert', [AdminEnquiryConversionController::class, 'show'])->name('enquiries.convert');
+    Route::post('/enquiries/{enquiry}/convert', [AdminEnquiryConversionController::class, 'store'])->name('enquiries.convert.store');
+
     // Assessments (phase 2): the school creates the Meet/Zoom link and invites the tutor.
     Route::get('/assessments', [AdminAssessmentController::class, 'index'])->name('assessments.index');
+    Route::get('/assessments/{assessment}', [AdminAssessmentController::class, 'show'])->name('assessments.show');
     Route::post('/enquiries/{enquiry}/assessments', [AdminAssessmentController::class, 'store'])->name('enquiries.assessments.store');
+    Route::post('/assessments/{assessment}/result', [AdminAssessmentController::class, 'recordResult'])->name('assessments.result');
+    Route::get('/assessments/{assessment}/report', [AdminAssessmentController::class, 'downloadReport'])->name('assessments.report');
     Route::post('/assessments/{assessment}/cancel', [AdminAssessmentController::class, 'cancel'])->name('assessments.cancel');
 });
 
@@ -174,8 +182,11 @@ Route::prefix('tutor')->name('tutor.')->middleware(['auth', 'role:tutor'])->grou
     
     Route::resource('materials', TutorMaterialController::class)->only(['index', 'create', 'store', 'destroy']);
 
-    // Assessment calls assigned to this tutor (note 13, phase 2).
+    // Assessment calls assigned to this tutor (note 13, phases 2-3).
     Route::get('/assessments', [TutorAssessmentController::class, 'index'])->name('assessments.index');
+    Route::get('/assessments/{assessment}', [TutorAssessmentController::class, 'show'])->name('assessments.show');
+    Route::post('/assessments/{assessment}/result', [TutorAssessmentController::class, 'recordResult'])->name('assessments.result');
+    Route::get('/assessments/{assessment}/report', [TutorAssessmentController::class, 'downloadReport'])->name('assessments.report');
 
     // Learning goals (visible to administrators, then shared with parents)
     Route::get('/learning-goals', [TutorLearningGoalController::class, 'index'])->name('learning-goals.index');

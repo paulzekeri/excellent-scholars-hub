@@ -58,6 +58,23 @@ class AssessmentSession extends Model
         self::STATUS_CANCELLED => 'bg-gray-100 text-gray-700',
     ];
 
+    /* Outcomes the tutor records after the call (phase 3). */
+    public const OUTCOME_READY = 'ready';
+    public const OUTCOME_NEEDS_SUPPORT = 'needs_support';
+    public const OUTCOME_NOT_READY = 'not_ready';
+
+    public const OUTCOMES = [
+        self::OUTCOME_READY => 'Ready for the recommended class',
+        self::OUTCOME_NEEDS_SUPPORT => 'Needs additional support',
+        self::OUTCOME_NOT_READY => 'Not ready yet',
+    ];
+
+    public const OUTCOME_BADGES = [
+        self::OUTCOME_READY => 'bg-green-100 text-green-800',
+        self::OUTCOME_NEEDS_SUPPORT => 'bg-amber-100 text-amber-800',
+        self::OUTCOME_NOT_READY => 'bg-red-100 text-red-800',
+    ];
+
     protected $fillable = [
         'enquiry_id', 'tutor_id', 'scheduled_at', 'duration_minutes', 'platform',
         'meeting_link', 'status', 'outcome', 'recommended_class_id', 'recommended_level',
@@ -109,6 +126,22 @@ class AssessmentSession extends Model
     public function statusBadge(): string
     {
         return self::STATUS_BADGES[$this->status] ?? self::STATUS_BADGES[self::STATUS_CANCELLED];
+    }
+
+    public function outcomeLabel(): string
+    {
+        return self::OUTCOMES[$this->outcome] ?? 'Not recorded';
+    }
+
+    public function outcomeBadge(): string
+    {
+        return self::OUTCOME_BADGES[$this->outcome] ?? self::STATUS_BADGES[self::STATUS_CANCELLED];
+    }
+
+    /** A result can be entered/edited until the call is cancelled or marked a no-show. */
+    public function canRecordResult(): bool
+    {
+        return in_array($this->status, [self::STATUS_SCHEDULED, self::STATUS_COMPLETED], true);
     }
 
     public function isOnline(): bool

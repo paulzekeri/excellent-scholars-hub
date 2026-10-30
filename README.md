@@ -134,6 +134,33 @@ Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` nee
 
 ## Feature change log
 
+### Enquiry conversion (note 13, phase 4, 30 October 2026)
+
+An *Awaiting enrolment* enquiry can now become a real family without re-typing anything: the school
+confirms the usernames and class, and the child is enrolled with logins emailed to the guardian.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Wizard | **Convert to learner** on a placed enquiry: child username + optional email, guardian username (or reuse the existing parent matched by email), class (recommended preselected) | `EnquiryConversionController`, `admin/enquiries/convert.blade.php` |
+| Accounts | Parent and learner users + profiles, unique usernames, temporary passwords, `must_change_password`; the child inherits the enquiry's grade level; existing parents are never duplicated | `EnquiryConversionController@store` |
+| Enrolment | Child attached to the class (capacity enforced), enquiry marked **Enrolled** with `converted_learner_id` / `converted_at`, timeline entry and activity log | same |
+| Credentials | `AccountProvisionedMail` to the guardian (and the child's own email when present); when mail cannot deliver, both sets are flashed on the enquiry page | `AccountProvisionedMail` |
+| Safeguards | Placed status required, guardian email required and not a staff/learner address, duplicate usernames refused, double submission made idempotent with a locked transaction | same |
+| Tests | `tests/Feature/EnquiryConversionTest.php` (10) — accounts, reuse, idempotency, status guard, duplicate username, staff email, capacity, credential flash, access control, render | `tests/Feature` |
+
+### Assessment results and placement (note 13, phase 3, 30 October 2026)
+
+After the call, the tutor (or the school) records what happened; the enquiry then moves to *Assessed* or
+*Awaiting enrolment* automatically, with the report kept on file.
+
+| Area | Change | Where |
+|------|--------|-------|
+| Result form | Assessment detail pages for the school and the tutor: **Completed / No show**, outcome (ready / needs support / not ready), strengths, focus areas, recommended class + level, internal notes and an optional PDF/image report (5 MB, replaces the old one) | `admin/assessments/show.blade.php`, `tutor/assessments/show.blade.php`, `partials/assessment-result-form.blade.php` |
+| Pipeline | Completed → **Assessed**; completed **with a recommended class** → **Awaiting enrolment**; no-show → **Contacted** (rebook). Manual status moves to *Assessed*/*Awaiting enrolment* are refused without the matching result | `AssessmentResultService`, `EnquiryController@updateStatus` |
+| Evidence | Report download for the school and the assigned tutor; every result and no-show writes a timeline entry and an `activity_logs` row | `Admin\AssessmentController@downloadReport`, `Tutor\AssessmentController@downloadReport` |
+| Safeguards | A tutor can only open/record their own assessments (403 otherwise); a no-show or cancelled assessment cannot be edited into a completion | `Tutor\AssessmentController`, `AssessmentResultService` |
+| Tests | `tests/Feature/AssessmentResultTest.php` (11) — completion, placement, outcome requirement, no-show, late recommendation, uploads/downloads, mime guard, tutor isolation, pipeline guards, render smoke | `tests/Feature` |
+
 ### Assessment booking (note 13, phase 2, 30 October 2026)
 
 A parent can now book the assessment from the public landing page — before any account exists — and the

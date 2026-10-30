@@ -379,6 +379,8 @@
                         <li>Declining needs a reason; <strong>Archived</strong> is final. The assessment and enrolment steps arrive in the next release, so those moves are deliberately closed today.</li>
                         <li>Requests made through the <strong>“Book a video-call assessment”</strong> form on the public website arrive here as <strong>New</strong> (source <em>Website</em>) and every administrator/CEO is notified.</li>
                         <li>Once an enquiry is <strong>Contacted</strong>, use the <strong>Assessment calls</strong> card to book the call: pick the tutor, date/time, platform and paste the Google Meet/Zoom link. The guardian is emailed the join link (the WhatsApp button sends the same message), and you, the CEO and the tutor all join from it.</li>
+                        <li>After the call, open the assessment and <strong>record the result</strong>. Completing it moves the enquiry to <strong>Assessed</strong>; choosing a recommended class moves it to <strong>Awaiting enrolment</strong>. A no-show sends it back to <strong>Contacted</strong> so you can rebook. Reports download from the same page.</li>
+                        <li>When the child is <strong>Awaiting enrolment</strong>, click <strong>Convert to learner</strong>: confirm the child's username (their email is optional), the guardian's username (or reuse the existing parent matched by their email) and the class. Both accounts get temporary passwords, the child is enrolled, and the logins are emailed to the guardian — or shown to you when mail is not configured.</li>
                     </ul>
                     <p class="text-sm text-gray-600">The dashboard shows <strong>New Enquiries</strong> and <strong>Enquiries In Progress</strong> so nothing gets forgotten.</p>
                 </div>
@@ -686,7 +688,8 @@
                         <li><strong>Today's assessment calls</strong> on your dashboard show the time, child and guardian, with a <strong>Join call</strong> button.</li>
                         <li><strong>Teaching &rarr; Assessments</strong> lists today, upcoming and past calls (yours only) with the same link, the guardian's phone number and the enquiry reference.</li>
                         <li>Everyone joins from the same Meet/Zoom link: the parent receives it by email/WhatsApp and the school sees it too.</li>
-                        <li>If a parent cannot join, call the guardian's number on the card. Recording the outcome arrives in the next release.</li>
+                        <li>If a parent cannot join, call the guardian's number on the card.</li>
+                        <li>After the call, open it and <strong>record the result</strong>: Completed or No show, the outcome (ready / needs support / not ready), strengths, focus areas, a recommended class and level, notes, and an optional PDF/image report. Saving moves the enquiry to <strong>Assessed</strong> or <strong>Awaiting enrolment</strong> for the school.</li>
                     </ul>
                 </div>
 
@@ -1348,10 +1351,13 @@
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Learner panel</td><td class="px-4 py-3 text-gray-600">"Live now / Up next" panel at the top of the dashboard — see <a href="#dashboard-extras" class="text-blue-700 underline">Dashboard extras</a>.</td><td class="px-4 py-3 text-gray-600">Learners</td></tr>
                             @endif
                             @if($guideIsAdmin || $guideIsTutor)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Assessment calls</td><td class="px-4 py-3 text-gray-600">Parents can request an assessment on the website; the school books the Meet/Zoom call, invites the tutor and emails/WhatsApps the guardian the join link. Today's calls appear on the dashboard.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Assessment calls</td><td class="px-4 py-3 text-gray-600">Parents can request an assessment on the website; the school books the Meet/Zoom call, invites the tutor and emails/WhatsApps the guardian the join link. After the call the tutor or school records the result (outcome, strengths, focus areas, recommended class, report), which moves the enquiry to Assessed or Awaiting enrolment.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
                             @endif
                             @if($guideIsAdmin)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Admissions</td><td class="px-4 py-3 text-gray-600">Capture WhatsApp/phone enquiries before an account exists, track them on the pipeline and log every call on the timeline &mdash; <strong>People &rarr; Admissions</strong>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Conversion</td><td class="px-4 py-3 text-gray-600">Turn an <em>Awaiting enrolment</em> enquiry into parent + learner accounts, enrol the child in the recommended class and email the logins &mdash; <strong>Convert to learner</strong> on the enquiry.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
                             @if($guideIsAdmin)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly count of classes per tutor with a month picker and a six-month trend.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>

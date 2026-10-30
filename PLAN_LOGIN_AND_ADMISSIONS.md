@@ -21,13 +21,15 @@ The first slice is built, migrated and green (`php artisan test` → **102 passi
 | `esh:backfill-usernames` + `esh:audit-guardian-links` | ✅ `app/Console/Commands` |
 | Note 13 **P1** — enquiry capture, pipeline list, detail + timeline, dashboard counters | ✅ `Admin\EnquiryController`, `admin/enquiries/*`, `Enquiry` / `EnquiryNote`, sidebar **People → Admissions** |
 | Note 13 **P2** — public booking, school-created Meet/Zoom link, tutor invite, guardian email + WhatsApp, three-party join | ✅ `PublicBookingController`, `Admin\AssessmentController`, `Tutor\AssessmentController`, `AssessmentSession`, `AssessmentScheduledMail` |
-| Note 13 **P3–P5** — result recording, conversion wizard, reminders/status page | ⏳ next |
+| Note 13 **P3** — assessment result (outcome, strengths/focus areas, recommended class, report) and *Assessed / Awaiting enrolment* moves | ✅ `AssessmentResultService`, `AssessmentResultRequest`, `admin.assessments.show` / `tutor.assessments.show`, report downloads |
+| Note 13 **P4** — conversion wizard: parent + learner accounts, force-change logins, class enrolment, *Enrolled* | ✅ `EnquiryConversionController`, `admin/enquiries/convert`, `AccountProvisionedMail` |
+| Note 13 **P5** — optional reminders and a guardian status page | ⏳ next |
 
 Tests added: `tests/Feature/UsernameLoginTest.php` (12), `AccountProvisioningTest.php` (11),
-`GuardianPasswordResetTest.php` (12), `MaintenanceCommandsTest.php` (8), `AdmissionsTest.php` (12) and
-`AssessmentBookingTest.php` (13); `AdminUserParentLinkTest` rewritten for the mandatory-guardian rule and
-`PasswordResetTest` updated for the new login field and the neutral reset response. Full suite:
-**147 passing**.
+`GuardianPasswordResetTest.php` (12), `MaintenanceCommandsTest.php` (8), `AdmissionsTest.php` (12),
+`AssessmentBookingTest.php` (13), `AssessmentResultTest.php` (11) and `EnquiryConversionTest.php` (10);
+`AdminUserParentLinkTest` rewritten for the mandatory-guardian rule and `PasswordResetTest` updated for the
+new login field and the neutral reset response. Full suite: **168 passing**.
 
 Implementation notes that differ from the sketch above:
 
@@ -659,6 +661,8 @@ The phase-1 design above assumes an administrator books from a captured enquiry.
 | `POST /book-assessment` (public, guest) | Landing-page request form (child, guardian name/phone/email, preferred slot, notes, honeypot, rate-limited). Creates an enquiry with `source = website` and notifies every administrator/CEO — **no account** | Visitors |
 | `admin.assessments.index` (implemented) | Today / Upcoming / Past / All with counts, tutor filter and a Join button per row | CEO + administrators |
 | `POST admin/enquiries/{enquiry}/assessments` (implemented) | Booking form on the enquiry screen: tutor, date/time, duration, platform, Meet/Zoom link, guardian email → `assessment_booked`, tutor notification, guardian email | CEO + administrators |
+| `admin.assessments.show` / `tutor.assessments.show` (implemented) | Assessment detail + **result form**: completed/no-show, outcome, strengths, focus areas, recommended class/level, internal notes and a PDF/image report; report download for the school and the assigned tutor | CEO + administrators, assigned tutor |
+| `admin.enquiries.convert` (implemented) | Conversion wizard: child username (optional email), guardian username or the existing parent matched by email, and the class (recommended preselected) → accounts created, enrolled, *Enrolled*, credentials emailed (or flashed when mail is off) | CEO + administrators |
 | `admin.enquiries.convert` | Conversion wizard (§2.5) | CEO + administrators |
 
 Sidebar: **People → Admissions** (admin/CEO) and **Teaching → Assessments** (tutors) — one line each
@@ -668,6 +672,14 @@ Privacy: an enquiry is *not* a user, so learners and parents have no access at a
 numbers are only visible to CEO/administrators and the assigned tutor.
 
 ### 2.5 The conversion wizard (the step that pays for the feature)
+
+**Implemented in P4** (see §2.3a for the client clarifications that shaped the booking side). It is only
+reachable when the enquiry is **Awaiting enrolment**, the guardian email is present, the email does not
+belong to a staff/learner account, and the class has capacity; submitting twice is idempotent because the
+enquiry row is locked and `converted_learner_id` is checked inside the transaction. Parent and child get
+temporary passwords, `must_change_password = true`, and `AccountProvisionedMail`; when the mailer cannot
+deliver (UAT `log`/`array`) the credentials are flashed on the enquiry page. The child's `grade_level` is
+copied from the enquiry.
 
 `GET/POST admin/enquiries/{enquiry}/convert` — a 4-step form on one page (all pre-filled from the
 enquiry + assessment):
@@ -740,6 +752,9 @@ that already exists.
 | **P5** | Optional: cron reminders, public parent status page, Google Meet/Zoom auto-link creation | M — varies | Convenience only; defer until the school asks |
 
 Ship P1 alone if the client wants something live next week; P1–P3 need no auth work at all.
+
+**Status:** P1 (capture/pipeline), P2 (booking/public request/three-party call link) and P3 (result and
+placement) are shipped up to 30 October 2026. P4 (conversion) and P5 (reminders/status page) remain.
 
 ### 2.9 Test plan
 
