@@ -477,12 +477,12 @@
             </ul>
         </div>
         <div class="bg-white/10 border border-white/20 rounded-3xl p-8">
-            <p class="font-script text-3xl text-sun">Come and see us</p>
-            <h3 class="mt-1 font-display text-xl font-bold text-white">Visit or call</h3>
+            <p class="font-script text-3xl text-sun">We are online</p>
+            <h3 class="mt-1 font-display text-xl font-bold text-white">Talk to us</h3>
             <ul class="mt-4 space-y-3 text-blue-50 text-sm">
-                <li><i class="fas fa-location-dot text-sun mr-3"></i>8, Alice Ogunsona Crescent, Kuti Street, Hilltop Estate, Radio, Ikorodu</li>
                 <li><i class="fas fa-phone text-sun mr-3"></i><a href="tel:+2348119656244" class="transition hover:text-sun">+234 811 965 6244</a></li>
                 <li><i class="fas fa-envelope text-sun mr-3"></i><a href="mailto:excellentscholars2@gmail.com" class="transition hover:text-sun">excellentscholars2@gmail.com</a></li>
+                <li><i class="fas fa-video text-sun mr-3"></i>All classes and assessments run live online (Google Meet or Zoom)</li>
                 <li><i class="fas fa-clock text-sun mr-3"></i>Monday – Saturday, 8:00am – 6:00pm</li>
             </ul>
             <a href="{{ route('register') }}" class="mt-6 inline-flex items-center bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-6 py-3 rounded-lg transition">

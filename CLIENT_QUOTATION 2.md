@@ -1,11 +1,8 @@
 
 
-\+2348061355032
+\+2348119656244
 
-admin@lit-grp.com
-
-8, Alice Ogunsona Crescent, Kuti Street, Hilltop Estate, Radio  
-Ikorodu
+excellentscholars2@gmail.com
 
 # **SOFTWARE DEVELOPMENT QUOTATION & DEPLOYMENT AGREEMENT**
 
