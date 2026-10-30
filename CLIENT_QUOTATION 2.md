@@ -119,7 +119,7 @@ covered by the fees in Part 1**; they will be quoted separately when the school 
 | Ref | Deferred item | Phase |
 | :---- | :---- | :---- |
 | Meeting note 9(ii) | Admin/CEO-managed landing-page slider (add, reorder and remove slides from the backend) | V2 |
-| Meeting note 9(iii) | Social media links on the public website | V2 |
+| Meeting note 9(iii) | **Admin-managed** social links (editable from the backend). The school's handles (`@esh_tutoring` on Instagram, X, TikTok, Facebook) are already published in the landing-page footer as fixed links | V2 |
 | Meeting note 13 (P5) | Automated assessment reminders by cron + a public guardian status page | V2 |
 | Meeting note 11 | Fully automated online payment gateway (Paystack) with the gateway response saved and a CEO view | V2 (deferred 29 October 2026) |
 | Related | Automatic Google Meet/Zoom link creation for assessments/classes (needs OAuth credentials) | V2 |
@@ -129,8 +129,9 @@ covered by the fees in Part 1**; they will be quoted separately when the school 
 * The current deployment has **no cron job**. Assessment visibility is handled by the in-app
   "today's assessment calls" panels on the admin, CEO and tutor dashboards. V2 reminders will require the
   school to enable a daily cron job on the hosting account.
-* The public landing page, live programmes and CEO-approved testimonials are included now; only the
-  **dynamic slider** and **social links** are deferred.
+* The public landing page, live programmes, CEO-approved testimonials and the flyer-style design (navy/blue/orange,
+  subject strip, social footer) are included now; only the **backend-managed slider** and **backend-managed social
+  links** are deferred.
 * Everything delivered under meeting-note items **1–8, 9(i), 10, 12 and 13 (P1–P4)** is in the current scope.
   The final consolidated, re-priced quotation (meeting note 14) will list those additions formally.
 

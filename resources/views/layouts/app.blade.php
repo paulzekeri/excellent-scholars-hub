@@ -9,6 +9,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -23,6 +26,10 @@
                             ink: '#0f1f3a',
                         },
                     },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        display: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    },
                 },
             },
         };
@@ -32,6 +39,9 @@
 </head>
 <body class="bg-gray-50 font-sans antialiased">
     <style>
+        /* Brand typography: Poppins headings, Inter body (utility classes still win). */
+        h1, h2, h3 { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.015em; }
+
         /* App shell: blue sidebar + slim top bar (school colours) */
         .esh-shell { transition: padding-left .2s ease; }
         .esh-sidebar { transition: width .2s ease, transform .2s ease; }

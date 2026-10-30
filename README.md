@@ -161,7 +161,23 @@ Rules applied across the app:
   orange text on white uses `orange-700` (5.2:1), and orange-500 icons are darkened.
 - **Tokens** `esh.navy / esh.blue / esh.orange / esh.sun / esh.ink` are defined in the app, plain and landing
   Tailwind setup for future components.
-- Still outstanding: replace `logo.jpg` (130×88) with the client's vector logo.
+- The client asked to **keep the existing `logo.jpg`** (30 October 2026), so the mark is untouched; it is shown on
+  a white chip in the footer so it stays legible on navy.
+
+### Flyer look and feel — typography and landing rebuild (Pass B, 30 October 2026)
+
+The public landing page now carries the flyer's visual language instead of a plain hero.
+
+| Element | Implementation |
+|---|---|
+| Type | **Poppins** 600–800 headings + **Inter** body everywhere; **Caveat** script used only on the marketing page ("Bigger goals, brighter future", "Come and see us"). App headings inherit Poppins through a single `h1–h3` rule in `layouts/app.blade.php`; utility classes still win |
+| Hero | Cream `#FBFAF7` paper, **navy corner shape + navy bottom wave** (inline SVG), pale-blue circle, **subject strip** (Math \| English \| Sciences \| SATs/11+ \| Coding & AI \| Chess \| Creative Writing), navy headline with an **orange→sun brush underline**, navy / orange / outline CTA set |
+| Illustration | Hand-built inline SVG: graduation cap, four colour-coded book spines (LEARN / GROW / ACHIEVE / EXCEL), monitor, sun-yellow sticky note with the script line and sun sparkles — no external image dependency |
+| Sections | Pale-blue `#EAF2FB` programme cards with circular icon chips, sun/orange section eyebrows, quote cards on cream paper with initial-avatar fallbacks, navy About band with sun check marks, navy footer band carrying the flyer's socials (`@esh_tutoring` on Instagram, X, TikTok, Facebook) and the contact block |
+| Boundaries | The slider content, testimonial data, booking form, nav anchors and every asserted string are unchanged — this is styling only, so the landing tests still guard the structure |
+
+Still outstanding (client-requested, v2): admin-managed slider slides, admin-managed social links, and a
+vector logo asset.
 
 ### Learning goals shared with learners (note 7 follow-up, 30 October 2026)
 

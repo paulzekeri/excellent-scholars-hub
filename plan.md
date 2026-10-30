@@ -118,6 +118,9 @@
       `messages` + notifications, broadcast report, inbox for every role, category filters for administrators
 - [x] **Blue / white / orange branding** — navy/blue structure with orange actions and **sun-yellow highlights**;
       indigo, purple and red removed from every view (orange now carries warnings and attention too)
+- [x] **Flyer look and feel** — Poppins headings + Inter body (`Caveat` script on the marketing page only), the
+      landing hero rebuilt as the flyer: navy corner + wave, subject strip, colour-coded book illustration, brush
+      underline, pale-blue callouts, sun sparkles and a navy footer with the school's socials
 - [x] **Affirmation of the day** — rotation card on all four dashboards
 - [x] **Public landing page** — hero slider, live programmes, how-it-works, testimonials, about/contact and
       register CTA at `/` for guests (signed-in users still redirect to their dashboard)

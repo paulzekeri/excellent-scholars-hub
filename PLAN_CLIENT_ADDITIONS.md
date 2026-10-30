@@ -25,7 +25,7 @@ guide, sidebar). This is the honest picture of all 14 notes:
 | 9 | Landing page (slider, testimonials, about, register) | `[~]` — page + live programmes exist; testimonials are now member-written and CEO-approved; the slider remains static |
 | 9-i | Testimonials backend + admin approval | `[x]` — members submit from **My profile**; the CEO approves/rejects; approved ones appear on the landing page (photo only when allowed) |
 | 9-ii | Admin/CEO-managed slider | `[ ]` — **deferred to v2** (marked on the quotation) |
-| 9-iii | Social media links | `[ ]` — **deferred to v2** (marked on the quotation) |
+| 9-iii | Social media links | `[x]` — `@esh_tutoring` Instagram/X/TikTok/Facebook links published in the landing footer; **backend-managed links deferred to v2** |
 | 10 | Profile update (name/email/photo) + testimonial consent, CEO tick | `[x]` — **My profile** (name, email, photo with replace/remove), testimonial submission with a photo-consent question, CEO approval/rejection with a note |
 | 11 | Automated payment gateway | **Deferred by the client (29 Oct 2026)** — not in scope; `PaystackService` stays as the stub |
 | 12 | Children without email: username login + reset | `[x]` — username login, provisioning, forced first-login change, guardian-delivered reset, parent-initiated reset and the backfill/audit commands are shipped (Phase 11) |
@@ -118,6 +118,9 @@ guide, sidebar). This is the honest picture of all 14 notes:
       so the number matches what a tutor is paid for.
 - [x] Palette: navy → blue, orange accents, sun-yellow highlights, white surfaces; **red removed entirely**
       (orange carries actions, warnings and attention).
+- [x] Flyer typography and landing treatment: Poppins headings / Inter body (Caveat script only on the public
+      page), navy corner + wave, subject strip, book illustration, brush underline, pale-blue callouts, navy footer
+      with `@esh_tutoring` socials. Existing `logo.jpg` kept per the client's instruction.
 - [x] `partials/affirmation` card (deterministic per day) on all four dashboards.
 
 ## Phase 6 — Learning goals (note 11)
