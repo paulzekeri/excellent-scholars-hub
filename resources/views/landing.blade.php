@@ -528,15 +528,11 @@
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-accent hover:text-blue-950">
                 <i class="fab fa-instagram"></i>
             </a>
-            <a href="https://x.com/esh_tutoring" target="_blank" rel="noopener" aria-label="Excellent Scholars Hub on X"
-                class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-accent hover:text-blue-950">
-                <i class="fab fa-x-twitter"></i>
-            </a>
             <a href="https://www.tiktok.com/@esh_tutoring" target="_blank" rel="noopener" aria-label="Excellent Scholars Hub on TikTok"
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-accent hover:text-blue-950">
                 <i class="fab fa-tiktok"></i>
             </a>
-            <a href="https://www.facebook.com/esh_tutoring" target="_blank" rel="noopener" aria-label="Excellent Scholars Hub on Facebook"
+            <a href="https://www.facebook.com/share/17FhV1iwaD" target="_blank" rel="noopener" aria-label="Excellent Scholars Hub on Facebook"
                 class="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-accent hover:text-blue-950">
                 <i class="fab fa-facebook-f"></i>
             </a>
