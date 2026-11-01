@@ -259,7 +259,86 @@ class PaymentBatchTest extends TestCase
             ->assertSee('What are you paying for?')
             ->assertSee('JSS2 Mathematics')
             ->assertSee('General payment')
-            ->assertSee('name="amounts[' . $maths->id . ']"', false)
+            ->assertSee('name="amounts[' . $child->id . ':' . $maths->id . ']"', false)
             ->assertSee('This submission:');
+    }
+
+    /**
+     * "If a parent has many children, record payment once for all children, not
+     * per child" — one transfer, one reference, one receipt, two children.
+     */
+    public function test_one_transfer_can_cover_several_children(): void
+    {
+        [$parentUser, $parent, $child] = $this->makeFamily();
+
+        $second = Learner::create([
+            'user_id' => $this->makeUser('learner', 'Ada Okafor Jnr')->id,
+            'parent_id' => $parent->id,
+            'grade_level' => 'JSS 1',
+        ]);
+
+        $maths = $this->makeClass('JSS2 Mathematics');
+        $english = $this->makeClass('JSS1 English');
+        $child->classes()->attach($maths->id);
+        $second->classes()->attach($english->id);
+
+        $firstKey = $child->id . ':' . $maths->id;
+        $secondKey = $second->id . ':' . $english->id;
+        $reference = 'FAM-' . uniqid();
+
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), [
+            'learner_ids' => [$child->id, $second->id],
+            'payment_type' => 'tuition',
+            'term' => 'First Term',
+            'payment_method' => Payment::METHOD_TRANSFER,
+            'payment_account_id' => $this->account()->id,
+            'reference' => $reference,
+            'payment_date' => now()->toDateString(),
+            'class_ids' => [$firstKey, $secondKey],
+            'amounts' => [$firstKey => 20000, $secondKey => 30000],
+            'total_fees' => [$firstKey => 100000, $secondKey => 100000],
+        ])->assertRedirect(route('parent.payments.index'))->assertSessionHas('success');
+
+        $payments = Payment::where('reference', $reference)->get();
+
+        $this->assertCount(2, $payments);
+        $this->assertSame(
+            [$child->id, $second->id],
+            $payments->pluck('learner_id')->sort()->values()->all()
+        );
+        $this->assertSame(50000.0, (float) $payments->sum('amount'));
+        $this->assertSame($maths->id, $payments->firstWhere('learner_id', $child->id)->class_id);
+        $this->assertSame($english->id, $payments->firstWhere('learner_id', $second->id)->class_id);
+    }
+
+    public function test_a_row_for_another_family_is_rejected(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+
+        $stranger = Learner::create([
+            'user_id' => $this->makeUser('learner', 'Stranger Child')->id,
+        ]);
+
+        $maths = $this->makeClass();
+        $child->classes()->attach($maths->id);
+
+        $key = $stranger->id . ':' . $maths->id;
+
+        $this->actingAs($parentUser)
+            ->from(route('parent.payments.create'))
+            ->post(route('parent.payments.store'), [
+                'learner_ids' => [$child->id],
+                'payment_type' => 'tuition',
+                'term' => 'First Term',
+                'payment_method' => Payment::METHOD_TRANSFER,
+                'payment_account_id' => $this->account()->id,
+                'payment_date' => now()->toDateString(),
+                'class_ids' => [$key],
+                'amounts' => [$key => 10000],
+            ])
+            ->assertSessionHasErrors('class_ids.' . $key);
+
+        $this->assertSame(0, Payment::where('learner_id', $stranger->id)->count());
+        $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
     }
 }

@@ -95,8 +95,8 @@ class LearnerLearningGoalsTest extends TestCase
         $this->actingAs($learnerUser)
             ->get(route('learner.learning-goals.index'))
             ->assertOk()
-            ->assertSee('Read for twenty minutes daily')
-            ->assertSee('Finish the term workbook');
+            ->assertSee('My Learning Goals')
+            ->assertSee('Read for twenty minutes daily');
 
         $this->assertTrue($goal->isVisibleToLearner($learner));
     }

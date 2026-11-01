@@ -8,7 +8,12 @@
         <form action="{{ route('admin.classes.update', $class) }}" method="POST" class="space-y-6">@csrf @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div><label class="block text-sm font-medium text-gray-700">Class Name</label><input type="text" name="name" value="{{ $class->name }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
-                <div><label class="block text-sm font-medium text-gray-700">Class Code</label><input type="text" name="code" value="{{ $class->code }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Class Code <span class="text-gray-500 font-normal">(optional)</span></label>
+                    <input type="text" name="code" value="{{ old('code', $class->code) }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Leave blank to keep the current code">
+                    <p class="text-xs text-gray-500 mt-1">Leave blank to keep the current code.</p>
+                    @error('code')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                </div>
                 <div><label class="block text-sm font-medium text-gray-700">Tutor</label><select name="tutor_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">@foreach($tutors as $tutor)<option value="{{ $tutor->id }}" {{ $class->tutor_id == $tutor->id ? 'selected' : '' }}>{{ $tutor->user->name }}</option>@endforeach</select></div>
                 <div><label class="block text-sm font-medium text-gray-700">Subject</label><input type="text" name="subject" value="{{ $class->subject }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Grade Level</label><input type="text" name="grade_level" value="{{ $class->grade_level }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>

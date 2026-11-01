@@ -24,15 +24,35 @@
         @else
         <form action="{{ route('parent.payments.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">@csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="learner_id" class="block text-sm font-medium text-gray-700">Child <span class="text-orange-700">*</span></label>
-                    <select id="learner_id" name="learner_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select child</option>
+                <div class="md:col-span-2">
+                    <p class="block text-sm font-medium text-gray-700">Children covered by this payment <span class="text-orange-700">*</span></p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Tick every child this transfer covers. The payment is recorded once for the whole family — one line per
+                        child and class below — so you do not submit a separate payment for each child.
+                    </p>
+
+                    @php
+                        $checkedChildren = array_map('strval', old(
+                            'learner_ids',
+                            $selectedLearner !== '' ? [$selectedLearner] : [$children->first()->id]
+                        ));
+                    @endphp
+
+                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
                         @foreach($children as $learner)
-                            <option value="{{ $learner->id }}" {{ (string) old('learner_id', $selectedLearner) === (string) $learner->id ? 'selected' : '' }}>{{ $learner->user->name }}</option>
+                            <label class="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+                                <input type="checkbox" name="learner_ids[]" value="{{ $learner->id }}" data-child-check
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                                    {{ in_array((string) $learner->id, $checkedChildren, true) ? 'checked' : '' }}>
+                                <span class="min-w-0">
+                                    <span class="block font-medium text-gray-800">{{ $learner->user->name }}</span>
+                                    <span class="block text-xs text-gray-500">{{ $learner->classes->count() }} {{ \Illuminate\Support\Str::plural('class', $learner->classes->count()) }}</span>
+                                </span>
+                            </label>
                         @endforeach
-                    </select>
-                    @error('learner_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    </div>
+                    @error('learner_ids')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    @error('learner_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="payment_type" class="block text-sm font-medium text-gray-700">Payment Type <span class="text-orange-700">*</span></label>
@@ -53,13 +73,15 @@
                 <div class="md:col-span-2">
                     <p class="block text-sm font-medium text-gray-700">What are you paying for? <span class="text-orange-700">*</span></p>
                     <p class="text-xs text-gray-500 mt-1">
-                        Tick every class this transfer covers and type what you paid per class — one record is created per ticked class,
-                        so a single transfer can clear two or three subjects at once. Tick <strong>general</strong> for registration,
-                        materials or anything not tied to a class.
+                        Type the amount paid against each row this transfer covers — one record is created per row, under the
+                        same reference and receipt, so a single transfer can clear two or three children and subjects at once.
+                        Tick <strong>general</strong> for registration, materials or anything not tied to a class.
                     </p>
 
                     @php
-                        $oldClasses = collect(old('class_ids', []))->map(fn ($id) => (int) $id)->all();
+                        $oldClasses = collect(old('class_ids', []))->map(function ($id) {
+                            return (string) $id;
+                        })->all();
                         $oldAmounts = old('amounts', []);
                         $oldTotals = old('total_fees', []);
                     @endphp
@@ -69,54 +91,60 @@
                             <thead class="bg-[#EAF2FB]">
                                 <tr>
                                     <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Pay</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Child / class</th>
                                     <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Amount paid now</th>
                                     <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Total fee (optional)</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 bg-white">
-                                <tr data-pay-row>
-                                    <td class="px-3 py-2 align-top">
-                                        <input type="checkbox" name="class_ids[]" value="0" data-pay-check
-                                            class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                            {{ in_array(0, $oldClasses, true) ? 'checked' : '' }}>
-                                    </td>
-                                    <td class="px-3 py-2 align-top">
-                                        <span class="font-medium text-gray-800">General payment</span>
-                                        <span class="block text-xs text-gray-500">Not tied to one class</span>
-                                    </td>
-                                    <td class="px-3 py-2 align-top">
-                                        <input type="number" step="0.01" min="0" name="amounts[0]" data-pay-amount
-                                            value="{{ $oldAmounts[0] ?? '' }}" placeholder="0.00"
-                                            class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                    </td>
-                                    <td class="px-3 py-2 align-top">
-                                        <input type="number" step="0.01" min="0" name="total_fees[0]"
-                                            value="{{ $oldTotals[0] ?? '' }}" placeholder="optional"
-                                            class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                    </td>
-                                </tr>
                                 @foreach($children as $learner)
+                                    @php $generalKey = $learner->id . ':0'; @endphp
+                                    <tr data-child-heading="{{ $learner->id }}" class="bg-[#EAF2FB]/70">
+                                        <td colspan="4" class="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#0a2550]">{{ $learner->user->name }}</td>
+                                    </tr>
+                                    <tr data-pay-row data-learner-row="{{ $learner->id }}">
+                                        <td class="px-3 py-2 align-top">
+                                            <input type="checkbox" name="class_ids[]" value="{{ $generalKey }}" data-pay-check
+                                                class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                                                {{ in_array($generalKey, $oldClasses, true) ? 'checked' : '' }}>
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <span class="font-medium text-gray-800">General payment</span>
+                                            <span class="block text-xs text-gray-500">Not tied to one class</span>
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <input type="number" step="0.01" min="0" name="amounts[{{ $generalKey }}]" data-pay-amount
+                                                value="{{ $oldAmounts[$generalKey] ?? '' }}" placeholder="0.00"
+                                                class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                            @error('amounts.' . $generalKey)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                        </td>
+                                        <td class="px-3 py-2 align-top">
+                                            <input type="number" step="0.01" min="0" name="total_fees[{{ $generalKey }}]"
+                                                value="{{ $oldTotals[$generalKey] ?? '' }}" placeholder="optional"
+                                                class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                        </td>
+                                    </tr>
                                     @foreach($learner->classes->sortBy('name') as $class)
+                                        @php $rowKey = $learner->id . ':' . $class->id; @endphp
                                         <tr data-pay-row data-learner-row="{{ $learner->id }}">
                                             <td class="px-3 py-2 align-top">
-                                                <input type="checkbox" name="class_ids[]" value="{{ $class->id }}" data-pay-check
+                                                <input type="checkbox" name="class_ids[]" value="{{ $rowKey }}" data-pay-check
                                                     class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                                    {{ in_array($class->id, $oldClasses, true) ? 'checked' : '' }}>
+                                                    {{ in_array($rowKey, $oldClasses, true) ? 'checked' : '' }}>
                                             </td>
                                             <td class="px-3 py-2 align-top">
                                                 <span class="font-medium text-gray-800">{{ $class->name }}</span>
                                                 <span class="block text-xs text-gray-500">{{ $learner->user->name }}</span>
                                             </td>
                                             <td class="px-3 py-2 align-top">
-                                                <input type="number" step="0.01" min="0" name="amounts[{{ $class->id }}]" data-pay-amount
-                                                    value="{{ $oldAmounts[$class->id] ?? '' }}" placeholder="0.00"
+                                                <input type="number" step="0.01" min="0" name="amounts[{{ $rowKey }}]" data-pay-amount
+                                                    value="{{ $oldAmounts[$rowKey] ?? '' }}" placeholder="0.00"
                                                     class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                                @error('amounts.' . $class->id)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                                @error('amounts.' . $rowKey)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
                                             </td>
                                             <td class="px-3 py-2 align-top">
-                                                <input type="number" step="0.01" min="0" name="total_fees[{{ $class->id }}]"
-                                                    value="{{ $oldTotals[$class->id] ?? '' }}" placeholder="optional"
+                                                <input type="number" step="0.01" min="0" name="total_fees[{{ $rowKey }}]"
+                                                    value="{{ $oldTotals[$rowKey] ?? '' }}" placeholder="optional"
                                                     class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
                                             </td>
                                         </tr>
@@ -127,11 +155,12 @@
                     </div>
 
                     <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
-                        <p class="text-xs text-gray-500"><i class="fas fa-circle-info mr-1"></i>Only classes your child attends are listed. Amounts apply to the term chosen above.</p>
+                        <p class="text-xs text-gray-500"><i class="fas fa-circle-info mr-1"></i>Only the classes of the children you ticked are listed. Amounts apply to the term chosen above.</p>
                         <p class="text-sm font-semibold text-[#0a2550]">This submission: <span id="pay-total">0.00</span></p>
                     </div>
 
                     @error('class_ids')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    @error('class_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                     @error('amounts')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
 
@@ -277,19 +306,32 @@
             });
         });
 
-        // Multi-class payment rows: only the chosen child's classes are shown,
-        // typing an amount ticks its row, and the submission total updates live.
-        const child = document.getElementById('learner_id');
+        // Multi-child payment rows: a family transfer can cover several children.
+        // Only the ticked children's rows are enabled, typing an amount ticks its
+        // row, and the submission total updates live.
+        const childChecks = Array.prototype.slice.call(document.querySelectorAll('[data-child-check]'));
         const payRows = Array.prototype.slice.call(document.querySelectorAll('[data-pay-row]'));
+        const childHeadings = Array.prototype.slice.call(document.querySelectorAll('[data-child-heading]'));
         const payTotal = document.getElementById('pay-total');
 
+        function selectedChildren() {
+            return childChecks.filter(function (box) { return box.checked; }).map(function (box) {
+                return box.value;
+            });
+        }
+
         function refreshPayRows() {
-            const learnerId = child ? child.value : '';
+            const chosen = selectedChildren();
+
+            childHeadings.forEach(function (heading) {
+                heading.classList.toggle('hidden', chosen.indexOf(heading.getAttribute('data-child-heading')) === -1);
+            });
+
             let total = 0;
 
             payRows.forEach(function (row) {
                 const owner = row.getAttribute('data-learner-row');
-                const allowed = !owner || learnerId === '' || owner === learnerId;
+                const allowed = !owner || chosen.indexOf(owner) !== -1;
 
                 row.classList.toggle('hidden', !allowed);
 
@@ -336,7 +378,10 @@
             if (amount) amount.addEventListener('input', refreshPayRows);
         });
 
-        if (child) child.addEventListener('change', refreshPayRows);
+        childChecks.forEach(function (box) {
+            box.addEventListener('change', refreshPayRows);
+        });
+
         refreshPayRows();
     });
 </script>

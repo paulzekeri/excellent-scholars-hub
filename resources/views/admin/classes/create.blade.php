@@ -7,8 +7,13 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-6">Create New Class</h1>
         <form action="{{ route('admin.classes.store') }}" method="POST" class="space-y-6">@csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label class="block text-sm font-medium text-gray-700">Class Name</label><input type="text" name="name" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
-                <div><label class="block text-sm font-medium text-gray-700">Class Code</label><input type="text" name="code" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
+                <div><label class="block text-sm font-medium text-gray-700">Class Name</label><input type="text" name="name" value="{{ old('name') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Class Code <span class="text-gray-500 font-normal">(optional)</span></label>
+                    <input type="text" name="code" value="{{ old('code') }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500" placeholder="Leave blank to auto-generate">
+                    <p class="text-xs text-gray-500 mt-1">A unique code is created from the class name when you leave this blank.</p>
+                    @error('code')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                </div>
                 <div><label class="block text-sm font-medium text-gray-700">Tutor</label><select name="tutor_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">@foreach($tutors as $tutor)<option value="{{ $tutor->id }}">{{ $tutor->user->name }}</option>@endforeach</select></div>
                 <div><label class="block text-sm font-medium text-gray-700">Subject</label><input type="text" name="subject" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label class="block text-sm font-medium text-gray-700">Grade Level</label><input type="text" name="grade_level" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>

@@ -217,3 +217,30 @@
       (subtotal ₦260,000 + VAT ₦40,000 = **₦300,000**, matching the 2 × ₦150,000 milestones) and keeps the v2
       deferred section.
 
+
+## Phase 12: Client Review of 1 November 2026
+- [x] **One payment record for several children** — the parent form has a child checkbox list and a general +
+      per-class row for every ticked child (`class_ids[] = learnerId:classId`); one submission, reference,
+      receipt, account and date create one installment per row, and the CEO verifies the transfer once. The
+      legacy single-child payload still works. Tests: `PaymentBatchTest` (11, two new)
+- [x] **Role filter on Users** — `/admin/users?role=tutor` (plus status and name/username/email search) with
+      quick role chips and per-role counts. Tests: `RoundTwoEnhancementsTest`
+- [x] **Class Code optional** — blank codes are generated from the class name (`NAME-XXXXX`, unique); editing with
+      a blank code keeps the current one. Tests: `RoundTwoEnhancementsTest`
+- [x] **Repeat a schedule once** — `recurrence_rule` / `recurrence_until` / `recurrence_group` on
+      `class_schedules`; `ClassScheduleService::createSeries()` creates every weekly session from the first date
+      until the chosen end date, visible automatically to the class and tutor; the lists flag weekly sessions.
+      New **Automatic video room (Jitsi Meet)** platform generates a free, reusable meeting link when the link is
+      left blank. Tests: `RoundTwoEnhancementsTest`
+- [x] **Learning goals as free text** — `learning_goals.title` is now `TEXT`; the upload form is one 5,000-character
+      goal area with the learner picker, "What success looks like" and notes removed (existing rows keep their
+      data). A free **LanguageTool** wording assistant fixes spelling/grammar via
+      `POST /tutor/learning-goals/polish` and fails gracefully offline. Tests: `RoundTwoEnhancementsTest`
+- [x] **Individual goal sharing** — `learning_goal_shares` pivot (`learning_goal_id`, `user_id`, `role_slug`,
+      `shared_by`); the admin Goals screen picks individual parents/learners/tutors (or everyone the goal is
+      about) and shows chips; parent child page, learner page and tutor "Shared with you" all honour direct
+      shares, and tutor downloads work for recipients. Tests: `RoundTwoEnhancementsTest`,
+      `LearnerLearningGoalsTest`, `ClientAdditionsTest`
+- [x] **Documentation** — in-app user guide (What's New + Classes/Schedules/Fees/Learning goals sections),
+      `PLAN_CLIENT_ADDITIONS.md` (Round 2) and this phase. Full suite: **225 passing**
+

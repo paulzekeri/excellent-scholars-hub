@@ -216,10 +216,13 @@ Route::prefix('tutor')->name('tutor.')->middleware(['auth', 'role:tutor'])->grou
     Route::post('/assessments/{assessment}/result', [TutorAssessmentController::class, 'recordResult'])->name('assessments.result');
     Route::get('/assessments/{assessment}/report', [TutorAssessmentController::class, 'downloadReport'])->name('assessments.report');
 
-    // Learning goals (visible to administrators, then shared with parents)
+    // Learning goals (visible to administrators, then shared with individuals)
     Route::get('/learning-goals', [TutorLearningGoalController::class, 'index'])->name('learning-goals.index');
     Route::get('/learning-goals/create', [TutorLearningGoalController::class, 'create'])->name('learning-goals.create');
     Route::post('/learning-goals', [TutorLearningGoalController::class, 'store'])->name('learning-goals.store');
+    Route::post('/learning-goals/polish', [TutorLearningGoalController::class, 'polish'])
+        ->middleware('throttle:20,1')
+        ->name('learning-goals.polish');
     Route::get('/learning-goals/{goal}/download', [TutorLearningGoalController::class, 'download'])->name('learning-goals.download');
     Route::delete('/learning-goals/{goal}', [TutorLearningGoalController::class, 'destroy'])->name('learning-goals.destroy');
 });

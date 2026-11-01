@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassSchedule;
 use App\Models\Classes;
+use App\Services\ClassScheduleService;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -30,20 +31,31 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $tutor = auth()->user()->tutor;
-        
-        $request->validate([
+
+        $validated = $request->validate([
             'class_id' => 'required|exists:classes,id',
             'title' => 'required|string|max:255',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'meeting_link' => 'nullable|url',
-            'meeting_platform' => 'nullable|string',
+            'meeting_platform' => 'nullable|in:google_meet,zoom,jitsi',
             'description' => 'nullable|string',
+            // A tutor can set the Monday lesson once and repeat it every week.
+            'repeat' => 'nullable|in:none,weekly',
+            'repeat_until' => 'nullable|required_if:repeat,weekly|date|after:start_time',
         ]);
 
-        ClassSchedule::create(array_merge($request->all(), ['tutor_id' => $tutor->id]));
+        $validated['tutor_id'] = $tutor->id;
 
-        return redirect()->route('tutor.schedules.index')->with('success', 'Schedule created successfully.');
+        $sessions = app(ClassScheduleService::class)->createSeries($validated);
+        $first = $sessions->first();
+
+        $message = $sessions->count() > 1
+            ? $sessions->count() . ' sessions created — every ' . $first->start_time->format('l')
+                . ' at ' . $first->start_time->format('g:i a') . ' from ' . $first->start_time->format('M d, Y') . '.'
+            : 'Schedule created successfully.';
+
+        return redirect()->route('tutor.schedules.index')->with('success', $message);
     }
 
     public function markCompleted(ClassSchedule $schedule)

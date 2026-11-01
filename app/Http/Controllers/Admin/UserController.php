@@ -20,10 +20,49 @@ use Throwable;
 
 class UserController extends Controller
 {
-    public function index()
+    /**
+     * Every user, with a role filter (client note: "filter by roles to be
+     * added"), plus a quick name/username/email search and status filter.
+     */
+    public function index(Request $request)
     {
-        $users = User::with(['role', 'learner.parent.user', 'parent.children'])->latest()->paginate(10);
-        return view('admin.users.index', compact('users'));
+        $role = $request->query('role');
+        $search = trim((string) $request->query('q'));
+        $status = $request->query('status');
+
+        $users = User::with(['role', 'learner.parent.user', 'parent.children'])
+            ->when($role && $role !== 'all', function ($query) use ($role) {
+                $query->whereHas('role', function ($roleQuery) use ($role) {
+                    $roleQuery->where('slug', $role);
+                });
+            })
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('username', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($status === 'active', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->when($status === 'inactive', function ($query) {
+                $query->where('is_active', false);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.users.index', [
+            'users' => $users,
+            'roles' => Role::orderBy('name')->get(),
+            'roleFilter' => $role,
+            'search' => $search,
+            'statusFilter' => $status,
+            'roleCounts' => User::selectRaw('role_id, COUNT(*) as total')
+                ->groupBy('role_id')
+                ->pluck('total', 'role_id'),
+        ]);
     }
 
     public function create()

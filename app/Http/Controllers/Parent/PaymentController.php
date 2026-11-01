@@ -80,7 +80,6 @@ class PaymentController extends Controller
         $batch = $request->has('class_ids');
 
         $rules = [
-            'learner_id' => ['required', Rule::in($childIds)],
             'payment_type' => 'required|in:tuition,registration,material,other',
             'term' => 'nullable|string|max:50',
             'payment_method' => ['required', Rule::in(Payment::PARENT_METHODS)],
@@ -100,18 +99,24 @@ class PaymentController extends Controller
             'receipt' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
         ];
 
-        // The form ticks the classes a transfer covered; a single-installment
+        // The form ticks the children and classes a transfer covered. Each row
+        // is "learnerId:classId", so one submission can pay for several children
+        // (class 0 = a general payment for that child). A single-installment
         // post (old links, API callers) still sends class_id/amount/total_fee.
         $rules += $batch
             ? [
+                'learner_id' => ['nullable', Rule::in($childIds)],
+                'learner_ids' => 'nullable|array',
+                'learner_ids.*' => ['nullable', Rule::in($childIds)],
                 'class_ids' => 'required|array|min:1',
-                'class_ids.*' => 'integer|min:0',
+                'class_ids.*' => ['nullable', 'regex:/^\d+(:\d+)?$/'],
                 'amounts' => 'required|array',
                 'amounts.*' => 'nullable|numeric|min:0',
                 'total_fees' => 'nullable|array',
                 'total_fees.*' => 'nullable|numeric|min:0',
             ]
             : [
+                'learner_id' => ['required', Rule::in($childIds)],
                 'class_id' => 'nullable|exists:classes,id',
                 'amount' => 'required|numeric|min:1',
                 'total_fee' => 'nullable|numeric|min:0',
@@ -119,21 +124,23 @@ class PaymentController extends Controller
 
         $validated = $request->validate($rules, [
             'learner_id.in' => 'Choose one of the children linked to your account.',
+            'learner_ids.*.in' => 'One of the children you ticked is not linked to your account.',
+            'class_ids.required' => 'Tick the child or class this payment covers.',
+            'class_ids.*.regex' => 'One of the payment rows is not valid. Refresh the page and try again.',
             'payment_method.required' => 'Choose how you paid.',
             'payment_method.in' => 'Card payments are coming soon. Please pay by bank transfer for now.',
             'payment_account_id.required' => 'Choose the school account you transferred the money into.',
             'payment_account_id.exists' => 'That school account is no longer listed. Choose another one, or contact the school if none is listed.',
         ]);
 
-        $learner = $children->firstWhere('id', (int) $validated['learner_id']);
-        $lines = $this->installments($validated, $learner, $batch);
+        $lines = $this->installments($validated, $children, $batch);
 
         // Only a transfer carries a school account; cash happens at the office.
         $account = $validated['payment_method'] === Payment::METHOD_TRANSFER
             ? PaymentAccount::find($validated['payment_account_id'] ?? null)
             : null;
 
-        // The receipt is the same document for every class in the transfer.
+        // The receipt is the same document for every child and class covered.
         $receipt = [];
         if ($request->hasFile('receipt')) {
             $file = $request->file('receipt');
@@ -143,11 +150,11 @@ class PaymentController extends Controller
             ];
         }
 
-        $payments = DB::transaction(function () use ($parentUser, $learner, $lines, $validated, $account, $receipt) {
-            return collect($lines)->map(function (array $line) use ($parentUser, $learner, $validated, $account, $receipt) {
+        $payments = DB::transaction(function () use ($parentUser, $lines, $validated, $account, $receipt) {
+            return collect($lines)->map(function (array $line) use ($parentUser, $validated, $account, $receipt) {
                 return Payment::create(array_merge([
                     'user_id' => $parentUser->id,
-                    'learner_id' => $learner->id,
+                    'learner_id' => $line['learner_id'],
                     'payment_type' => $validated['payment_type'],
                     'term' => $validated['term'] ?? null,
                     'class_id' => $line['class_id'],
@@ -166,48 +173,72 @@ class PaymentController extends Controller
             });
         });
 
-        $this->notifyCeos($payments, $learner, $validated['payment_method']);
+        $paidFor = $children->whereIn('id', $payments->pluck('learner_id')->unique()->all());
+
+        $this->notifyCeos($payments, $paidFor, $validated['payment_method']);
 
         $summary = $payments->count() === 1
             ? '1 installment'
             : $payments->count() . ' installments';
 
+        $family = $paidFor->count() > 1 ? ' for ' . $paidFor->count() . ' children' : '';
+
         return redirect()
             ->route('parent.payments.index')
             ->with(
                 'success',
-                $summary . ' submitted. The school will check the '
+                $summary . $family . ' submitted. The school will check the '
                     . ($validated['payment_method'] === Payment::METHOD_CASH ? 'cash book' : 'bank')
                     . ' and the balance will update.'
             );
     }
 
     /**
-     * Turn the ticked classes into the installments to record.
+     * Turn the ticked rows into the installments to record.
+     *
+     * A row key is either "<learnerId>:<classId>" (new multi-child form) or a
+     * plain class id (the earlier single-child form). Class id 0 means a
+     * general payment for that child.
      *
      * @param  array<string, mixed>  $validated
-     * @return array<int, array{class_id: int|null, amount: float, total_fee: float|null}>
+     * @param  Collection<int, Learner>  $children
+     * @return array<int, array{learner_id: int, class_id: int|null, amount: float, total_fee: float|null}>
      */
-    private function installments(array $validated, Learner $learner, bool $batch): array
+    private function installments(array $validated, Collection $children, bool $batch): array
     {
         if (! $batch) {
+            $learner = $children->firstWhere('id', (int) $validated['learner_id']);
+
             $amount = (float) $validated['amount'];
             $total = isset($validated['total_fee']) ? (float) $validated['total_fee'] : null;
 
             $this->guardLine((int) ($validated['class_id'] ?? 0), $amount, $total, $learner, 'amount', 'class_id');
 
-            return [['class_id' => $validated['class_id'] ?? null, 'amount' => $amount, 'total_fee' => $total]];
+            return [[
+                'learner_id' => $learner->id,
+                'class_id' => $validated['class_id'] ?? null,
+                'amount' => $amount,
+                'total_fee' => $total,
+            ]];
         }
 
         $amounts = $validated['amounts'] ?? [];
         $fees = $validated['total_fees'] ?? [];
         $lines = [];
 
-        foreach (array_unique($validated['class_ids']) as $key) {
-            $key = (int) $key;
+        foreach (array_unique(array_map('strval', $validated['class_ids'])) as $key) {
+            [$learnerId, $classId] = $this->rowTarget($key, $validated);
+            $learner = $children->firstWhere('id', $learnerId);
+
+            if (! $learner) {
+                throw ValidationException::withMessages([
+                    'class_ids.' . $key => 'That child is not linked to your account.',
+                ]);
+            }
+
             $amount = (float) ($amounts[$key] ?? 0);
 
-            // A ticked class with no amount is simply not part of this transfer.
+            // A ticked row with no amount is simply not part of this transfer.
             if ($amount <= 0) {
                 continue;
             }
@@ -215,18 +246,46 @@ class PaymentController extends Controller
             $total = $fees[$key] ?? null;
             $total = ($total === null || $total === '') ? null : (float) $total;
 
-            $this->guardLine($key, $amount, $total, $learner, 'amounts.' . $key, 'class_ids.' . $key);
+            $this->guardLine($classId, $amount, $total, $learner, 'amounts.' . $key, 'class_ids.' . $key);
 
-            $lines[] = ['class_id' => $key ?: null, 'amount' => $amount, 'total_fee' => $total];
+            $lines[] = [
+                'learner_id' => $learner->id,
+                'class_id' => $classId ?: null,
+                'amount' => $amount,
+                'total_fee' => $total,
+            ];
         }
 
         if ($lines === []) {
             throw ValidationException::withMessages([
-                'amounts' => 'Enter the amount you paid against at least one class.',
+                'amounts' => 'Enter the amount you paid against at least one child or class.',
             ]);
         }
 
         return $lines;
+    }
+
+    /**
+     * Which child (and class) a ticked row belongs to.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array{0: int, 1: int}
+     */
+    private function rowTarget(string $key, array $validated): array
+    {
+        if (strpos($key, ':') !== false) {
+            [$learnerId, $classId] = array_map('intval', explode(':', $key, 2));
+
+            return [$learnerId, $classId];
+        }
+
+        $learnerId = (int) ($validated['learner_id'] ?? 0);
+
+        if (! $learnerId && ! empty($validated['learner_ids'])) {
+            $learnerId = (int) reset($validated['learner_ids']);
+        }
+
+        return [$learnerId, (int) $key];
     }
 
     /**
@@ -311,11 +370,13 @@ class PaymentController extends Controller
 
     /**
      * Lets the CEO know there is money to check against the bank or cash book.
-     * One submission can cover several classes, so the note summarises them.
+     * One submission can cover several children and classes, so the note
+     * summarises the whole family in one line.
      *
      * @param  Collection<int, Payment>  $payments
+     * @param  Collection<int, Learner>  $learners
      */
-    private function notifyCeos(Collection $payments, Learner $learner, string $method): void
+    private function notifyCeos(Collection $payments, Collection $learners, string $method): void
     {
         $payment = $payments->first();
 
@@ -326,12 +387,23 @@ class PaymentController extends Controller
         $count = $payments->count();
         $classes = $payments->pluck('class_id')->filter()->count();
 
+        $names = $learners
+            ->map(function (Learner $learner) {
+                return $learner->user->name ?? null;
+            })
+            ->filter()
+            ->values();
+
+        $who = $names->count() > 1
+            ? $names->count() . ' children (' . $names->implode(', ') . ')'
+            : ($names->first() ?: 'a learner');
+
         $message = sprintf(
             '%s submitted %s%s for %s (%s%s) by %s%s. %s',
             auth()->user()->name,
             number_format((float) $payments->sum('amount'), 2),
             $payment->currency ? ' ' . $payment->currency : '',
-            $learner->user->name ?? 'a learner',
+            $who,
             $count === 1 ? '1 installment' : $count . ' installments',
             $count > 1 && $classes < $count ? ' incl. a general payment' : '',
             strtolower(Payment::METHODS[$method] ?? $method),

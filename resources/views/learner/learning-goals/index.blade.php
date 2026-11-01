@@ -19,7 +19,7 @@
             <div class="bg-white rounded-xl shadow-md p-5">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                     <div class="min-w-0">
-                        <h2 class="font-semibold text-gray-800">{{ $goal->title }}</h2>
+                        <h2 class="font-semibold text-gray-800 whitespace-pre-line">{{ $goal->goalText() }}</h2>
                         <p class="text-xs text-gray-500 mt-1">
                             {{ $goal->schoolClass->name ?? 'General goal' }}
                             @if($goal->term) · {{ $goal->term }} @endif
@@ -30,14 +30,6 @@
                         <span class="shrink-0 text-xs text-gray-500">Shared {{ $goal->shared_at->format('M j, Y') }}</span>
                     @endif
                 </div>
-
-                @if($goal->target)
-                    <p class="mt-3 text-sm text-gray-700"><strong>Target:</strong> {{ $goal->target }}</p>
-                @endif
-
-                @if($goal->description)
-                    <p class="mt-2 text-sm text-gray-600 whitespace-pre-line">{{ $goal->description }}</p>
-                @endif
 
                 @if($goal->file_path)
                     <a href="{{ route('learner.learning-goals.download', $goal) }}"

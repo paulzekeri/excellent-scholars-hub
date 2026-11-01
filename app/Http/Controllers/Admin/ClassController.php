@@ -7,6 +7,7 @@ use App\Models\Classes;
 use App\Models\Learner;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ClassController extends Controller
 {
@@ -24,9 +25,10 @@ class ClassController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:classes',
+            // Optional: a blank code is generated from the class name below.
+            'code' => 'nullable|string|max:50|unique:classes,code',
             'tutor_id' => 'required|exists:tutors,id',
             'grade_level' => 'nullable|string',
             'subject' => 'nullable|string',
@@ -34,7 +36,9 @@ class ClassController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        Classes::create($request->all());
+        $validated['code'] = $this->generateCode($validated['code'] ?? null, $validated['name']);
+
+        Classes::create($validated);
 
         return redirect()->route('admin.classes.index')->with('success', 'Class created successfully.');
     }
@@ -54,19 +58,49 @@ class ClassController extends Controller
 
     public function update(Request $request, Classes $class)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:classes,code,' . $class->id,
+            // Optional: leaving it blank keeps the code the class already has.
+            'code' => 'nullable|string|max:50|unique:classes,code,' . $class->id,
             'tutor_id' => 'required|exists:tutors,id',
             'grade_level' => 'nullable|string',
             'subject' => 'nullable|string',
             'max_students' => 'nullable|integer|min:1',
             'description' => 'nullable|string',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $class->update($request->all());
+        if (empty($validated['code'])) {
+            unset($validated['code']);
+        } else {
+            $validated['code'] = strtoupper(trim($validated['code']));
+        }
+
+        $class->update($validated);
 
         return redirect()->route('admin.classes.index')->with('success', 'Class updated successfully.');
+    }
+
+    /**
+     * "Class Code should not be mandatory when Creating New Class" — a blank
+     * code becomes a short, unique code built from the class name.
+     */
+    private function generateCode(?string $code, string $name): string
+    {
+        $code = trim((string) $code);
+
+        if ($code !== '') {
+            return strtoupper($code);
+        }
+
+        $base = strtoupper(preg_replace('/[^A-Za-z0-9]+/', '', $name) ?: 'CLASS');
+        $base = substr($base, 0, 6);
+
+        do {
+            $candidate = $base . '-' . strtoupper(Str::random(5));
+        } while (Classes::where('code', $candidate)->exists());
+
+        return $candidate;
     }
 
     public function destroy(Classes $class)

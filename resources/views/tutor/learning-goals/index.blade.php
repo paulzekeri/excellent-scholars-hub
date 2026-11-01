@@ -5,7 +5,7 @@
     <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
         <div>
             <h1 class="text-3xl font-bold text-gray-800">Learning Goals</h1>
-            <p class="text-gray-600 mt-1">Upload goals for your learners. Administrators and the CEO can share them with parents.</p>
+            <p class="text-gray-600 mt-1">Write goals for your learners. Administrators and the CEO share them with individual parents, learners and tutors.</p>
         </div>
         <a href="{{ route('tutor.learning-goals.create') }}" class="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"><i class="fas fa-plus mr-1"></i> New goal</a>
     </div>
@@ -28,13 +28,10 @@
                     @forelse($myGoals as $goal)
                         <tr class="hover:bg-blue-50/40">
                             <td class="px-6 py-4 text-sm">
-                                <p class="font-medium text-gray-800">{{ $goal->title }}</p>
-                                @if($goal->target)
-                                    <p class="text-xs text-gray-500">Target: {{ $goal->target }}</p>
-                                @endif
+                                <p class="font-medium text-gray-800 whitespace-pre-line">{{ $goal->goalExcerpt(220) }}</p>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">
-                                {{ $goal->learner->user->name ?? 'Whole class' }}
+                                {{ $goal->learner->user->name ?? 'General goal' }}
                                 @if($goal->schoolClass)
                                     <span class="block text-xs text-gray-500">{{ $goal->schoolClass->name }}</span>
                                 @endif
@@ -51,8 +48,14 @@
                                 @if($goal->shared_with_parent)
                                     <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800">Parent</span>
                                 @endif
+                                @if($goal->shared_with_learner)
+                                    <span class="px-2 py-1 rounded-full bg-green-100 text-green-800">Learner</span>
+                                @endif
                                 @if($goal->shared_with_tutor)
                                     <span class="px-2 py-1 rounded-full bg-orange-100 text-orange-800">Tutor</span>
+                                @endif
+                                @if($goal->recipients->isNotEmpty())
+                                    <span class="mt-1 block text-gray-500">{{ $goal->recipients->count() }} {{ \Illuminate\Support\Str::plural('person', $goal->recipients->count()) }} by name</span>
                                 @endif
                                 @unless($goal->isShared())
                                     <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-600">Pending review</span>
@@ -84,11 +87,8 @@
             @forelse($sharedGoals as $goal)
                 <div class="p-6 flex flex-wrap justify-between gap-3">
                     <div>
-                        <p class="font-medium text-gray-800">{{ $goal->title }}</p>
+                        <p class="font-medium text-gray-800 whitespace-pre-line">{{ $goal->goalExcerpt(300) }}</p>
                         <p class="text-sm text-gray-600">{{ $goal->contextLabel() }}</p>
-                        @if($goal->description)
-                            <p class="text-sm text-gray-500 mt-1">{{ \Illuminate\Support\Str::limit($goal->description, 160) }}</p>
-                        @endif
                         <p class="text-xs text-gray-500 mt-1">
                             Shared {{ $goal->shared_at ? $goal->shared_at->format('M d, Y') : '' }}
                             @if($goal->sharedBy) by {{ $goal->sharedBy->name }} @endif

@@ -20,7 +20,7 @@ guide, sidebar). This is the honest picture of all 14 notes:
 | 4 | Assignment images + optional max students | `[x]` |
 | 5 | Monthly classes per tutor | `[x]` — admin/CEO can tick a class as completed (with audit + reopen); the report now counts **completed** classes and shows completed vs scheduled |
 | 6 | Blue / white / orange branding | `[x]` |
-| 7 | Tutor learning goals, shared by admin/CEO | `[x]` — shared with parents, **learners** and tutors; learners get a dashboard panel and a "My Learning Goals" page with attachment downloads |
+| 7 | Tutor learning goals, shared by admin/CEO | `[x]` — goals are now a **long text area** (up to 5,000 characters) with a free **AI wording assistant**, and each goal is shared with **individual parents, learners and tutors** (pivot `learning_goal_shares`) or with everyone the goal is about; learners get a dashboard panel and a "My Learning Goals" page with attachment downloads |
 | 8 | Affirmation card | `[x]` — administrators/CEO publish the weekly affirmation from **Affirmations**; every dashboard shows the latest active post (colourful card), with the built-in rotation as fallback |
 | 9 | Landing page (slider, testimonials, about, register) | `[~]` — page + live programmes exist; testimonials are now member-written and CEO-approved; the slider remains static |
 | 9-i | Testimonials backend + admin approval | `[x]` — members submit from **My profile**; the CEO approves/rejects; approved ones appear on the landing page (photo only when allowed) |
@@ -272,4 +272,93 @@ Design: `PLAN_LOGIN_AND_ADMISSIONS.md` §2. Phase 1 shipped on 29 October 2026.
       usernames refused, idempotent via a locked transaction. Tests: `EnquiryConversionTest` (10).
 - [ ] **P5** — optional cron reminders, guardian status page, automatic Meet/Zoom links. **Deferred to v2
       and marked on the quotation** (the deployment has no cron; today's panels already cover visibility).
+
+---
+
+## Round 2 — client review of 1 November 2026
+
+All six items are implemented and verified. New/updated tests:
+`tests/Feature/RoundTwoEnhancementsTest.php` (6), `PaymentBatchTest` (+2),
+`LearnerLearningGoalsTest` (updated for the removed target/notes). Full suite: **225 passing**.
+
+| # | Client request | Status |
+|---|---|---|
+| R1 | "If a parent has many children, record payment once for all children, not per child" | `[x]` |
+| R2 | "On tutor page, do filtering by role" / `…/admin/users` filter by roles | `[x]` — the Users page (where tutors are listed) now has a role filter |
+| R3 | Class Code should not be mandatory when creating a class | `[x]` |
+| R4 | Set a schedule once with a repeat (every Monday, same time, users and video link automatic) | `[x]` |
+| R5 | Learning goals: drop "What success looks like", learner and notes; take enough text; free AI wording correction | `[x]` |
+| R6 | Learning goals shared to individual parents / learners / tutors | `[x]` |
+
+### R1 — one payment for the whole family
+
+- The parent payment form now shows a **child checkbox list** ("Children covered by this payment"). Ticking a
+  child reveals a **General payment** row and one row per class that child attends.
+- Every row posts as `class_ids[]=<learnerId>:<classId>` (`:0` = general), with `amounts[<key>]` and
+  `total_fees[<key>]`. `Parent\PaymentController::installments()` + `rowTarget()` create one `payments` row per
+  row, all under **one reference, one receipt, one bank account and one date**, so the CEO verifies the transfer
+  once. The old single-child payload (`learner_id` + plain class ids) is still accepted.
+- Rows for another family are rejected (`class_ids.<key>`), the CEO notification summarises the total and names
+  every child, and the success message reports "N installments for M children".
+
+### R2 — role filter on the users page
+
+- `Admin\UserController@index` accepts `role`, `status` and `q` (name/username/email), with
+  `withQueryString()` pagination.
+- `admin/users/index` adds a filter form plus quick role chips showing the count per role
+  (`All users (n)`, `Tutor (n)`, `Learner (n)`, …).
+
+### R3 — optional class code
+
+- `ClassController` validates `code` as nullable; a blank code becomes `NAME-XXXXX` from the class name
+  (`generateCode()`), guaranteed unique. Editing with a blank code keeps the existing code.
+- Create/edit screens say "(optional) / Leave blank to auto-generate".
+
+### R4 — set once, repeat weekly, automatic video room
+
+- Migration `add_recurrence_to_class_schedules_table`: `recurrence_rule`, `recurrence_until`,
+  `recurrence_group` (+ index).
+- `App\Services\ClassScheduleService::createSeries()` creates one session per week from the first date until
+  `repeat_until` (max 52), all sharing `recurrence_group`; duration, tutor, class, meeting link and platform are
+  copied. Because they are ordinary sessions, learner/tutor dashboards, attendance, completion and the monthly
+  tutor report need no changes.
+- New platform **"Automatic video room (Jitsi Meet)"**: with a blank link the service generates a free
+  `https://meet.jit.si/esh-…` room once and reuses it for every session in the series.
+- Both schedule forms (admin and tutor) gain **Repeat** (does not repeat / every week) and **Repeat until**,
+  and both lists flag weekly sessions.
+
+### R5 — learning goals: long text, no target/learner/notes, free AI check
+
+- Migration `expand_learning_goal_text` changes `learning_goals.title` to `TEXT` (driver-aware, no doctrine/dbal).
+  The tutor form now has one large **Goal** textarea (5,000 characters) and no "What success looks like",
+  learner picker or notes field. `description`/`target` remain in the schema for existing rows but are no longer
+  collected or shown.
+- **Wording assistant** (`App\Services\GoalWordingService`): the **Improve wording (free AI)** button posts the
+  text to `POST /tutor/learning-goals/polish` (throttled), which calls the free public LanguageTool API
+  (`https://api.languagetool.org/v2/check`, no key), applies the first replacement for each match and returns the
+  corrected paragraph plus a count. Failures (no internet / API down) return a friendly message and leave the
+  text unchanged. Config: `config/services.php → languagetool` + `GOAL_WORDING_ASSISTANT`, `LANGUAGETOOL_URL`,
+  `LANGUAGETOOL_LANGUAGE`, `LANGUAGETOOL_TIMEOUT`.
+
+### R6 — share a goal with individual people
+
+- Migration `create_learning_goal_shares_table`: one row per (`learning_goal_id`, `user_id`) with `role_slug`
+  (`parent` / `learner` / `tutor`) and `shared_by`; `LearningGoal::recipients()` is a `belongsToMany`.
+- The admin Goals screen replaces the three switches with **Choose people**: multi-selects for Parents,
+  Learners and Tutors (current picks pre-selected), optional "All parents/learners/tutors the goal is about",
+  and chips showing exactly who has the goal. A new **Shared with chosen people** filter lists them.
+- Visibility now honours both styles:
+  - parent goals tab — legacy `shared_with_parent` scope **or** a direct share to that parent;
+  - learner dashboard / "My Learning Goals" — `scopeVisibleToLearner()` includes direct shares and
+    `isVisibleToLearner()` checks them first;
+  - tutor "Shared with you" — legacy class-wide tutor sharing **or** a direct share; downloads now work for
+    goals shared by name (previously 403 for the recipient).
+- The legacy `shared_with_*` payload is still supported, and it also adds/removes the implied person
+  (the learner's parent, the learner, the tutor) so both sharing styles stay in step.
+
+### Documentation
+
+- In-app **Help → What's new in this release**: rows updated for Fees, Learning goals and Classes, new rows for
+  Schedules and Users; the Classes, Schedules, Fees and Learning-goals sections were rewritten for the new flow.
+- `PLAN_CLIENT_ADDITIONS.md` (this file) and `plan.md` (Phase 12) list the same changes.
 

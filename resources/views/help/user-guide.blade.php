@@ -414,7 +414,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Subject</strong>, <strong>Grade Level</strong>, assign a <strong>Tutor</strong>, set <strong>Max Students</strong>, and add a <strong>Description</strong> (optional).</span>
+                            <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Class Code</strong> (optional), <strong>Subject</strong>, <strong>Grade Level</strong>, assign a <strong>Tutor</strong>, set <strong>Max Students</strong>, and add a <strong>Description</strong> (optional).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -423,7 +423,7 @@
                     </ol>
 
                     <div class="tip-box">
-                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Each class is automatically assigned a unique <strong>Class Code</strong> that learners can use for enrollment.</p>
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> <strong>Class Code is optional.</strong> Leave it blank and the school generates a short, unique code from the class name (for example <em>MATHS-7K2QP</em>) that learners can use for enrollment.</p>
                     </div>
 
                     <p class="font-medium text-gray-700 mb-2">Enrolling Learners in a Class:</p>
@@ -460,13 +460,18 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class</strong> and <strong>Tutor</strong>, set <strong>Start/End Time</strong>, and optionally add a <strong>Meeting Link</strong> (e.g., Zoom/Google Meet URL).</span>
+                            <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class</strong> and <strong>Tutor</strong>, set the <strong>Start/End Time</strong>, then choose a <strong>Meeting Platform</strong> and, if you have one, a <strong>Meeting Link</strong> (Zoom/Google Meet).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create Schedule"</strong>.</span>
                         </li>
                     </ol>
+
+                    <div class="tip-box">
+                        <p class="text-sm text-gray-700 mb-2"><strong>Repeat a weekly lesson:</strong> set <strong>Repeat</strong> to <em>Every week</em>, pick the first Monday in <strong>Start Time</strong> and choose a <strong>Repeat until</strong> date. The school creates the same lesson for every following Monday at the same time; enrolled learners and the tutor see every session on their dashboards automatically.</p>
+                        <p class="text-sm text-gray-700"><strong>Automatic video room:</strong> choose <strong>Automatic video room (Jitsi Meet)</strong> and leave the link blank &mdash; a free meeting link is generated for you and reused for every session in the series.</p>
+                    </div>
 
                     <p class="font-medium text-gray-700 mt-4 mb-2">To tick a class as completed:</p>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
@@ -761,7 +766,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Choose the <strong>Class</strong>, set the <strong>Title</strong>, <strong>Start/End Time</strong>, and optionally add a <strong>Meeting Link</strong> (for virtual classes).</span>
+                            <span class="text-gray-600">Choose the <strong>Class</strong>, set the <strong>Title</strong>, <strong>Start/End Time</strong> and <strong>Meeting Platform</strong>. Set <strong>Repeat</strong> to <em>Every week</em> with a <strong>Repeat until</strong> date to create the same lesson every week from a single form.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -769,7 +774,7 @@
                         </li>
                     </ol>
                     <div class="tip-box">
-                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> You can add a Zoom, Google Meet, or Microsoft Teams link so learners can join the virtual class with one click.</p>
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Pick <strong>Automatic video room (Jitsi Meet)</strong> and leave the link blank &mdash; a free video link is generated for you and used for every session in the weekly series.</p>
                     </div>
                 </div>
 
@@ -1403,7 +1408,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @if($guideIsParent || $guideIsCeo)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Fees</td><td class="px-4 py-3 text-gray-600">Parents now record their own payments (installments, receipt upload, per term and per class) and choose <strong>bank transfer</strong>, <strong>cash</strong> or <strong>card</strong>; the CEO checks the bank or cash book and clicks <strong>Payment received</strong> — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">Parents, CEO</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Fees</td><td class="px-4 py-3 text-gray-600">Parents record their own payments (installments, receipt upload, per term and per class) and choose <strong>bank transfer</strong>, <strong>cash</strong> or <strong>card</strong>. One transfer can be recorded <strong>once for several children</strong> — tick each child, then each class — and the CEO checks the bank or cash book and clicks <strong>Payment received</strong> — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">Parents, CEO</td></tr>
                             @endif
                             @if($guideIsCeo)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Bank accounts</td><td class="px-4 py-3 text-gray-600">New <strong>Finance → Bank accounts</strong> screen: the CEO adds, edits, switches off or deletes the accounts parents transfer into. Only switched-on accounts appear on the parent form, with a copy-number button — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">CEO</td></tr>
@@ -1415,7 +1420,7 @@
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Inbox</td><td class="px-4 py-3 text-gray-600">Tutors and learners now have their own inbox and can reply.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners</td></tr>
                             @endif
                             @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learning goals</td><td class="px-4 py-3 text-gray-600">Tutors upload goals; the school shares them with parents, learners and tutors — see <a href="#learning-goals" class="text-blue-700 underline">Learning goals</a>. Learners see shared goals on their dashboard and in My Learning.</td><td class="px-4 py-3 text-gray-600">Tutors, Admin, CEO, Parents, Learners</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learning goals</td><td class="px-4 py-3 text-gray-600">Tutors write goals in a <strong>large text area</strong> (up to 5,000 characters) with a free <strong>Improve wording</strong> AI assistant. The school shares each goal with <strong>individual parents, learners and tutors</strong> — see <a href="#learning-goals" class="text-blue-700 underline">Learning goals</a>. Shared goals appear on the parent's child page, the learner's dashboard and the tutor's Goals screen.</td><td class="px-4 py-3 text-gray-600">Tutors, Admin, CEO, Parents, Learners</td></tr>
                             @endif
                             @if($guideIsLearner)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Learner panel</td><td class="px-4 py-3 text-gray-600">"Live now / Up next" panel at the top of the dashboard — see <a href="#dashboard-extras" class="text-blue-700 underline">Dashboard extras</a>.</td><td class="px-4 py-3 text-gray-600">Learners</td></tr>
@@ -1444,7 +1449,13 @@
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Assignments</td><td class="px-4 py-3 text-gray-600">Tutors can attach up to six pictures to an assignment.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners, Parents</td></tr>
                             @endif
                             @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Classes</td><td class="px-4 py-3 text-gray-600">Maximum students is now optional (blank = unlimited).</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Classes</td><td class="px-4 py-3 text-gray-600">Maximum students and the <strong>Class Code</strong> are both optional (blank code = auto-generated, blank maximum = unlimited).</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
+                            @endif
+                            @if($guideIsAdmin || $guideIsTutor)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Schedules</td><td class="px-4 py-3 text-gray-600">Set a lesson once with <strong>Repeat &rarr; Every week</strong> and a <em>Repeat until</em> date; every week appears automatically for the class. Choose <strong>Automatic video room (Jitsi Meet)</strong> to generate a free meeting link once and reuse it for the series. Weekly sessions are flagged on the Schedules list.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
+                            @endif
+                            @if($guideIsAdmin)
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Users</td><td class="px-4 py-3 text-gray-600">The Users page now filters by <strong>role</strong> (quick chips show the count per role), plus status and a name/username/email search.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Website</td><td class="px-4 py-3 text-gray-600">Public landing page with sliders, programmes, testimonials and registration.</td><td class="px-4 py-3 text-gray-600">Visitors</td></tr>
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Branding</td><td class="px-4 py-3 text-gray-600">Blue, white and orange colour scheme across the whole platform.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
@@ -1529,11 +1540,11 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Step 1 — record your payment</h3>
                 <ol class="space-y-2 mb-4">
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Fees &amp; Payments</strong> and click <strong>Record a payment</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Choose one of <strong>your own children</strong> — other families' children are never listed — and optionally that child's <strong>class</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Enter the <strong>payment type</strong>, the <strong>term</strong>, the <strong>total fee</strong> (if known) and the <strong>amount paid now</strong>. A single installment can never be larger than the total fee.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Tick <strong>every child</strong> this transfer covers (only your own children are ever listed), then type the amount paid against each child and class row &mdash; one transfer is recorded once for the whole family, not once per child.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Choose the <strong>payment type</strong> and <strong>term</strong>; each row takes the <strong>amount paid now</strong> and, if known, the <strong>total fee</strong>. A single installment can never be larger than the total fee.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Pay by <strong>bank transfer</strong> — the school accounts are listed with a copy button, and you must pick the one you used (cash is not accepted, as the school is online-only; card stays disabled as <em>coming soon</em> until Paystack is connected). Then add the reference (the transfer narration), the date and the <strong>receipt or teller slip</strong> (PDF or image, up to 5 MB).</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">On submit the record is stored as <strong>Pending verification</strong> — you can never mark your own payment as paid.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">6.</span><span class="text-gray-600">The school is notified: <em>"Payment awaiting verification"</em>, with the amount, child and fee.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">6.</span><span class="text-gray-600">The school is notified: <em>"Payment awaiting verification"</em>, with the total amount and every child and fee it covers.</span></li>
                 </ol>
                 @endif
 
@@ -1624,8 +1635,9 @@
                         Your tutor records what you are working towards. The school reviews those goals and decides which
                         ones you can see — they then appear on your dashboard and in <strong>My Learning → Learning Goals</strong>.
                     @else
-                        Tutors record what each learner is working towards. You review those goals and decide which ones
-                        are shared with the parent, the learner and/or the tutor — nothing reaches them automatically.
+                        Tutors write what each learner is working towards. You review those goals and choose <strong>individual
+                        parents, learners and tutors</strong> to share each one with &mdash; or share it with everyone the goal
+                        is about &mdash; and nothing reaches them automatically.
                     @endif
                 </p>
 
@@ -1633,9 +1645,9 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">For tutors — uploading a goal</h3>
                 <ol class="space-y-2 mb-6">
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Goals</strong> in the menu and click <strong>New goal</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Enter the goal (for example "Read one chapter aloud each week") and, optionally, what success looks like.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Choose the <strong>learner</strong>, the <strong>class</strong>, or both, plus the term.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Attach a PDF, Word document or image if useful (maximum 8 MB) and click <strong>Save goal</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Write the goal in the large <strong>Goal</strong> box &mdash; up to 5,000 characters, so the whole wording fits, not just a heading.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Optional: click <strong>Improve wording (free AI)</strong>. The free LanguageTool assistant fixes spelling, grammar and phrasing and puts the corrected text back in the box for you to review.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Optionally choose the <strong>class</strong> and the <strong>term</strong>, attach a PDF, Word document or image (maximum 8 MB) and click <strong>Save goal</strong>.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">The sharing column shows <strong>Pending review</strong> until the school shares it.</span></li>
                 </ol>
                 <div class="warning-box">
@@ -1649,8 +1661,9 @@
                 <ol class="space-y-2 mb-6">
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Goals</strong> in the admin menu. The tiles show all goals, how many are shared with parents, learners and tutors, and how many are awaiting review.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Filter by tutor or by sharing status if the list is long.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">In the <strong>Share with</strong> column tick <strong>Parent</strong>, <strong>Learner</strong> and/or <strong>Tutor</strong>, then click <strong>Save</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">The date and the name of the person who shared it are recorded in <strong>Last shared</strong>. Unticking all switches withdraws the goal.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Open <strong>Choose people</strong> in the sharing column. Tick the <strong>individual parents</strong>, <strong>learners</strong> and <strong>tutors</strong> who should receive the goal (hold Ctrl/Cmd to pick several), or tick <em>All parents/learners/tutors the goal is about</em> to share it more widely, then click <strong>Save sharing</strong>.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">The chips beside the form show exactly who has the goal, and <strong>Last shared</strong> records who shared it and when. Unticking everyone withdraws it.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">Use the <strong>Shared with chosen people</strong> filter to list every individually shared goal.</span></li>
                 </ol>
                 @endif
 
@@ -1658,8 +1671,8 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">For parents — where to find them</h3>
                 <p class="text-gray-600 mb-3">
                     On the parent dashboard open a child and choose the <strong>Learning Goals</strong> tab (the orange
-                    counter). Only goals the school shared with parents appear there, showing the goal, the target, the
-                    tutor, the term and any attachment.
+                    counter). Only goals the school shared with you (by name, or with all parents of that class) appear
+                    there, showing the goal, the tutor, the term and any attachment.
                 </p>
                 @endif
 

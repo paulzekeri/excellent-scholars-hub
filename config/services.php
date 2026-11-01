@@ -40,5 +40,17 @@ return [
         'base_url' => env('PAYSTACK_BASE_URL', 'https://api.paystack.co'),
     ],
 
+    /*
+    | Free wording assistant for learning goals (LanguageTool). No key is needed
+    | for the public endpoint; point the URL at a self-hosted instance to avoid
+    | the public rate limit, or set GOAL_WORDING_ASSISTANT=false to switch it off.
+    */
+    'languagetool' => [
+        'enabled' => env('GOAL_WORDING_ASSISTANT', true),
+        'url' => env('LANGUAGETOOL_URL', 'https://api.languagetool.org/v2/check'),
+        'language' => env('LANGUAGETOOL_LANGUAGE', 'en-US'),
+        'timeout' => (int) env('LANGUAGETOOL_TIMEOUT', 15),
+    ],
+
 ];
 

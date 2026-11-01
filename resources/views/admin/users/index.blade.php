@@ -47,6 +47,53 @@
         </div>
     @endif
 
+    <form method="GET" action="{{ route('admin.users.index') }}" class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+            <div>
+                <label for="role-filter" class="block text-xs font-medium text-gray-600 mb-1">Role</label>
+                <select id="role-filter" name="role" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="all">All roles</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->slug }}" {{ $roleFilter === $role->slug ? 'selected' : '' }}>
+                            {{ ucfirst($role->name) }} ({{ $roleCounts[$role->id] ?? 0 }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="status-filter" class="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                <select id="status-filter" name="status" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Any status</option>
+                    <option value="active" {{ $statusFilter === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ $statusFilter === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+            </div>
+            <div>
+                <label for="user-search" class="block text-xs font-medium text-gray-600 mb-1">Search</label>
+                <input id="user-search" type="search" name="q" value="{{ $search }}" placeholder="Name, username or email"
+                    class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-800 transition"><i class="fas fa-filter mr-1"></i> Filter</button>
+                <a href="{{ route('admin.users.index') }}" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">Reset</a>
+            </div>
+        </div>
+
+        <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-gray-500">Quick filter:</span>
+            <a href="{{ route('admin.users.index') }}"
+                class="rounded-full px-3 py-1 font-semibold {{ empty($roleFilter) || $roleFilter === 'all' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                All users ({{ $roleCounts->sum() }})
+            </a>
+            @foreach($roles as $role)
+                <a href="{{ route('admin.users.index', array_filter(['role' => $role->slug, 'q' => $search ?: null, 'status' => $statusFilter ?: null])) }}"
+                    class="rounded-full px-3 py-1 font-semibold {{ $roleFilter === $role->slug ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                    {{ ucfirst($role->name) }} ({{ $roleCounts[$role->id] ?? 0 }})
+                </a>
+            @endforeach
+        </div>
+    </form>
+
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -63,7 +110,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    @foreach($users as $user)
+                    @forelse($users as $user)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ $user->name }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">
@@ -141,7 +188,13 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                                No users match this filter.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

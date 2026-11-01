@@ -16,7 +16,11 @@
                     @foreach($schedules as $schedule)
                     @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
                     <tr class="{{ $isToday ? 'bg-sun-light hover:bg-sun-light' : 'hover:bg-gray-50' }}">
-                        <td class="px-6 py-4 text-sm font-medium"><a href="{{ route('admin.schedules.show', $schedule) }}" class="{{ $isToday ? 'text-sun-ink hover:text-sun-ink' : 'text-gray-800 hover:text-blue-600' }}">{{ $schedule->title }}</a></td>
+                        <td class="px-6 py-4 text-sm font-medium"><a href="{{ route('admin.schedules.show', $schedule) }}" class="{{ $isToday ? 'text-sun-ink hover:text-sun-ink' : 'text-gray-800 hover:text-blue-600' }}">{{ $schedule->title }}</a>
+                            @if($schedule->isRecurring())
+                                <span class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-800" title="{{ $schedule->repeatLabel() }}">Weekly</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->tutor->user->name }}</td>
                         <td class="px-6 py-4 text-sm {{ $isToday ? 'text-sun-ink font-semibold' : '' }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>@endif</td>

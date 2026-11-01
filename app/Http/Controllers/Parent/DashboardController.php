@@ -204,20 +204,28 @@ class DashboardController extends Controller
     }
 
     /**
-     * Goals the school chose to share with the parent: those written for this
-     * learner plus class goals for any class the learner belongs to.
+     * Goals the school chose to share with this parent: those written for this
+     * learner, class goals for a class the learner belongs to, and anything the
+     * school shared with this parent by name.
      */
     private function sharedGoals(Learner $learner, ?Collection $classIds = null)
     {
         $classIds = $classIds ?? $learner->classes()->pluck('classes.id');
+        $parentUserId = auth()->id();
 
         return LearningGoal::with(['tutor.user', 'schoolClass'])
-            ->where('shared_with_parent', true)
-            ->where(function ($query) use ($learner, $classIds) {
-                $query->where('learner_id', $learner->id)
-                    ->orWhere(function ($inner) use ($classIds) {
-                        $inner->whereNull('learner_id')->whereIn('class_id', $classIds);
-                    });
+            ->where(function ($query) use ($learner, $classIds, $parentUserId) {
+                $query->where(function ($legacy) use ($learner, $classIds) {
+                    $legacy->where('shared_with_parent', true)
+                        ->where(function ($scope) use ($learner, $classIds) {
+                            $scope->where('learner_id', $learner->id)
+                                ->orWhere(function ($inner) use ($classIds) {
+                                    $inner->whereNull('learner_id')->whereIn('class_id', $classIds);
+                                });
+                        });
+                })->orWhereHas('recipients', function ($share) use ($parentUserId) {
+                    $share->where('user_id', $parentUserId);
+                });
             })
             ->latest('shared_at')
             ->latest();

@@ -597,18 +597,12 @@
                     <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                             <div class="flex-1">
-                                <h3 class="font-semibold text-gray-800">{{ $goal->title }}</h3>
+                                <h3 class="font-semibold text-gray-800 whitespace-pre-line">{{ $goal->goalText() }}</h3>
                                 <p class="text-sm text-gray-500 mt-1">
-                                    {{ $goal->learner->user->name ?? 'Whole class' }}
+                                    {{ $goal->learner->user->name ?? 'General goal' }}
                                     @if($goal->schoolClass) · {{ $goal->schoolClass->name }} @endif
                                     @if($goal->term) · {{ $goal->term }} @endif
                                 </p>
-                                @if($goal->target)
-                                    <p class="text-sm text-blue-700 mt-2"><i class="fas fa-flag mr-1"></i>Target: {{ $goal->target }}</p>
-                                @endif
-                                @if($goal->description)
-                                    <p class="text-sm text-gray-600 mt-2">{{ $goal->description }}</p>
-                                @endif
                                 <div class="flex flex-wrap items-center gap-4 mt-2 text-xs text-gray-500">
                                     <span><i class="fas fa-chalkboard-teacher mr-1"></i>{{ $goal->tutor->user->name ?? 'Tutor' }}</span>
                                     @if($goal->shared_at)
