@@ -1182,13 +1182,12 @@
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">
-                                Choose <strong>how you paid</strong>:
+                                Pay by <strong>bank transfer</strong>:
                                 <span class="mt-1 block text-xs text-gray-600">
-                                    <span class="block"><strong>Bank transfer</strong> — the school accounts are listed with a <strong>Copy</strong> button. Transfer the exact amount, then pick the account you used (this is required).</span>
-                                    <span class="block"><strong>Cash</strong> — pay at the school office, keep the bursar's receipt and upload a photo of it.</span>
-                                    <span class="block"><strong>Card</strong> — Paystack is coming soon; please use transfer or cash for now.</span>
+                                    <span class="block">The school accounts are listed with a <strong>Copy</strong> button. Transfer the exact amount, then pick the account you used (this is required).</span>
+                                    <span class="block">The school is online-only, so <strong>cash is not accepted</strong>; <strong>Card</strong> stays disabled until Paystack is connected.</span>
                                 </span>
-                                Then enter the <strong>total fee</strong> (if you know it), the <strong>amount paid now</strong>, the <strong>reference</strong> (transfer narration or bursar's receipt number), attach the receipt (PDF or image, 5 MB) and click <strong>"Submit for verification"</strong>.
+                                Then enter the <strong>total fee</strong> (if you know it), the <strong>amount paid now</strong>, the <strong>reference</strong> (the transfer narration), attach the receipt (PDF or image, 5 MB) and click <strong>"Submit for verification"</strong>.
                             </span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
@@ -1532,7 +1531,7 @@
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Fees &amp; Payments</strong> and click <strong>Record a payment</strong>.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Choose one of <strong>your own children</strong> — other families' children are never listed — and optionally that child's <strong>class</strong>.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Enter the <strong>payment type</strong>, the <strong>term</strong>, the <strong>total fee</strong> (if known) and the <strong>amount paid now</strong>. A single installment can never be larger than the total fee.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Choose <strong>how you paid</strong>: bank transfer (the school accounts are listed with a copy button, and you must pick the one you used), cash at the office, or card — which stays disabled as <em>coming soon</em> until Paystack is connected. Then add the reference (transfer narration or bursar's receipt number), the date and the <strong>receipt or teller slip</strong> (PDF or image, up to 5 MB).</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Pay by <strong>bank transfer</strong> — the school accounts are listed with a copy button, and you must pick the one you used (cash is not accepted, as the school is online-only; card stays disabled as <em>coming soon</em> until Paystack is connected). Then add the reference (the transfer narration), the date and the <strong>receipt or teller slip</strong> (PDF or image, up to 5 MB).</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">On submit the record is stored as <strong>Pending verification</strong> — you can never mark your own payment as paid.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">6.</span><span class="text-gray-600">The school is notified: <em>"Payment awaiting verification"</em>, with the amount, child and fee.</span></li>
                 </ol>

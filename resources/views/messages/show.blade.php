@@ -54,8 +54,8 @@
                     <label for="type" class="block text-xs font-semibold uppercase tracking-wide text-gray-500">Message type</label>
                     <select id="type" name="type"
                         class="mt-1 w-full sm:w-80 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                        <option value="general" @selected(old('type', 'general') === 'general')>General message</option>
-                        <option value="testimonial" @selected(old('type') === 'testimonial')>Testimonial — may be published on the website</option>
+                        <option value="general" {{ old('type', 'general') === 'general' ? 'selected' : '' }}>General message</option>
+                        <option value="testimonial" {{ old('type') === 'testimonial' ? 'selected' : '' }}>Testimonial — may be published on the website</option>
                     </select>
                     <p class="mt-1 text-xs text-gray-500">
                         Choose <strong>Testimonial</strong> to share a sentence or two about the school. It goes to the school for review;

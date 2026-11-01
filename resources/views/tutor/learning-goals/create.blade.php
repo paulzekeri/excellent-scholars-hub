@@ -19,7 +19,7 @@
                     <select name="learner_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Whole class</option>
                         @foreach($learners as $learner)
-                            <option value="{{ $learner->id }}" @selected(old('learner_id') == $learner->id)>{{ $learner->user->name }}</option>
+                            <option value="{{ $learner->id }}" {{ old('learner_id') == $learner->id ? 'selected' : '' }}>{{ $learner->user->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -28,7 +28,7 @@
                     <select name="class_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Not class-specific</option>
                         @foreach($classes as $class)
-                            <option value="{{ $class->id }}" @selected(old('class_id') == $class->id)>{{ $class->name }}</option>
+                            <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                         @endforeach
                     </select>
                     <p class="text-xs text-gray-500 mt-1">Choose a learner, a class, or both.</p>

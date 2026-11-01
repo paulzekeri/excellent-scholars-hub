@@ -53,7 +53,7 @@
             <select name="learner_id" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All learners</option>
                 @foreach($learners as $learner)
-                    <option value="{{ $learner->id }}" @selected((string) $filters['learner_id'] === (string) $learner->id)>{{ $learner->user->name }}</option>
+                    <option value="{{ $learner->id }}" {{ (string) $filters['learner_id'] === (string) $learner->id ? 'selected' : '' }}>{{ $learner->user->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -62,7 +62,7 @@
             <select name="term" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All terms</option>
                 @foreach($terms as $term)
-                    <option value="{{ $term }}" @selected($filters['term'] === $term)>{{ $term }}</option>
+                    <option value="{{ $term }}" {{ $filters['term'] === $term ? 'selected' : '' }}>{{ $term }}</option>
                 @endforeach
             </select>
         </div>
@@ -71,7 +71,7 @@
             <select name="class_id" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All classes</option>
                 @foreach($classes as $class)
-                    <option value="{{ $class->id }}" @selected((string) $filters['class_id'] === (string) $class->id)>{{ $class->name }}</option>
+                    <option value="{{ $class->id }}" {{ (string) $filters['class_id'] === (string) $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -80,7 +80,7 @@
             <select name="status" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">Any status</option>
                 @foreach(\App\Models\Payment::STATUSES as $value => $label)
-                    <option value="{{ $value }}" @selected($filters['status'] === $value)>{{ $label }}</option>
+                    <option value="{{ $value }}" {{ $filters['status'] === $value ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
         </div>
@@ -89,7 +89,7 @@
             <select name="method" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">Any method</option>
                 @foreach($methods as $value => $label)
-                    <option value="{{ $value }}" @selected($filters['method'] === $value)>{{ $label }}</option>
+                    <option value="{{ $value }}" {{ $filters['method'] === $value ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
         </div>

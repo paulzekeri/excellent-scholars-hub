@@ -13,7 +13,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @foreach($audiences as $value => $label)
                         <label class="border rounded-lg p-4 cursor-pointer hover:border-blue-500 hover:bg-blue-50/40 transition {{ old('audience') === $value ? 'border-blue-600 bg-blue-50' : 'border-gray-200' }}">
-                            <input type="radio" name="audience" value="{{ $value }}" class="mr-2" @checked(old('audience', 'parents') === $value)>
+                            <input type="radio" name="audience" value="{{ $value }}" class="mr-2" {{ old('audience', 'parents') === $value ? 'checked' : '' }}>
                             <span class="font-medium text-gray-800">{{ $label }}</span>
                             <span class="block text-xs text-gray-500 mt-1">
                                 @if(isset($counts[$value]))
@@ -32,7 +32,7 @@
                 <select name="class_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Select a class</option>
                     @foreach($classes as $class)
-                        <option value="{{ $class->id }}" @selected(old('class_id') == $class->id)>
+                        <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
                             {{ $class->name }} — {{ $class->tutor->user->name ?? 'No tutor' }} ({{ $class->learners()->count() }} learners)
                         </option>
                     @endforeach

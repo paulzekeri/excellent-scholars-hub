@@ -120,9 +120,9 @@ class PaymentController extends Controller
         $validated = $request->validate($rules, [
             'learner_id.in' => 'Choose one of the children linked to your account.',
             'payment_method.required' => 'Choose how you paid.',
-            'payment_method.in' => 'Card payments are coming soon. Please pay by bank transfer or cash for now.',
+            'payment_method.in' => 'Card payments are coming soon. Please pay by bank transfer for now.',
             'payment_account_id.required' => 'Choose the school account you transferred the money into.',
-            'payment_account_id.exists' => 'That school account is no longer listed. Choose another one or pay in cash.',
+            'payment_account_id.exists' => 'That school account is no longer listed. Choose another one, or contact the school if none is listed.',
         ]);
 
         $learner = $children->firstWhere('id', (int) $validated['learner_id']);

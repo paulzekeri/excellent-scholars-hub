@@ -36,7 +36,7 @@
             <select name="tutor_id" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All tutors</option>
                 @foreach($tutors as $tutor)
-                    <option value="{{ $tutor->id }}" @selected((string) $tutorId === (string) $tutor->id)>{{ $tutor->user->name ?? 'Tutor #' . $tutor->id }}</option>
+                    <option value="{{ $tutor->id }}" {{ (string) $tutorId === (string) $tutor->id ? 'selected' : '' }}>{{ $tutor->user->name ?? 'Tutor #' . $tutor->id }}</option>
                 @endforeach
             </select>
         </div>
@@ -44,10 +44,10 @@
             <label class="block text-xs font-medium text-gray-600 mb-1">Sharing</label>
             <select name="shared" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                 <option value="">Any</option>
-                <option value="parent" @selected($shared === 'parent')>Shared with parent</option>
-                <option value="learner" @selected($shared === 'learner')>Shared with learner</option>
-                <option value="tutor" @selected($shared === 'tutor')>Shared with tutor</option>
-                <option value="unshared" @selected($shared === 'unshared')>Awaiting review</option>
+                <option value="parent" {{ $shared === 'parent' ? 'selected' : '' }}>Shared with parent</option>
+                <option value="learner" {{ $shared === 'learner' ? 'selected' : '' }}>Shared with learner</option>
+                <option value="tutor" {{ $shared === 'tutor' ? 'selected' : '' }}>Shared with tutor</option>
+                <option value="unshared" {{ $shared === 'unshared' ? 'selected' : '' }}>Awaiting review</option>
             </select>
         </div>
         <div class="flex gap-2">
@@ -101,17 +101,17 @@
                                     @csrf
                                     <label class="flex items-center gap-2">
                                         <input type="hidden" name="shared_with_parent" value="0">
-                                        <input type="checkbox" name="shared_with_parent" value="1" @checked($goal->shared_with_parent)>
+                                        <input type="checkbox" name="shared_with_parent" value="1" {{ $goal->shared_with_parent ? 'checked' : '' }}>
                                         <span>Parent</span>
                                     </label>
                                     <label class="flex items-center gap-2">
                                         <input type="hidden" name="shared_with_learner" value="0">
-                                        <input type="checkbox" name="shared_with_learner" value="1" @checked($goal->shared_with_learner)>
+                                        <input type="checkbox" name="shared_with_learner" value="1" {{ $goal->shared_with_learner ? 'checked' : '' }}>
                                         <span>Learner</span>
                                     </label>
                                     <label class="flex items-center gap-2">
                                         <input type="hidden" name="shared_with_tutor" value="0">
-                                        <input type="checkbox" name="shared_with_tutor" value="1" @checked($goal->shared_with_tutor)>
+                                        <input type="checkbox" name="shared_with_tutor" value="1" {{ $goal->shared_with_tutor ? 'checked' : '' }}>
                                         <span>Tutor</span>
                                     </label>
                                     <button type="submit" class="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-800 transition">Save</button>

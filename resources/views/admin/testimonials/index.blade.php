@@ -77,7 +77,7 @@
                             <label class="flex items-center gap-2 text-xs text-gray-600">
                                 <input type="hidden" name="publish_photo" value="0">
                                 <input type="checkbox" name="publish_photo" value="1" class="h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                    @checked($testimonial->publish_photo)>
+                                    {{ $testimonial->publish_photo ? 'checked' : '' }}>
                                 Publish this member's photo with the quote
                             </label>
                             <button type="submit" class="bg-[#0a2550] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#0d3070]">

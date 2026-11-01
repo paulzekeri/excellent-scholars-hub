@@ -21,11 +21,12 @@ Implemented guards:
   to parents only, restricted to the children linked to their own account, and every submission is stored as
   `pending`. The CEO's `/admin/payments` screen no longer records payments — it is a verification queue with
   *Payment received* (`admin.payments.verify`) and *Cannot match it* (`admin.payments.reject`) actions.
-- **Fees are paid by transfer or cash (card is stubbed for Paystack).** A transfer must name the school account it
+- **Fees are paid by bank transfer (card is stubbed for Paystack).** A transfer must name the school account it
   went into, so `/admin/payment-accounts` lets only the CEO add, correct, switch off or delete the bank accounts.
   Active accounts appear on the parent form with a copy button; a switched-off account disappears without losing the
-  payments already recorded (`payments.paid_into` keeps the snapshot). Cash needs no account and is checked against
-  the cash book. Card shows as *coming soon* until `PAYSTACK_PUBLIC_KEY` / `PAYSTACK_SECRET_KEY` are set — see
+  payments already recorded (`payments.paid_into` keeps the snapshot). The school is online-only, so the parent form
+  no longer offers cash (older cash records still verify against the cash book). Card shows as *coming soon* until
+  `PAYSTACK_PUBLIC_KEY` / `PAYSTACK_SECRET_KEY` are set — see
   `App\Services\PaystackService` for the two-call flow (initialise → verify).
 - **Passwords reset themselves.** `Forgot your password?` on `/login` emails a one-time link (`password.request`,
   `password.email`, `password.reset`, `password.update`), valid for 60 minutes and usable once; the new password
@@ -356,7 +357,7 @@ sitting, then the school only confirms the money arrived.
 |------|--------|-------|
 | Parent fees | New **Fees & Payments** screen: per-child fee cards (term · class), verified vs pending amounts, progress bars, "Payment complete" badges and a submission history with receipt downloads | `Parent\PaymentController`, `parent/payments/*`, sidebar `Finance` group |
 | Record payment | Moved from the CEO to the parent: the form picks only the parent's own children and their classes, forces `status = pending`, and notifies every CEO that money is waiting | `parent.payments.create/store`, `Payment::STATUS_PENDING` |
-| Payment methods | **Bank transfer**, **cash** or **card**. A transfer must pick the school account it went into and keeps a `paid_into` snapshot; cash needs no account and points the CEO at the cash book; card is disabled with "coming soon" | `Payment::METHOD_*`, `parent/payments/create.blade.php` |
+| Payment methods | **Bank transfer** on the parent form (the school is online-only, so cash is no longer offered; older cash records still verify against the cash book), plus **card** disabled with "coming soon". A transfer must pick the school account it went into and keeps a `paid_into` snapshot | `Payment::METHOD_*`, `parent/payments/create.blade.php` |
 | School bank accounts | CEO-only `/admin/payment-accounts`: add, edit, switch off (hides it from parents) and delete accounts. Active ones appear on the parent fee screens with a copy-number button; deleting keeps the historical `paid_into` | `Admin\PaymentAccountController`, `payment_accounts`, `admin/payment-accounts/*` |
 | Card (future) | Paystack seam with `initializeTransaction()` / `verifyTransaction()`, config keys and a status panel on the bank-accounts screen; the card radio stays disabled until the flow is wired | `App\Services\PaystackService`, `config/services.php`, `PAYSTACK_*` |
 | Role-aware guide | The in-app **User Guide** now shows only the sections for the signed-in role: administrators get the admin guide without finance, the CEO also gets payments/bank accounts, and tutor/learner/parent content (plus role-specific FAQs) is hidden from everyone else | `resources/views/help/user-guide.blade.php` |

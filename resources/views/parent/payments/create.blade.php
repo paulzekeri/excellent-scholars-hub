@@ -3,17 +3,6 @@
 @section('title', 'Record a Payment')
 
 @section('content')
-@php
-    // With no school account on file, cash is the only method that can work.
-    $defaultMethod = $accounts->isEmpty() ? \App\Models\Payment::METHOD_CASH : \App\Models\Payment::METHOD_TRANSFER;
-    $chosenMethod = old('payment_method', $defaultMethod);
-
-    // A rejected card attempt falls back to a method the school can actually take.
-    if (! in_array($chosenMethod, \App\Models\Payment::PARENT_METHODS, true)) {
-        $chosenMethod = $defaultMethod;
-    }
-@endphp
-
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <a href="{{ route('parent.payments.index') }}" class="text-blue-700 hover:text-blue-900 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back to fees</a>
 
@@ -23,7 +12,7 @@
 
         <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-900 p-4 rounded-r-lg mb-6 text-sm">
             <p class="font-semibold"><i class="fas fa-clock mr-1"></i> Your payment starts as Pending</p>
-            <p class="mt-1">The school checks every submission — transfers against the bank statement, cash against the cash book. Once the CEO verifies it, the payment is <strong>complete</strong> and your child's balance drops.</p>
+            <p class="mt-1">The school checks every submission against the bank statement. Once the CEO verifies it, the payment is <strong>complete</strong> and your child's balance drops.</p>
         </div>
 
         @if($children->isEmpty())
@@ -40,7 +29,7 @@
                     <select id="learner_id" name="learner_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select child</option>
                         @foreach($children as $learner)
-                            <option value="{{ $learner->id }}" @selected((string) old('learner_id', $selectedLearner) === (string) $learner->id)>{{ $learner->user->name }}</option>
+                            <option value="{{ $learner->id }}" {{ (string) old('learner_id', $selectedLearner) === (string) $learner->id ? 'selected' : '' }}>{{ $learner->user->name }}</option>
                         @endforeach
                     </select>
                     @error('learner_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
@@ -49,7 +38,7 @@
                     <label for="payment_type" class="block text-sm font-medium text-gray-700">Payment Type <span class="text-orange-700">*</span></label>
                     <select id="payment_type" name="payment_type" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                         @foreach(['tuition', 'registration', 'material', 'other'] as $type)
-                            <option value="{{ $type }}" @selected(old('payment_type', 'tuition') === $type)>{{ ucfirst($type) }}</option>
+                            <option value="{{ $type }}" {{ old('payment_type', 'tuition') === $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -90,7 +79,7 @@
                                     <td class="px-3 py-2 align-top">
                                         <input type="checkbox" name="class_ids[]" value="0" data-pay-check
                                             class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                            @checked(in_array(0, $oldClasses, true))>
+                                            {{ in_array(0, $oldClasses, true) ? 'checked' : '' }}>
                                     </td>
                                     <td class="px-3 py-2 align-top">
                                         <span class="font-medium text-gray-800">General payment</span>
@@ -113,7 +102,7 @@
                                             <td class="px-3 py-2 align-top">
                                                 <input type="checkbox" name="class_ids[]" value="{{ $class->id }}" data-pay-check
                                                     class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                                    @checked(in_array($class->id, $oldClasses, true))>
+                                                    {{ in_array($class->id, $oldClasses, true) ? 'checked' : '' }}>
                                             </td>
                                             <td class="px-3 py-2 align-top">
                                                 <span class="font-medium text-gray-800">{{ $class->name }}</span>
@@ -150,22 +139,13 @@
 
             <div>
                 <p class="block text-sm font-medium text-gray-700 mb-2">How did you pay? <span class="text-orange-700">*</span></p>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label data-method-card="transfer" class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-blue-300 {{ $accounts->isEmpty() ? 'cursor-not-allowed opacity-60' : '' }}">
-                        <input type="radio" name="payment_method" value="{{ \App\Models\Payment::METHOD_TRANSFER }}" class="sr-only" @checked($chosenMethod === \App\Models\Payment::METHOD_TRANSFER) @disabled($accounts->isEmpty())>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-blue-600 bg-blue-50/40 p-4 ring-2 ring-blue-200 {{ $accounts->isEmpty() ? 'cursor-not-allowed opacity-60' : '' }}">
+                        <input type="radio" name="payment_method" value="{{ \App\Models\Payment::METHOD_TRANSFER }}" class="sr-only" checked {{ $accounts->isEmpty() ? 'disabled' : '' }}>
                         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700"><i class="fas fa-building-columns"></i></span>
                         <span class="min-w-0">
                             <span class="block text-sm font-semibold text-gray-800">Bank transfer</span>
                             <span class="block text-xs text-gray-500">Transfer into a school account</span>
-                        </span>
-                    </label>
-
-                    <label data-method-card="cash" class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4 transition hover:border-blue-300">
-                        <input type="radio" name="payment_method" value="{{ \App\Models\Payment::METHOD_CASH }}" class="sr-only" @checked($chosenMethod === \App\Models\Payment::METHOD_CASH)>
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700"><i class="fas fa-money-bill-wave"></i></span>
-                        <span class="min-w-0">
-                            <span class="block text-sm font-semibold text-gray-800">Cash</span>
-                            <span class="block text-xs text-gray-500">Pay at the school office</span>
                         </span>
                     </label>
 
@@ -182,14 +162,14 @@
 
                 @if($accounts->isEmpty())
                     <p class="mt-2 rounded-lg bg-orange-50 px-3 py-2 text-xs text-orange-800">
-                        <i class="fas fa-circle-info mr-1"></i>No school bank account has been listed yet, so please pay in cash at the office.
+                        <i class="fas fa-circle-info mr-1"></i>The school has not listed a bank account yet. Please contact the school and try again once it has been added.
                     </p>
                 @endif
             </div>
 
 
             {{-- Bank transfer: the accounts the CEO added (only active ones) --}}
-            <div data-method-panel="transfer" class="{{ $chosenMethod === \App\Models\Payment::METHOD_TRANSFER ? '' : 'hidden' }}">
+            <div>
                 <div class="rounded-xl border border-blue-200 bg-blue-50/60 p-4">
                     <h2 class="text-sm font-semibold text-blue-900"><i class="fas fa-building-columns mr-1"></i>School accounts you can transfer into</h2>
                     <p class="mt-1 text-xs text-blue-900">Transfer the exact amount, then pick the account you used below. Keep the reference the bank gives you.</p>
@@ -221,7 +201,7 @@
                         <select id="payment_account_id" name="payment_account_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select the account you transferred to</option>
                             @foreach($accounts as $account)
-                                <option value="{{ $account->id }}" @selected((string) old('payment_account_id') === (string) $account->id)>{{ $account->fullLabel() }}</option>
+                                <option value="{{ $account->id }}" {{ (string) old('payment_account_id') === (string) $account->id ? 'selected' : '' }}>{{ $account->fullLabel() }}</option>
                             @endforeach
                         </select>
                         @error('payment_account_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
@@ -229,27 +209,12 @@
                 </div>
             </div>
 
-            {{-- Cash: paid at the office --}}
-            <div data-method-panel="cash" class="{{ $chosenMethod === \App\Models\Payment::METHOD_CASH ? '' : 'hidden' }}">
-                <div class="rounded-xl border border-green-200 bg-green-50/70 p-4">
-                    <h2 class="text-sm font-semibold text-green-900"><i class="fas fa-money-bill-wave mr-1"></i>Paying in cash</h2>
-                    <ul class="mt-2 space-y-1 text-xs text-green-900 list-disc list-inside">
-                        <li>Pay at the school office (bursar's desk) during working hours.</li>
-                        <li>Collect the bursar's receipt — take a photo of it for the upload below.</li>
-                        <li>Record it here straight away; the payment stays <strong>Pending</strong> until the CEO checks the cash book.</li>
-                    </ul>
-                </div>
-            </div>
-
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="reference" id="reference-label" class="block text-sm font-medium text-gray-700">{{ $chosenMethod === \App\Models\Payment::METHOD_CASH ? 'Bursar receipt number (optional)' : 'Transfer reference / narration' }}</label>
+                    <label for="reference" class="block text-sm font-medium text-gray-700">Transfer reference / narration</label>
                     <input type="text" id="reference" name="reference" value="{{ old('reference') }}" placeholder="e.g. FBN-8821345" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                    <p id="reference-help" class="text-xs text-gray-500 mt-1">
-                        {{ $chosenMethod === \App\Models\Payment::METHOD_CASH
-                            ? 'If the school office gave you a receipt number, put it here.'
-                            : 'The reference or narration on the transfer — this is what the school looks for on the statement.' }}
+                    <p class="text-xs text-gray-500 mt-1">
+                        The reference or narration on the transfer — this is what the school looks for on the statement.
                     </p>
                     @error('reference')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
@@ -263,10 +228,8 @@
             <div>
                 <label for="receipt" class="block text-sm font-medium text-gray-700">Receipt / Teller Slip</label>
                 <input type="file" id="receipt" name="receipt" accept=".pdf,.jpg,.jpeg,.png,.webp" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-blue-500 focus:border-blue-500">
-                <p id="receipt-help" class="text-xs text-gray-500 mt-1">
-                    <span id="receipt-help-text">{{ $chosenMethod === \App\Models\Payment::METHOD_CASH
-                        ? 'Upload a photo of the bursar\'s receipt (PDF or image, max 5 MB).'
-                        : 'Attach the bank teller or transfer receipt if you have one (PDF or image, max 5 MB).' }}</span>
+                <p class="text-xs text-gray-500 mt-1">
+                    Attach the bank teller or transfer receipt if you have one (PDF or image, max 5 MB).
                     Only you and the school can download it.
                 </p>
                 @error('receipt')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
@@ -289,70 +252,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        /*
-         * Payment method picker: highlight the chosen card, show only its panel,
-         * and only submit the school account for a transfer.
-         */
-        const methodInputs = document.querySelectorAll('input[name="payment_method"]');
-        const methodCards = document.querySelectorAll('[data-method-card]');
-        const methodPanels = document.querySelectorAll('[data-method-panel]');
-        const accountSelect = document.getElementById('payment_account_id');
-        const referenceLabel = document.getElementById('reference-label');
-        const referenceHelp = document.getElementById('reference-help');
-        const receiptHelp = document.getElementById('receipt-help-text');
-
-        const wording = {
-            transfer: {
-                reference: 'Transfer reference / narration',
-                help: 'The reference or narration on the transfer — this is what the school looks for on the statement.',
-                receipt: 'Attach the bank teller or transfer receipt if you have one (PDF or image, max 5 MB).'
-            },
-            cash: {
-                reference: 'Bursar receipt number (optional)',
-                help: 'If the school office gave you a receipt number, put it here.',
-                receipt: 'Upload a photo of the bursar\'s receipt (PDF or image, max 5 MB).'
-            }
-        };
-
-        function chosenMethod() {
-            const checked = document.querySelector('input[name="payment_method"]:checked');
-            return checked ? checked.value : null;
-        }
-
-        function applyMethod() {
-            const method = chosenMethod();
-
-            Array.prototype.forEach.call(methodCards, function (card) {
-                const active = card.dataset.methodCard === method;
-                card.classList.toggle('border-blue-600', active);
-                card.classList.toggle('ring-2', active);
-                card.classList.toggle('ring-blue-200', active);
-                card.classList.toggle('border-gray-200', !active);
-            });
-
-            Array.prototype.forEach.call(methodPanels, function (panel) {
-                panel.classList.toggle('hidden', panel.dataset.methodPanel !== method);
-            });
-
-            if (accountSelect) {
-                // Only a transfer needs the account; hiding it must not submit a stale value.
-                accountSelect.disabled = method !== 'transfer';
-                if (accountSelect.disabled) accountSelect.value = '';
-            }
-
-            const copy = wording[method];
-            if (copy) {
-                if (referenceLabel) referenceLabel.textContent = copy.reference;
-                if (referenceHelp) referenceHelp.textContent = copy.help;
-                if (receiptHelp) receiptHelp.textContent = copy.receipt;
-            }
-        }
-
-        Array.prototype.forEach.call(methodInputs, function (input) {
-            input.addEventListener('change', applyMethod);
-        });
-        applyMethod();
-
         // Copy an account number without leaving the form.
         document.querySelectorAll('[data-copy]').forEach(function (button) {
             button.addEventListener('click', function () {

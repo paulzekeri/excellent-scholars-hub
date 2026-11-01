@@ -45,14 +45,9 @@
                 </div>
             @empty
                 <div class="rounded-lg border border-dashed border-orange-300 bg-orange-50 p-3 text-sm text-orange-800">
-                    <i class="fas fa-circle-info mr-1"></i> No school bank account has been listed yet — pay in cash at the office.
+                    <i class="fas fa-circle-info mr-1"></i> No school bank account has been listed yet. Please contact the school and try again once it has been added.
                 </div>
             @endforelse
-
-            <div class="rounded-lg border border-green-200 bg-green-50/60 p-3">
-                <p class="text-sm font-semibold text-gray-800"><i class="fas fa-money-bill-wave text-green-700 mr-1"></i> Cash</p>
-                <p class="text-xs text-gray-600 mt-1">Pay at the school office (bursar's desk) and keep the receipt. Record it here so the CEO can confirm it.</p>
-            </div>
         </div>
 
         <p class="mt-3 text-xs text-gray-500"><i class="fas fa-credit-card mr-1"></i> Card payments via Paystack are coming soon.</p>
