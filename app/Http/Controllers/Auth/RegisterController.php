@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -27,10 +28,23 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    /**
+     * Roles that may create an account themselves. Parents are provisioned by
+     * the school (or automatically from a learner's guardian details).
+     */
+    public const SELF_REGISTER_ROLES = ['learner', 'tutor'];
+
     public function showRegistrationForm()
     {
-        // Exclude 'parent' from registration dropdown - only learners & tutors can self-register
-        $roles = Role::whereIn('slug', ['learner', 'tutor'])->get();
+        // "I am a" is the first field on the form, so list the choices in that
+        // order: Learner, then Tutor.
+        $roles = Role::whereIn('slug', self::SELF_REGISTER_ROLES)
+            ->get()
+            ->sortBy(function (Role $role) {
+                return array_search($role->slug, self::SELF_REGISTER_ROLES, true);
+            })
+            ->values();
+
         return view('auth.register', compact('roles'));
     }
 
@@ -53,7 +67,14 @@ class RegisterController extends Controller
                 'string', 'email', 'max:255', 'unique:users',
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role_id' => ['required', 'exists:roles,id'],
+            // The first field on the form: only a learner or a tutor can
+            // register here, so a crafted role_id cannot create staff.
+            'role_id' => [
+                'required',
+                Rule::exists('roles', 'id')->where(function ($query) {
+                    $query->whereIn('slug', self::SELF_REGISTER_ROLES);
+                }),
+            ],
             'phone' => ['nullable', 'string', 'max:20'],
         ];
 

@@ -205,6 +205,14 @@ next slice.
       name + email mandatory, a staff email cannot be used as the guardian address, and a child's own
       email cannot equal the guardian's. A guardian account created during registration gets a
       generated username and is flagged for a password change.
+- [x] Registration form order: **"I am a — Learner / Tutor"** is now the first field (two selectable
+      cards, learner listed first). The shared inputs are re-worded for a learner — *Learner Full Name*,
+      *Learner Username*, *Learner Email*, *Learner Phone*, *Learner Password*, *Confirm Learner Password*,
+      *Create Learner Account* — and the guardian block is titled **Parent/Guardian Details** with
+      *Parent/Guardian Full Name* / *Parent/Guardian Email*, so learner fields can never be confused with the
+      parent's. The button/labels switch back to tutor wording when Tutor is chosen, and `role_id` is now
+      validated against `learner`/`tutor` so the public form cannot create other roles.
+      Covered by `tests/Feature/RegistrationFormTest.php`.
 - [x] Admin provisioning: **Users → New User** creates a parent with username + email + temporary
       password; **Edit parent → Add child** creates a learner with username + password + optional
       email. Both email the credentials (`AccountProvisionedMail`) and are flagged.
