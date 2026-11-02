@@ -361,6 +361,13 @@ All six items are implemented and verified. New/updated tests:
   corrected paragraph plus a count. Failures (no internet / API down) return a friendly message and leave the
   text unchanged. Config: `config/services.php → languagetool` + `GOAL_WORDING_ASSISTANT`, `LANGUAGETOOL_URL`,
   `LANGUAGETOOL_LANGUAGE`, `LANGUAGETOOL_TIMEOUT`.
+- **Reading a long goal (2 November 2026):** the admin and tutor lists used to stop at a 220/300-character
+  excerpt with no way to see the rest. They now share `resources/views/partials/goal-text.blade.php`: the
+  excerpt plus a **Read the full goal (n characters)** toggle that opens the whole text in a scrollable box,
+  so the 5,000-character limit is fully readable on the screen. The tutor "Shared with you" list uses the
+  same partial, the learner "My Learning → Learning Goals" page and the parent's child **Goals** tab already
+  printed the full text, and the learner dashboard preview is now a 160-character excerpt that links through
+  to that page. Covered by `tests/Feature/LearningGoalReadingTest.php`.
 
 ### R6 — share a goal with individual people
 
@@ -377,6 +384,15 @@ All six items are implemented and verified. New/updated tests:
     goals shared by name (previously 403 for the recipient).
 - The legacy `shared_with_*` payload is still supported, and it also adds/removes the implied person
   (the learner's parent, the learner, the tutor) so both sharing styles stay in step.
+- **Fixed (2 November 2026):** picking people by name used to set `shared_with_*` *and* the screen read
+  "everyone" from those same flags, so a by-name share showed **All parents / All learners / All tutors**
+  too. The explicit tick is now stored on its own columns — `share_all_parent`, `share_all_learner`,
+  `share_all_tutor` (migration `2026_11_02_000001_add_share_all_flags_to_learning_goals_table`) — and
+  `LearningGoal::sharesWithAll()` drives the chips and the checkboxes, while `shared_with_*` keeps meaning
+  "shared with that role at all" for the filters and the legacy visibility scopes. The migration backfills
+  the new flags only where nobody of that role had been picked by name, so older goals keep their real
+  "everyone" share and the affected ones show just the named people. The checkbox labels now read
+  *Every parent/learner/tutor the goal is about*. Covered by `tests/Feature/LearningGoalSharingTest.php`.
 
 ### Documentation
 

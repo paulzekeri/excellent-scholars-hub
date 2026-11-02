@@ -249,6 +249,15 @@
       about) and shows chips; parent child page, learner page and tutor "Shared with you" all honour direct
       shares, and tutor downloads work for recipients. Tests: `RoundTwoEnhancementsTest`,
       `LearnerLearningGoalsTest`, `ClientAdditionsTest`
+- [x] **By-name sharing no longer looks like "everyone"** — `share_all_parent` / `share_all_learner` /
+      `share_all_tutor` record the explicit *Every … the goal is about* tick, so choosing people by name
+      leaves the boxes unticked and the chips show only the named people. `shared_with_*` still means
+      "shared with that role at all" for the filters and legacy scopes; the migration backfills the new
+      flags only where nobody of that role was picked by name. Tests: `LearningGoalSharingTest`
+- [x] **Long goals are readable in full** — the admin and tutor lists show an excerpt plus a *Read the full
+      goal (n characters)* toggle (`partials/goal-text.blade.php`) instead of a dead cut-off; the tutor
+      "Shared with you" list and the learner/parent pages all expose the complete text, and the learner
+      dashboard preview is a 160-character excerpt linking to the goals page. Tests: `LearningGoalReadingTest`
 - [x] **Documentation** — in-app user guide (What's New + Classes/Schedules/Fees/Learning goals sections),
       `PLAN_CLIENT_ADDITIONS.md` (Round 2) and this phase. Full suite: **225 passing**
 

@@ -28,7 +28,7 @@
                     @forelse($myGoals as $goal)
                         <tr class="hover:bg-blue-50/40">
                             <td class="px-6 py-4 text-sm">
-                                <p class="font-medium text-gray-800 whitespace-pre-line">{{ $goal->goalExcerpt(220) }}</p>
+                                @include('partials.goal-text', ['goal' => $goal, 'limit' => 220])
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">
                                 {{ $goal->learner->user->name ?? 'General goal' }}
@@ -86,9 +86,9 @@
         <div class="divide-y divide-gray-100">
             @forelse($sharedGoals as $goal)
                 <div class="p-6 flex flex-wrap justify-between gap-3">
-                    <div>
-                        <p class="font-medium text-gray-800 whitespace-pre-line">{{ $goal->goalExcerpt(300) }}</p>
-                        <p class="text-sm text-gray-600">{{ $goal->contextLabel() }}</p>
+                    <div class="min-w-0 flex-1">
+                        @include('partials.goal-text', ['goal' => $goal, 'limit' => 300])
+                        <p class="text-sm text-gray-600 mt-1">{{ $goal->contextLabel() }}</p>
                         <p class="text-xs text-gray-500 mt-1">
                             Shared {{ $goal->shared_at ? $goal->shared_at->format('M d, Y') : '' }}
                             @if($goal->sharedBy) by {{ $goal->sharedBy->name }} @endif
