@@ -467,7 +467,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class</strong> and <strong>Tutor</strong>, set the <strong>Start/End Time</strong>, then choose a <strong>Meeting Platform</strong> and, if you have one, a <strong>Meeting Link</strong> (Zoom/Google Meet).</span>
+                            <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class</strong> and <strong>Tutor</strong>, then choose a <strong>Meeting Platform</strong> and, if you have one, a <strong>Meeting Link</strong> (Zoom/Google Meet). For a single lesson set the <strong>Start/End Time</strong>; for a repeating class use the weekly builder described below.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -476,7 +476,7 @@
                     </ol>
 
                     <div class="tip-box">
-                        <p class="text-sm text-gray-700 mb-2"><strong>Repeat a weekly lesson:</strong> set <strong>Repeat</strong> to <em>Every week</em>, pick the first Monday in <strong>Start Time</strong> and choose a <strong>Repeat until</strong> date. The school creates the same lesson for every following Monday at the same time; enrolled learners and the tutor see every session on their dashboards automatically.</p>
+                        <p class="text-sm text-gray-700 mb-2"><strong>Repeat a weekly lesson:</strong> set <strong>Repeat</strong> to <em>Every week on the days &amp; times I choose</em>, then add one row per day &mdash; for example <strong>10:00 am Monday</strong>, <strong>2:00 pm Wednesday</strong> and <strong>6:00 pm Friday</strong>. Choose a <strong>Repeats from</strong> date and a <strong>Repeat until</strong> date: each row is created every week on its own day and time, so one form builds the whole timetable. Enrolled learners and the tutor see every session on their dashboards automatically.</p>
                         <p class="text-sm text-gray-700"><strong>Automatic video room:</strong> choose <strong>Automatic video room (Jitsi Meet)</strong> and leave the link blank &mdash; a free meeting link is generated for you and reused for every session in the series.</p>
                     </div>
 
@@ -773,7 +773,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Choose the <strong>Class</strong>, set the <strong>Title</strong>, <strong>Start/End Time</strong> and <strong>Meeting Platform</strong>. Set <strong>Repeat</strong> to <em>Every week</em> with a <strong>Repeat until</strong> date to create the same lesson every week from a single form.</span>
+                            <span class="text-gray-600">Choose the <strong>Class</strong>, set the <strong>Title</strong> and <strong>Meeting Platform</strong>. Set <strong>Repeat</strong> to <em>Every week on the days &amp; times I choose</em> and add a row per day (for example Monday 10:00 am, Wednesday 2:00 pm, Friday 6:00 pm), then choose <strong>Repeats from</strong> and <strong>Repeat until</strong> &mdash; each day repeats weekly at its own time.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -1459,7 +1459,7 @@
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Classes</td><td class="px-4 py-3 text-gray-600">Maximum students and the <strong>Class Code</strong> are both optional (blank code = auto-generated, blank maximum = unlimited).</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
                             @endif
                             @if($guideIsAdmin || $guideIsTutor)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Schedules</td><td class="px-4 py-3 text-gray-600">Set a lesson once with <strong>Repeat &rarr; Every week</strong> and a <em>Repeat until</em> date; every week appears automatically for the class. Choose <strong>Automatic video room (Jitsi Meet)</strong> to generate a free meeting link once and reuse it for the series. Weekly sessions are flagged on the Schedules list.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
+                            <tr><td class="px-4 py-3 font-medium text-gray-800">Schedules</td><td class="px-4 py-3 text-gray-600">Set a lesson once with <strong>Repeat &rarr; Every week on the days &amp; times I choose</strong>: add a row per day (10:00 am Monday, 2:00 pm Wednesday, 6:00 pm Friday) plus <em>Repeats from</em> / <em>Repeat until</em> dates, and each day repeats weekly at its own time. Choose <strong>Automatic video room (Jitsi Meet)</strong> to generate a free meeting link once and reuse it for the series. Weekly sessions are flagged on the Schedules list.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
                             @endif
                             @if($guideIsAdmin)
                             <tr><td class="px-4 py-3 font-medium text-gray-800">Users</td><td class="px-4 py-3 text-gray-600">The Users page now filters by <strong>role</strong> (quick chips show the count per role), plus status and a name/username/email search.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>

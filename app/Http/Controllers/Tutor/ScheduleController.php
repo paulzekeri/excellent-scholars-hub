@@ -8,6 +8,7 @@ use App\Models\ClassSchedule;
 use App\Models\Classes;
 use App\Services\ClassScheduleService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ScheduleController extends Controller
 {
@@ -25,34 +26,44 @@ class ScheduleController extends Controller
     {
         $tutor = auth()->user()->tutor;
         $classes = Classes::where('tutor_id', $tutor->id)->where('is_active', true)->get();
-        return view('tutor.schedules.create', compact('classes'));
+
+        return view('tutor.schedules.create', [
+            'classes' => $classes,
+            'weekdays' => ClassScheduleService::weekdays(),
+        ]);
     }
 
     public function store(Request $request)
     {
         $tutor = auth()->user()->tutor;
+        $service = app(ClassScheduleService::class);
 
-        $validated = $request->validate([
+        $repeat = $request->input('repeat') === ClassScheduleService::REPEAT_WEEKLY
+            ? ClassScheduleService::REPEAT_WEEKLY
+            : ClassScheduleService::REPEAT_NONE;
+
+        $validated = $request->validate(array_merge([
             'class_id' => 'required|exists:classes,id',
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
             'meeting_link' => 'nullable|url',
             'meeting_platform' => 'nullable|in:google_meet,zoom,jitsi',
             'description' => 'nullable|string',
-            // A tutor can set the Monday lesson once and repeat it every week.
+            // A tutor can set the Monday lesson once and repeat it every week,
+            // or run the same class on several days at different times.
             'repeat' => 'nullable|in:none,weekly',
-            'repeat_until' => 'nullable|required_if:repeat,weekly|date|after:start_time',
-        ]);
+        ], ClassScheduleService::repeatRules($repeat)));
+
+        if ($errors = $service->seriesErrors($validated)) {
+            throw ValidationException::withMessages($errors);
+        }
 
         $validated['tutor_id'] = $tutor->id;
 
-        $sessions = app(ClassScheduleService::class)->createSeries($validated);
-        $first = $sessions->first();
+        $sessions = $service->createSeries($validated);
 
         $message = $sessions->count() > 1
-            ? $sessions->count() . ' sessions created — every ' . $first->start_time->format('l')
-                . ' at ' . $first->start_time->format('g:i a') . ' from ' . $first->start_time->format('M d, Y') . '.'
+            ? $sessions->count() . ' sessions created — every ' . ClassScheduleService::slotSummary($sessions)
+                . ' from ' . $sessions->first()->start_time->format('M d, Y') . '.'
             : 'Schedule created successfully.';
 
         return redirect()->route('tutor.schedules.index')->with('success', $message);

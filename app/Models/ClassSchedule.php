@@ -76,6 +76,37 @@ class ClassSchedule extends Model
         return 'Every ' . $this->start_time->format('l') . ', ' . $this->start_time->format('g:i a');
     }
 
+    /**
+     * Every day and time in this session's series, e.g.
+     * "Mon 10:00 am, Wed 2:00 pm, Fri 6:00 pm" — a weekly series can run on
+     * several days at different times.
+     */
+    public function seriesLabel(): string
+    {
+        if (! $this->isRecurring() || ! $this->recurrence_group) {
+            return 'One-off';
+        }
+
+        // One query per group, not per row on the schedules list.
+        static $labels = [];
+
+        $group = $this->recurrence_group;
+
+        if (! array_key_exists($group, $labels)) {
+            $labels[$group] = static::where('recurrence_group', $group)
+                ->orderBy('start_time')
+                ->get(['start_time'])
+                ->map(function (self $session) {
+                    return $session->start_time->format('D g:i a');
+                })
+                ->unique()
+                ->values()
+                ->implode(', ');
+        }
+
+        return 'Every ' . $labels[$group];
+    }
+
     /** Tailwind label for the platform stored on the row. */
     public function platformLabel(): string
     {

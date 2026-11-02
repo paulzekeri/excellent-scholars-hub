@@ -19,21 +19,8 @@
                         <option value="zoom" {{ old('meeting_platform') === 'zoom' ? 'selected' : '' }}>Zoom</option>
                     </select>
                 </div>
-                <div><label class="block text-sm font-medium text-gray-700">Start Time</label><input type="datetime-local" name="start_time" value="{{ old('start_time') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
-                <div><label class="block text-sm font-medium text-gray-700">End Time</label><input type="datetime-local" name="end_time" value="{{ old('end_time') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Repeat</label>
-                    <select name="repeat" id="schedule-repeat" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="none" {{ old('repeat', 'none') === 'none' ? 'selected' : '' }}>Does not repeat</option>
-                        <option value="weekly" {{ old('repeat') === 'weekly' ? 'selected' : '' }}>Every week (same day &amp; time)</option>
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">Pick the first Monday in Start Time — the same lesson is created for every following Monday.</p>
-                </div>
-                <div id="repeat-until-row">
-                    <label class="block text-sm font-medium text-gray-700">Repeat until</label>
-                    <input type="date" name="repeat_until" value="{{ old('repeat_until') }}" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                    @error('repeat_until')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                </div>
+                {{-- Repeat: a one-off lesson, or a weekly series on several days & times --}}
+                @include('partials.schedule-repeat')
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700">Meeting Link (optional)</label>
@@ -45,24 +32,4 @@
         </form>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const repeat = document.getElementById('schedule-repeat');
-        const untilRow = document.getElementById('repeat-until-row');
-        const until = untilRow ? untilRow.querySelector('input') : null;
-
-        function sync() {
-            if (!repeat || !untilRow) return;
-            const weekly = repeat.value === 'weekly';
-            untilRow.classList.toggle('hidden', !weekly);
-            if (until) until.required = weekly;
-        }
-
-        if (repeat) repeat.addEventListener('change', sync);
-        sync();
-    });
-</script>
-@endpush
 @endsection

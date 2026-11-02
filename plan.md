@@ -232,6 +232,11 @@
       until the chosen end date, visible automatically to the class and tutor; the lists flag weekly sessions.
       New **Automatic video room (Jitsi Meet)** platform generates a free, reusable meeting link when the link is
       left blank. Tests: `RoundTwoEnhancementsTest`
+- [x] **Weekly repeat on several days & times** — the schedule forms take any number of day + start + end rows
+      (10:00 Monday, 14:00 Wednesday, 18:00 Friday) between **Repeats from** and **Repeat until**; each slot
+      repeats on its own weekday and time with its own length, all rows sharing one series. Validation covers
+      missing days, an end time before its start, and an end date before the first lesson.
+      Tests: `WeeklySlotScheduleTest`
 - [x] **Learning goals as free text** — `learning_goals.title` is now `TEXT`; the upload form is one 5,000-character
       goal area with the learner picker, "What success looks like" and notes removed (existing rows keep their
       data). A free **LanguageTool** wording assistant fixes spelling/grammar via

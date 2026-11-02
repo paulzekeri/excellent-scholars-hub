@@ -18,7 +18,7 @@
                     <tr class="{{ $isToday ? 'bg-sun-light hover:bg-sun-light' : 'hover:bg-gray-50' }}">
                         <td class="px-6 py-4 text-sm font-medium"><a href="{{ route('admin.schedules.show', $schedule) }}" class="{{ $isToday ? 'text-sun-ink hover:text-sun-ink' : 'text-gray-800 hover:text-blue-600' }}">{{ $schedule->title }}</a>
                             @if($schedule->isRecurring())
-                                <span class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-800" title="{{ $schedule->repeatLabel() }}">Weekly</span>
+                                <span class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-800" title="{{ $schedule->seriesLabel() }}">Weekly</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>

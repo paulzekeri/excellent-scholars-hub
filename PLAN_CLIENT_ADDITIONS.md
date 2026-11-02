@@ -334,6 +334,15 @@ All six items are implemented and verified. New/updated tests:
   `https://meet.jit.si/esh-…` room once and reuses it for every session in the series.
 - Both schedule forms (admin and tutor) gain **Repeat** (does not repeat / every week) and **Repeat until**,
   and both lists flag weekly sessions.
+- **Several days at different times:** the weekly repeat takes any number of day + start + end rows
+  (`slots[0][day]`, `slots[0][start]`, `slots[0][end]`, …) plus **Repeats from** and **Repeat until**, so
+  *10:00 Monday, 14:00 Wednesday and 18:00 Friday* are created from one submission. Each slot keeps its own
+  length (`end - start`), the first lesson of each day is on/after `repeats_from`, every slot stops at
+  `repeat_until`, and all rows share one `recurrence_group` (52 sessions per slot, 364 per form).
+  `ClassScheduleService::repeatRules()` / `seriesErrors()` hold the shared validation (each slot must end after
+  it starts, the end date may not precede the first lesson), `slotSummary()` writes the flash message, and
+  `ClassSchedule::seriesLabel()` lists the series' days for the *Weekly* badge tooltip. The old single-date
+  payload still works, so existing links and tests are unaffected. Covered by `tests/Feature/WeeklySlotScheduleTest.php`.
 
 ### R5 — learning goals: long text, no target/learner/notes, free AI check
 

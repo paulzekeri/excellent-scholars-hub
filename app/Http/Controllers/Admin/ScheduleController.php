@@ -11,6 +11,7 @@ use App\Models\LearningMaterial;
 use App\Models\Tutor;
 use App\Services\ClassScheduleService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ScheduleController extends Controller
 {
@@ -85,31 +86,43 @@ class ScheduleController extends Controller
     {
         $classes = Classes::with('tutor.user')->where('is_active', true)->get();
         $tutors = Tutor::with('user')->where('is_active', true)->get();
-        return view('admin.schedules.create', compact('classes', 'tutors'));
+
+        return view('admin.schedules.create', [
+            'classes' => $classes,
+            'tutors' => $tutors,
+            'weekdays' => ClassScheduleService::weekdays(),
+        ]);
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $service = app(ClassScheduleService::class);
+
+        $repeat = $request->input('repeat') === ClassScheduleService::REPEAT_WEEKLY
+            ? ClassScheduleService::REPEAT_WEEKLY
+            : ClassScheduleService::REPEAT_NONE;
+
+        $validated = $request->validate(array_merge([
             'class_id' => 'required|exists:classes,id',
             'tutor_id' => 'required|exists:tutors,id',
             'title' => 'required|string|max:255',
-            'start_time' => 'required|date',
-            'end_time' => 'required|date|after:start_time',
             'meeting_link' => 'nullable|url',
             'meeting_platform' => 'nullable|in:google_meet,zoom,jitsi',
             'description' => 'nullable|string',
-            // "Set for Monday with repeat" — one form, a whole weekly series.
+            // "Set for Monday with repeat" — one form, a whole weekly series,
+            // optionally on several days at different times.
             'repeat' => 'nullable|in:none,weekly',
-            'repeat_until' => 'nullable|required_if:repeat,weekly|date|after:start_time',
-        ]);
+        ], ClassScheduleService::repeatRules($repeat)));
 
-        $sessions = app(ClassScheduleService::class)->createSeries($validated);
-        $first = $sessions->first();
+        if ($errors = $service->seriesErrors($validated)) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        $sessions = $service->createSeries($validated);
 
         $message = $sessions->count() > 1
-            ? $sessions->count() . ' sessions created — every ' . $first->start_time->format('l')
-                . ' at ' . $first->start_time->format('g:i a') . ' from ' . $first->start_time->format('M d, Y') . '.'
+            ? $sessions->count() . ' sessions created — every ' . ClassScheduleService::slotSummary($sessions)
+                . ' from ' . $sessions->first()->start_time->format('M d, Y') . '.'
             : 'Schedule created successfully.';
 
         return redirect()->route('admin.schedules.index')->with('success', $message);
