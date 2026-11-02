@@ -15,17 +15,63 @@ use Illuminate\Validation\ValidationException;
 
 class ScheduleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Upcoming and ongoing sessions first (soonest at the top), then past
-        // sessions most-recent-first, so the live session is always on page one.
+        // Filters: class, tutor, a single day of start times and status.
+        $classFilter = is_numeric($request->query('class_id')) ? (int) $request->query('class_id') : null;
+        $tutorFilter = is_numeric($request->query('tutor_id')) ? (int) $request->query('tutor_id') : null;
+        $statusFilter = in_array($request->query('status'), ['scheduled', 'ongoing', 'completed', 'cancelled'], true)
+            ? $request->query('status')
+            : null;
+        $dateFilter = $this->filterDate($request->query('date'));
+
         $schedules = ClassSchedule::with('class', 'tutor.user')
+            ->when($classFilter, function ($query) use ($classFilter) {
+                $query->where('class_id', $classFilter);
+            })
+            ->when($tutorFilter, function ($query) use ($tutorFilter) {
+                $query->where('tutor_id', $tutorFilter);
+            })
+            ->when($dateFilter, function ($query) use ($dateFilter) {
+                $query->whereDate('start_time', $dateFilter);
+            })
+            ->when($statusFilter, function ($query) use ($statusFilter) {
+                $query->where('status', $statusFilter);
+            })
+            // Upcoming and ongoing sessions first (soonest at the top), then past
+            // sessions most-recent-first, so the live session is always on page one.
             ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
             ->orderByRaw('CASE WHEN start_time >= ? THEN start_time END ASC', [now()])
             ->orderByRaw('CASE WHEN start_time < ? THEN start_time END DESC', [now()])
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('admin.schedules.index', compact('schedules'));
+        return view('admin.schedules.index', [
+            'schedules' => $schedules,
+            'classes' => Classes::orderBy('name')->get(),
+            'tutors' => Tutor::with('user')->get(),
+            'classFilter' => $classFilter,
+            'tutorFilter' => $tutorFilter,
+            'statusFilter' => $statusFilter,
+            'dateFilter' => $dateFilter,
+            'totalSessions' => ClassSchedule::count(),
+        ]);
+    }
+
+    /** A valid Y-m-d date from the filter box, or null when blank/invalid. */
+    private function filterDate($value): ?string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**

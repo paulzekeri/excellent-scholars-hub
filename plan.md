@@ -237,6 +237,9 @@
       repeats on its own weekday and time with its own length, all rows sharing one series. Validation covers
       missing days, an end time before its start, and an end date before the first lesson.
       Tests: `WeeklySlotScheduleTest`
+- [x] **Schedules filter** — the admin Schedules list filters by **Class**, **Tutor**, a **Start Time (day)**
+      date picker and **Status**, keeps the filters across pagination, shows *Showing X of Y sessions*, offers
+      **Today** / **Any day** / **Reset** shortcuts and an empty state. Tests: `ScheduleFiltersTest`
 - [x] **Learning goals as free text** — `learning_goals.title` is now `TEXT`; the upload form is one 5,000-character
       goal area with the learner picker, "What success looks like" and notes removed (existing rows keep their
       data). A free **LanguageTool** wording assistant fixes spelling/grammar via

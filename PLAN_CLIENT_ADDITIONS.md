@@ -343,6 +343,11 @@ All six items are implemented and verified. New/updated tests:
   it starts, the end date may not precede the first lesson), `slotSummary()` writes the flash message, and
   `ClassSchedule::seriesLabel()` lists the series' days for the *Weekly* badge tooltip. The old single-date
   payload still works, so existing links and tests are unaffected. Covered by `tests/Feature/WeeklySlotScheduleTest.php`.
+- **Schedules filters:** `/admin/schedules` takes `class_id`, `tutor_id`, `date` (a single day of `start_time`,
+  via `whereDate`) and `status`, so the school can drill into "everything on this day / for this class / with
+  this tutor". Filters survive pagination (`withQueryString()`), a hand-typed or invalid date is ignored instead
+  of erroring, the bar reports *Showing X of Y sessions* with **Today** / **Any day** shortcuts and a **Reset**,
+  and an empty result shows a message instead of a blank table. Covered by `tests/Feature/ScheduleFiltersTest.php`.
 
 ### R5 — learning goals: long text, no target/learner/notes, free AI check
 
