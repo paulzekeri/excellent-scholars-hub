@@ -78,7 +78,7 @@
                     @forelse($goals as $goal)
                         <tr class="hover:bg-blue-50/40 align-top">
                             <td class="px-6 py-4 text-sm max-w-sm">
-                                <p class="font-medium text-gray-800 whitespace-pre-line">{{ $goal->goalExcerpt(220) }}</p>
+                                @include('partials.goal-text', ['goal' => $goal, 'limit' => 220])
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">
                                 {{ $goal->learner->user->name ?? 'General goal' }}
@@ -104,9 +104,9 @@
                                         <input type="hidden" name="share_form" value="1">
 
                                         @foreach([
-                                            ['label' => 'Parents', 'field' => 'parent_ids', 'all' => 'share_all_parent', 'options' => $parents, 'role' => 'parent', 'flag' => $goal->shared_with_parent],
-                                            ['label' => 'Learners', 'field' => 'learner_ids', 'all' => 'share_all_learner', 'options' => $learners, 'role' => 'learner', 'flag' => $goal->shared_with_learner],
-                                            ['label' => 'Tutors', 'field' => 'tutor_ids', 'all' => 'share_all_tutor', 'options' => $tutorUsers, 'role' => 'tutor', 'flag' => $goal->shared_with_tutor],
+                                            ['label' => 'Parents', 'one' => 'parent', 'field' => 'parent_ids', 'all' => 'share_all_parent', 'options' => $parents, 'role' => 'parent', 'all_ticked' => $goal->sharesWithAll('parent')],
+                                            ['label' => 'Learners', 'one' => 'learner', 'field' => 'learner_ids', 'all' => 'share_all_learner', 'options' => $learners, 'role' => 'learner', 'all_ticked' => $goal->sharesWithAll('learner')],
+                                            ['label' => 'Tutors', 'one' => 'tutor', 'field' => 'tutor_ids', 'all' => 'share_all_tutor', 'options' => $tutorUsers, 'role' => 'tutor', 'all_ticked' => $goal->sharesWithAll('tutor')],
                                         ] as $group)
                                             <div>
                                                 <p class="font-semibold text-gray-700">{{ $group['label'] }}</p>
@@ -123,8 +123,8 @@
                                                 </select>
                                                 <label class="mt-1 flex items-center gap-1 text-[11px] text-gray-600">
                                                     <input type="hidden" name="{{ $group['all'] }}" value="0">
-                                                    <input type="checkbox" name="{{ $group['all'] }}" value="1" {{ $group['flag'] ? 'checked' : '' }}>
-                                                    <span>All {{ strtolower($group['label']) }} the goal is about</span>
+                                                    <input type="checkbox" name="{{ $group['all'] }}" value="1" {{ $group['all_ticked'] ? 'checked' : '' }}>
+                                                    <span>Every {{ $group['one'] }} the goal is about</span>
                                                 </label>
                                             </div>
                                         @endforeach
@@ -140,9 +140,9 @@
                                                 <span class="rounded-full px-2 py-0.5 text-[11px] {{ $chip }}" title="{{ ucfirst($roleKey) }}">{{ $person->name }}</span>
                                             @endforeach
                                         @endforeach
-                                        @if($goal->shared_with_parent)<span class="rounded-full bg-blue-50 text-blue-700 px-2 py-0.5 text-[11px]">All parents</span>@endif
-                                        @if($goal->shared_with_learner)<span class="rounded-full bg-green-50 text-green-700 px-2 py-0.5 text-[11px]">All learners</span>@endif
-                                        @if($goal->shared_with_tutor)<span class="rounded-full bg-orange-50 text-orange-700 px-2 py-0.5 text-[11px]">All tutors</span>@endif
+                                        @if($goal->sharesWithAll('parent'))<span data-share-chip="all-parent" class="rounded-full bg-blue-50 text-blue-700 px-2 py-0.5 text-[11px]">All parents</span>@endif
+                                        @if($goal->sharesWithAll('learner'))<span data-share-chip="all-learner" class="rounded-full bg-green-50 text-green-700 px-2 py-0.5 text-[11px]">All learners</span>@endif
+                                        @if($goal->sharesWithAll('tutor'))<span data-share-chip="all-tutor" class="rounded-full bg-orange-50 text-orange-700 px-2 py-0.5 text-[11px]">All tutors</span>@endif
                                     </div>
                                 @else
                                     <p class="mt-1 text-[11px] text-gray-500">Not shared</p>

@@ -116,13 +116,19 @@ class LearningGoalController extends Controller
 
         $shortGoal = \Illuminate\Support\Str::limit($goal->goalText(), 60);
 
-        // Legacy quick switches (kept for the existing screens and tests).
+        // Legacy quick switches (kept for the existing screens and tests). They
+        // meant "share with everyone of that role", so the "every …" flags mirror
+        // them and the chips keep matching the switches.
         if (! $request->boolean('share_form')) {
             $flags = [
                 'shared_with_parent' => (bool) ($validated['shared_with_parent'] ?? false),
                 'shared_with_learner' => (bool) ($validated['shared_with_learner'] ?? false),
                 'shared_with_tutor' => (bool) ($validated['shared_with_tutor'] ?? false),
             ];
+
+            $flags['share_all_parent'] = $flags['shared_with_parent'];
+            $flags['share_all_learner'] = $flags['shared_with_learner'];
+            $flags['share_all_tutor'] = $flags['shared_with_tutor'];
 
             $isShared = in_array(true, $flags, true);
 
@@ -162,12 +168,18 @@ class LearningGoalController extends Controller
         $goal->recipients()->sync($sync);
 
         $flags = [
+            // "Shared with that role" drives the list filters and the legacy
+            // visibility scopes, so it also goes on when somebody is chosen by
+            // name. The explicit "every …" tick is recorded separately below.
             'shared_with_parent' => $groups['parent']['all'] || $groups['parent']['ids'] !== [],
             'shared_with_learner' => $groups['learner']['all'] || $groups['learner']['ids'] !== [],
             'shared_with_tutor' => $groups['tutor']['all'] || $groups['tutor']['ids'] !== [],
+            'share_all_parent' => $groups['parent']['all'],
+            'share_all_learner' => $groups['learner']['all'],
+            'share_all_tutor' => $groups['tutor']['all'],
         ];
 
-        $isShared = in_array(true, $flags, true);
+        $isShared = $sync !== [] || $groups['parent']['all'] || $groups['learner']['all'] || $groups['tutor']['all'];
 
         $goal->update($flags + [
             'shared_by' => $isShared ? auth()->id() : null,

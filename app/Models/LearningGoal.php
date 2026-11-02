@@ -18,12 +18,16 @@ class LearningGoal extends Model
         'tutor_id', 'learner_id', 'class_id', 'title', 'description', 'term',
         'target', 'file_path', 'file_name', 'status',
         'shared_with_parent', 'shared_with_tutor', 'shared_with_learner', 'shared_by', 'shared_at',
+        'share_all_parent', 'share_all_learner', 'share_all_tutor',
     ];
 
     protected $casts = [
         'shared_with_parent' => 'boolean',
         'shared_with_tutor' => 'boolean',
         'shared_with_learner' => 'boolean',
+        'share_all_parent' => 'boolean',
+        'share_all_learner' => 'boolean',
+        'share_all_tutor' => 'boolean',
         'shared_at' => 'datetime',
     ];
 
@@ -73,6 +77,16 @@ class LearningGoal extends Model
     public function scopeSharedWithLearner($query)
     {
         return $query->where('shared_with_learner', true);
+    }
+
+    /**
+     * True only when the school ticked "every parent / learner / tutor the goal
+     * is about" for that role. Picking people by name does not set this: those
+     * names live in the shares table (see `recipients()`).
+     */
+    public function sharesWithAll(string $roleSlug): bool
+    {
+        return (bool) $this->getAttribute('share_all_' . $roleSlug);
     }
 
     /**
