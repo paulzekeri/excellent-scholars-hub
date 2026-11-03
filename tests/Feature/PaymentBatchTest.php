@@ -19,8 +19,8 @@ use Tests\TestCase;
 
 /**
  * A parent often clears two or three subjects in one bank transfer. The form
- * ticks the classes the transfer covered and records one installment per class
- * under the same reference, so each class keeps its own fee and balance.
+ * posts one row per payment line (child, type, class, amount, purpose) under the
+ * same reference, so each class keeps its own fee and balance.
  */
 class PaymentBatchTest extends TestCase
 {
@@ -79,22 +79,33 @@ class PaymentBatchTest extends TestCase
     }
 
     /**
-     * @param  array<int, float|int>  $amounts  keyed by class id (0 = general)
-     * @param  array<int, float|int>  $fees
+     * Build the `lines` payload the form posts: one row per class.
+     *
+     * @param  array<int, float|int>  $amounts  keyed by class id
+     * @param  array<int, float|int>  $fees     keyed by class id
      */
     private function batchData(Learner $child, array $amounts, array $fees = [], array $overrides = []): array
     {
+        $lines = [];
+
+        foreach ($amounts as $classId => $amount) {
+            $lines[] = [
+                'learner_id' => $child->id,
+                'payment_type' => 'tuition',
+                'class_id' => $classId,
+                'amount' => $amount,
+                'total_fee' => $fees[$classId] ?? null,
+                'purpose' => null,
+            ];
+        }
+
         return array_merge([
-            'learner_id' => $child->id,
-            'payment_type' => 'tuition',
             'term' => 'First Term',
             'payment_method' => Payment::METHOD_TRANSFER,
             'payment_account_id' => $this->account()->id,
             'reference' => 'TRF-' . uniqid(),
             'payment_date' => now()->toDateString(),
-            'class_ids' => array_keys($amounts),
-            'amounts' => $amounts,
-            'total_fees' => $fees,
+            'lines' => $lines,
         ], $overrides);
     }
 
@@ -125,20 +136,43 @@ class PaymentBatchTest extends TestCase
         $this->assertSame([Payment::STATUS_PENDING, Payment::STATUS_PENDING], $payments->pluck('status')->all());
     }
 
-    public function test_the_general_row_records_a_payment_that_is_not_tied_to_a_class(): void
+    public function test_each_row_keeps_its_own_type_and_purpose(): void
     {
         [$parentUser, , $child] = $this->makeFamily();
-        $maths = $this->makeClass();
-        $child->classes()->attach($maths->id);
+        $maths = $this->makeClass('JSS2 Mathematics');
+        $coding = $this->makeClass('JSS2 Coding');
 
-        $this->actingAs($parentUser)
-            ->post(route('parent.payments.store'), $this->batchData($child, [$maths->id => 50000, 0 => 10000]))
-            ->assertRedirect(route('parent.payments.index'));
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), $this->batchData(
+            $child,
+            [$maths->id => 50000, $coding->id => 15000],
+            [],
+            [
+                'lines' => [
+                    [
+                        'learner_id' => $child->id,
+                        'payment_type' => 'tuition',
+                        'class_id' => $maths->id,
+                        'amount' => 50000,
+                        'total_fee' => 100000,
+                        'purpose' => 'First term tuition',
+                    ],
+                    [
+                        'learner_id' => $child->id,
+                        'payment_type' => 'registration',
+                        'class_id' => $coding->id,
+                        'amount' => 15000,
+                        'purpose' => 'Registration for coding',
+                    ],
+                ],
+            ]
+        ))->assertRedirect(route('parent.payments.index'));
 
-        $general = Payment::where('learner_id', $child->id)->whereNull('class_id')->firstOrFail();
+        $payments = Payment::where('learner_id', $child->id)->orderBy('id')->get();
 
-        $this->assertSame(10000.0, $general->amount);
-        $this->assertSame(2, Payment::where('learner_id', $child->id)->count());
+        $this->assertCount(2, $payments);
+        // One transfer, but each line says what it is and which class it pays.
+        $this->assertSame(['tuition', 'registration'], $payments->pluck('payment_type')->all());
+        $this->assertSame(['First term tuition', 'Registration for coding'], $payments->pluck('purpose')->all());
     }
 
     public function test_a_ticked_class_without_an_amount_is_skipped(): void
@@ -165,7 +199,7 @@ class PaymentBatchTest extends TestCase
         $this->actingAs($parentUser)
             ->from(route('parent.payments.create'))
             ->post(route('parent.payments.store'), $this->batchData($child, [$maths->id => 0]))
-            ->assertSessionHasErrors('amounts');
+            ->assertSessionHasErrors('lines');
 
         $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
     }
@@ -196,29 +230,23 @@ class PaymentBatchTest extends TestCase
         $this->actingAs($parentUser)
             ->from(route('parent.payments.create'))
             ->post(route('parent.payments.store'), $this->batchData($child, [999999 => 20000]))
-            ->assertSessionHasErrors('class_ids.999999');
+            ->assertSessionHasErrors('lines.0.class_id');
 
         $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
     }
 
-    public function test_the_pay_ahead_dropdown_records_the_chosen_class(): void
+    public function test_a_row_records_the_class_the_parent_chooses(): void
     {
         [$parentUser, , $child] = $this->makeFamily();
         $enrolled = $this->makeClass('JSS2 Mathematics');
         $ahead = $this->makeClass('JSS2 Coding');
         $child->classes()->attach($enrolled->id);
 
-        $this->actingAs($parentUser)->post(route('parent.payments.store'), [
-            'learner_ids' => [$child->id],
-            'payment_type' => 'tuition',
-            'term' => 'First Term',
-            'payment_method' => Payment::METHOD_TRANSFER,
-            'payment_account_id' => $this->account()->id,
-            'payment_date' => now()->toDateString(),
-            'extra_class_ids' => [$child->id => $ahead->id],
-            'extra_amounts' => [$child->id => 30000],
-            'extra_total_fees' => [$child->id => 90000],
-        ])->assertRedirect(route('parent.payments.index'))->assertSessionHas('success');
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), $this->batchData(
+            $child,
+            [$ahead->id => 30000],
+            [$ahead->id => 90000]
+        ))->assertRedirect(route('parent.payments.index'))->assertSessionHas('success');
 
         $payment = Payment::where('learner_id', $child->id)->firstOrFail();
 
@@ -226,27 +254,6 @@ class PaymentBatchTest extends TestCase
         $this->assertSame(30000.0, $payment->amount);
         $this->assertSame(90000.0, $payment->total_fee);
         $this->assertFalse($child->classes()->where('class_id', $ahead->id)->exists());
-    }
-
-    public function test_the_pay_ahead_row_can_stay_a_general_payment(): void
-    {
-        [$parentUser, , $child] = $this->makeFamily();
-
-        $this->actingAs($parentUser)->post(route('parent.payments.store'), [
-            'learner_ids' => [$child->id],
-            'payment_type' => 'registration',
-            'term' => 'First Term',
-            'payment_method' => Payment::METHOD_TRANSFER,
-            'payment_account_id' => $this->account()->id,
-            'payment_date' => now()->toDateString(),
-            'extra_class_ids' => [$child->id => 0],
-            'extra_amounts' => [$child->id => 15000],
-        ])->assertRedirect(route('parent.payments.index'));
-
-        $payment = Payment::where('learner_id', $child->id)->firstOrFail();
-
-        $this->assertNull($payment->class_id);
-        $this->assertSame(15000.0, $payment->amount);
     }
 
     public function test_the_form_offers_classes_the_child_has_not_started(): void
@@ -258,10 +265,11 @@ class PaymentBatchTest extends TestCase
 
         $this->actingAs($parentUser)->get(route('parent.payments.create'))
             ->assertOk()
-            ->assertSee('General payment')
-            ->assertSee('Pay ahead — JSS2 Coding')
-            ->assertSee('name="extra_class_ids[' . $child->id . ']"', false)
-            ->assertSee('name="extra_amounts[' . $child->id . ']"', false);
+            ->assertSee('Payments on this transfer')
+            ->assertSee('JSS2 Coding')
+            ->assertSee('name="lines[0][class_id]"', false)
+            ->assertSee('name="lines[0][payment_type]"', false)
+            ->assertSee('Add another payment');
     }
 
     public function test_a_batch_line_cannot_exceed_its_total_fee(): void
@@ -277,7 +285,7 @@ class PaymentBatchTest extends TestCase
                 [$maths->id => 150000],
                 [$maths->id => 100000]
             ))
-            ->assertSessionHasErrors('amounts.' . $maths->id);
+            ->assertSessionHasErrors('lines.0.amount');
 
         $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
     }
@@ -335,10 +343,10 @@ class PaymentBatchTest extends TestCase
 
         $this->actingAs($parentUser)->get(route('parent.payments.create'))
             ->assertOk()
-            ->assertSee('What are you paying for?')
+            ->assertSee('Payments on this transfer')
             ->assertSee('JSS2 Mathematics')
-            ->assertSee('General payment')
-            ->assertSee('name="amounts[' . $child->id . ':' . $maths->id . ']"', false)
+            ->assertSee('name="lines[0][class_id]"', false)
+            ->assertSee('name="lines[0][learner_id]"', false)
             ->assertSee('This submission:');
     }
 
@@ -361,21 +369,30 @@ class PaymentBatchTest extends TestCase
         $child->classes()->attach($maths->id);
         $second->classes()->attach($english->id);
 
-        $firstKey = $child->id . ':' . $maths->id;
-        $secondKey = $second->id . ':' . $english->id;
         $reference = 'FAM-' . uniqid();
 
         $this->actingAs($parentUser)->post(route('parent.payments.store'), [
-            'learner_ids' => [$child->id, $second->id],
-            'payment_type' => 'tuition',
             'term' => 'First Term',
             'payment_method' => Payment::METHOD_TRANSFER,
             'payment_account_id' => $this->account()->id,
             'reference' => $reference,
             'payment_date' => now()->toDateString(),
-            'class_ids' => [$firstKey, $secondKey],
-            'amounts' => [$firstKey => 20000, $secondKey => 30000],
-            'total_fees' => [$firstKey => 100000, $secondKey => 100000],
+            'lines' => [
+                [
+                    'learner_id' => $child->id,
+                    'payment_type' => 'tuition',
+                    'class_id' => $maths->id,
+                    'amount' => 20000,
+                    'total_fee' => 100000,
+                ],
+                [
+                    'learner_id' => $second->id,
+                    'payment_type' => 'registration',
+                    'class_id' => $english->id,
+                    'amount' => 30000,
+                    'total_fee' => 100000,
+                ],
+            ],
         ])->assertRedirect(route('parent.payments.index'))->assertSessionHas('success');
 
         $payments = Payment::where('reference', $reference)->get();
@@ -401,21 +418,21 @@ class PaymentBatchTest extends TestCase
         $maths = $this->makeClass();
         $child->classes()->attach($maths->id);
 
-        $key = $stranger->id . ':' . $maths->id;
-
         $this->actingAs($parentUser)
             ->from(route('parent.payments.create'))
             ->post(route('parent.payments.store'), [
-                'learner_ids' => [$child->id],
-                'payment_type' => 'tuition',
                 'term' => 'First Term',
                 'payment_method' => Payment::METHOD_TRANSFER,
                 'payment_account_id' => $this->account()->id,
                 'payment_date' => now()->toDateString(),
-                'class_ids' => [$key],
-                'amounts' => [$key => 10000],
+                'lines' => [[
+                    'learner_id' => $stranger->id,
+                    'payment_type' => 'tuition',
+                    'class_id' => $maths->id,
+                    'amount' => 10000,
+                ]],
             ])
-            ->assertSessionHasErrors('class_ids.' . $key);
+            ->assertSessionHasErrors('lines.0.learner_id');
 
         $this->assertSame(0, Payment::where('learner_id', $stranger->id)->count());
         $this->assertSame(0, Payment::where('learner_id', $child->id)->count());

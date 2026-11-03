@@ -69,6 +69,12 @@
                 </dd>
             </div>
             <div><dt class="text-gray-500">Type</dt><dd class="font-semibold text-gray-800">{{ ucfirst($payment->payment_type) }}</dd></div>
+            <div>
+                <dt class="text-gray-500">Purpose</dt>
+                <dd class="font-semibold text-gray-800">
+                    {{ $payment->purpose ?: '—' }}
+                </dd>
+            </div>
             <div><dt class="text-gray-500">Term</dt><dd class="font-semibold text-gray-800">{{ $payment->term ?? '—' }}</dd></div>
             <div>
                 <dt class="text-gray-500">Class</dt>

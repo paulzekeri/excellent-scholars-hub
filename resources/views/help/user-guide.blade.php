@@ -1198,10 +1198,12 @@
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">
-                                Tick <strong>every class</strong> the payment covers and type what you paid against each one. One
-                                balance is kept per class, so a single transfer can clear two or three subjects at once. The
-                                <em>pay-ahead</em> dropdown lets you choose any class &mdash; even one your child has not started
-                                yet &mdash; and <em>General payment</em> covers registration or materials not tied to a class.
+                                Add a row for each payment: choose the <strong>child</strong>, what the money is for
+                                (<strong>tuition</strong>, <strong>registration</strong>, <strong>materials</strong> or
+                                <strong>other</strong>), the <strong>class</strong> it belongs to, the amount and an optional
+                                <strong>purpose</strong> in your own words. One transfer can cover several children and classes
+                                &mdash; tuition for one child and registration for another in the same submission. Pick any
+                                class, even one your child has not started yet.
                             </span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
@@ -1429,7 +1431,7 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Step 1 — record your payment</h3>
                 <ol class="space-y-2 mb-4">
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Fees &amp; Payments</strong> and click <strong>Record a payment</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Tick <strong>every child</strong> this transfer covers (only your own children are ever listed), then type the amount paid against each child and class row &mdash; one transfer is recorded once for the whole family, not once per child. To pay <strong>ahead of a class</strong> your child has not been enrolled in yet, pick that class in the <em>pay-ahead</em> dropdown; leave it on <strong>General payment</strong> for registration, materials or anything not tied to a class.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Add a row for each payment (only your own children are listed): the <strong>child</strong>, whether it is <strong>tuition</strong>, <strong>registration</strong>, <strong>materials</strong> or <strong>other</strong>, the <strong>class</strong> it belongs to, the amount and an optional <strong>purpose</strong> in your own words. One submission can pay for several children and classes &mdash; for example tuition for one child and registration for another. Pick any class, even one your child has not started yet.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Choose the <strong>payment type</strong> and <strong>term</strong>; each row takes the <strong>amount paid now</strong> and, if known, the <strong>total fee</strong>. A single installment can never be larger than the total fee.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Pay by <strong>bank transfer</strong> — the school accounts are listed with a copy button, and you must pick the one you used (cash is not accepted, as the school is online-only; card stays disabled as <em>coming soon</em> until Paystack is connected). Then add the reference (the transfer narration), the date and the <strong>receipt or teller slip</strong> (PDF or image, up to 5 MB).</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">On submit the record is stored as <strong>Pending verification</strong> — you can never mark your own payment as paid.</span></li>

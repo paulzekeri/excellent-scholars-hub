@@ -123,6 +123,9 @@
                                 {{ $payment->reference ?? 'PAY-' . str_pad($payment->id, 5, '0', STR_PAD_LEFT) }}
                             </a>
                             <span class="block text-xs text-gray-500">{{ ucfirst($payment->payment_type) }}</span>
+                            @if($payment->purpose)
+                                <span class="block text-xs italic text-gray-500">{{ \Illuminate\Support\Str::limit($payment->purpose, 40) }}</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-sm">
                             {{ $payment->learner->user->name ?? $payment->user->name }}

@@ -191,7 +191,12 @@
                                 <span class="block text-xs text-gray-500">sent {{ $payment->created_at->format('M d, Y') }}</span>
                             </td>
                             <td class="px-6 py-4">{{ $payment->learner->user->name ?? '—' }}</td>
-                            <td class="px-6 py-4 text-gray-600">{{ $payment->feeLabel() }}</td>
+                            <td class="px-6 py-4 text-gray-600">
+                                {{ $payment->feeLabel() }}
+                                @if($payment->purpose)
+                                    <span class="mt-1 block text-xs italic text-gray-500">{{ \Illuminate\Support\Str::limit($payment->purpose, 50) }}</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 font-semibold text-gray-800">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</td>
                             <td class="px-6 py-4">
                                 <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $payment->methodBadge() }}">{{ $payment->methodLabel() }}</span>

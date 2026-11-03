@@ -179,12 +179,12 @@ class RoundTwoEnhancementsTest extends TestCase
         $this->actingAs($parent->user)
             ->get(route('parent.payments.create'))
             ->assertOk()
-            ->assertSee('Children covered by this payment')
+            ->assertSee('Payments on this transfer')
             ->assertSee('Family Child One')
             ->assertSee('Family Child Two')
-            ->assertSee('name="learner_ids[]"', false)
-            ->assertSee('name="amounts[' . $first->id . ':' . $maths->id . ']"', false)
-            ->assertSee('name="amounts[' . $second->id . ':' . $english->id . ']"', false);
+            ->assertSee('name="lines[0][learner_id]"', false)
+            ->assertSee('Family Maths')
+            ->assertSee('Family English');
     }
 
     public function test_learning_goals_take_long_text_and_are_shared_with_chosen_people(): void

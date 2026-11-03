@@ -3,12 +3,12 @@
 @section('title', 'Record a Payment')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <a href="{{ route('parent.payments.index') }}" class="text-blue-700 hover:text-blue-900 mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i> Back to fees</a>
 
     <div class="bg-white rounded-xl shadow-md p-6 sm:p-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-1">Record a payment</h1>
-        <p class="text-sm text-gray-600 mb-4">Tell us what you paid and how. Each record is one installment — submit the same fee again later for a part payment.</p>
+        <p class="text-sm text-gray-600 mb-4">Tell us what you paid and how. Each row is one installment — submit the same fee again later for a part payment.</p>
 
         <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-900 p-4 rounded-r-lg mb-6 text-sm">
             <p class="font-semibold"><i class="fas fa-clock mr-1"></i> Your payment starts as Pending</p>
@@ -24,44 +24,6 @@
         @else
         <form action="{{ route('parent.payments.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">@csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <p class="block text-sm font-medium text-gray-700">Children covered by this payment <span class="text-orange-700">*</span></p>
-                    <p class="text-xs text-gray-500 mt-1">
-                        Tick every child this transfer covers. The payment is recorded once for the whole family — one line per
-                        child and class below — so you do not submit a separate payment for each child.
-                    </p>
-
-                    @php
-                        $checkedChildren = array_map('strval', old(
-                            'learner_ids',
-                            $selectedLearner !== '' ? [$selectedLearner] : [$children->first()->id]
-                        ));
-                    @endphp
-
-                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        @foreach($children as $learner)
-                            <label class="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
-                                <input type="checkbox" name="learner_ids[]" value="{{ $learner->id }}" data-child-check
-                                    class="h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                    {{ in_array((string) $learner->id, $checkedChildren, true) ? 'checked' : '' }}>
-                                <span class="min-w-0">
-                                    <span class="block font-medium text-gray-800">{{ $learner->user->name }}</span>
-                                    <span class="block text-xs text-gray-500">{{ $learner->classes->count() }} {{ \Illuminate\Support\Str::plural('class', $learner->classes->count()) }}</span>
-                                </span>
-                            </label>
-                        @endforeach
-                    </div>
-                    @error('learner_ids')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                    @error('learner_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                </div>
-                <div>
-                    <label for="payment_type" class="block text-sm font-medium text-gray-700">Payment Type <span class="text-orange-700">*</span></label>
-                    <select id="payment_type" name="payment_type" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        @foreach(['tuition', 'registration', 'material', 'other'] as $type)
-                            <option value="{{ $type }}" {{ old('payment_type', 'tuition') === $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 <div>
                     <label for="term" class="block text-sm font-medium text-gray-700">Term</label>
                     <input type="text" id="term" name="term" list="payment-terms" value="{{ old('term', $selectedTerm) }}" placeholder="e.g. First Term" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
@@ -70,123 +32,163 @@
                     </datalist>
                     <p class="text-xs text-gray-500 mt-1">Payments sharing a child, term and class share one balance.</p>
                 </div>
-                <div class="md:col-span-2">
-                    <p class="block text-sm font-medium text-gray-700">What are you paying for? <span class="text-orange-700">*</span></p>
-                    <p class="text-xs text-gray-500 mt-1">
-                        Type the amount paid against each row this transfer covers — one record is created per row, under the
-                        same reference and receipt, so a single transfer can clear two or three children and subjects at once.
-                        Use the <strong>pay-ahead</strong> row to pay for a class your child has not been enrolled in yet;
-                        leave it on <strong>General payment</strong> for registration, materials or anything not tied to a class.
+                <div class="flex items-end">
+                    <p class="text-xs text-gray-500">
+                        One submission can pay for several children and several classes — add a row for each payment line.
                     </p>
+                </div>
+            </div>
 
-                    @php
-                        $oldClasses = collect(old('class_ids', []))->map(function ($id) {
-                            return (string) $id;
-                        })->all();
-                        $oldAmounts = old('amounts', []);
-                        $oldTotals = old('total_fees', []);
-                    @endphp
+            <div>
+                <p class="block text-sm font-medium text-gray-700">Payments on this transfer <span class="text-orange-700">*</span></p>
+                <p class="text-xs text-gray-500 mt-1">
+                    One row per payment: choose the child, what the money is for, the class it belongs to, how much you paid and
+                    — optionally — what it was for in your own words. One row can be tuition for a child while another row is
+                    that child's or a sibling's registration.
+                </p>
 
-                    <div class="mt-3 overflow-x-auto rounded-xl border border-gray-200">
-                        <table class="min-w-full divide-y divide-gray-200 text-sm">
-                            <thead class="bg-[#EAF2FB]">
-                                <tr>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Pay</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Child / class</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Amount paid now</th>
-                                    <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Total fee (optional)</th>
+                @php
+                    $types = ['tuition' => 'Tuition', 'registration' => 'Registration', 'material' => 'Materials', 'other' => 'Other'];
+                    $formLines = old('lines');
+
+                    if (! is_array($formLines) || $formLines === []) {
+                        $formLines = [[
+                            'learner_id' => $selectedLearner !== '' ? $selectedLearner : $children->first()->id,
+                            'payment_type' => 'tuition',
+                            'class_id' => '',
+                            'amount' => '',
+                            'total_fee' => '',
+                            'purpose' => '',
+                        ]];
+                    }
+                @endphp
+
+                <div class="mt-3 overflow-x-auto rounded-xl border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead class="bg-[#EAF2FB]">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Child</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Payment for</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Amount paid</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Full fee (optional)</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-[#0a2550] uppercase">Purpose (optional)</th>
+                                <th class="px-3 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="payment-lines" class="divide-y divide-gray-100 bg-white">
+                            @foreach($formLines as $index => $line)
+                                <tr data-payment-row>
+                                    <td class="px-3 py-2 align-top">
+                                        <select name="lines[{{ $index }}][learner_id]" class="w-36 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                            @foreach($children as $learner)
+                                                <option value="{{ $learner->id }}" {{ (string) ($line['learner_id'] ?? '') === (string) $learner->id ? 'selected' : '' }}>{{ $learner->user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('lines.' . $index . '.learner_id')<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <select name="lines[{{ $index }}][payment_type]" class="w-32 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                            @foreach($types as $value => $label)
+                                                <option value="{{ $value }}" {{ ($line['payment_type'] ?? 'tuition') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('lines.' . $index . '.payment_type')<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <select name="lines[{{ $index }}][class_id]" class="w-48 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="">Choose a class</option>
+                                            @foreach($classes as $class)
+                                                <option value="{{ $class->id }}" {{ (string) ($line['class_id'] ?? '') === (string) $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('lines.' . $index . '.class_id')<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <input type="number" step="0.01" min="0" name="lines[{{ $index }}][amount]" data-line-amount
+                                            value="{{ $line['amount'] ?? '' }}" placeholder="0.00"
+                                            class="w-28 rounded-lg border border-gray-300 px-2 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                        @error('lines.' . $index . '.amount')<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <input type="number" step="0.01" min="0" name="lines[{{ $index }}][total_fee]"
+                                            value="{{ $line['total_fee'] ?? '' }}" placeholder="optional"
+                                            class="w-28 rounded-lg border border-gray-300 px-2 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <input type="text" maxlength="500" name="lines[{{ $index }}][purpose]"
+                                            value="{{ $line['purpose'] ?? '' }}" placeholder="e.g. First term tuition"
+                                            class="w-52 rounded-lg border border-gray-300 px-2 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                    </td>
+                                    <td class="px-3 py-2 align-top">
+                                        <button type="button" data-remove-row class="mt-2 text-gray-500 hover:text-orange-700" title="Remove this row">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 bg-white">
-                                @foreach($children as $learner)
-                                    @php
-                                        // Classes the child has not started yet - the pay-ahead dropdown.
-                                        $availableClasses = $classes->reject(function ($class) use ($learner) {
-                                            return $learner->classes->contains('id', $class->id);
-                                        });
-                                        $extraClassId = (string) old('extra_class_ids.' . $learner->id, '0');
-                                        $extraAmount = old('extra_amounts.' . $learner->id);
-                                        $extraTotal = old('extra_total_fees.' . $learner->id);
-                                    @endphp
-                                    <tr data-child-heading="{{ $learner->id }}" class="bg-[#EAF2FB]/70">
-                                        <td colspan="4" class="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#0a2550]">{{ $learner->user->name }}</td>
-                                    </tr>
-                                    <tr data-pay-row data-learner-row="{{ $learner->id }}">
-                                        <td class="px-3 py-2 align-top">
-                                            <input type="checkbox" data-pay-check
-                                                class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                                {{ ($extraAmount !== null && $extraAmount !== '') ? 'checked' : '' }}>
-                                        </td>
-                                        <td class="px-3 py-2 align-top">
-                                            <select name="extra_class_ids[{{ $learner->id }}]"
-                                                class="w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                                <option value="0" {{ $extraClassId === '0' ? 'selected' : '' }}>General payment — not tied to a class</option>
-                                                @foreach($availableClasses as $class)
-                                                    <option value="{{ $class->id }}" {{ $extraClassId === (string) $class->id ? 'selected' : '' }}>
-                                                        Pay ahead — {{ $class->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <span class="mt-1 block text-xs text-gray-500">
-                                                Pick any class to pay ahead, even one {{ $learner->user->name }} has not started yet.
-                                            </span>
-                                            @error('extra_class_ids.' . $learner->id)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
-                                        </td>
-                                        <td class="px-3 py-2 align-top">
-                                            <input type="number" step="0.01" min="0" name="extra_amounts[{{ $learner->id }}]" data-pay-amount
-                                                value="{{ $extraAmount }}" placeholder="0.00"
-                                                class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                            @error('extra_amounts.' . $learner->id)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
-                                        </td>
-                                        <td class="px-3 py-2 align-top">
-                                            <input type="number" step="0.01" min="0" name="extra_total_fees[{{ $learner->id }}]"
-                                                value="{{ $extraTotal }}" placeholder="optional"
-                                                class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                        </td>
-                                    </tr>
-                                    @foreach($learner->classes->sortBy('name') as $class)
-                                        @php $rowKey = $learner->id . ':' . $class->id; @endphp
-                                        <tr data-pay-row data-learner-row="{{ $learner->id }}">
-                                            <td class="px-3 py-2 align-top">
-                                                <input type="checkbox" name="class_ids[]" value="{{ $rowKey }}" data-pay-check
-                                                    class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                                    {{ in_array($rowKey, $oldClasses, true) ? 'checked' : '' }}>
-                                            </td>
-                                            <td class="px-3 py-2 align-top">
-                                                <span class="font-medium text-gray-800">{{ $class->name }}</span>
-                                                <span class="block text-xs text-gray-500">{{ $learner->user->name }}</span>
-                                            </td>
-                                            <td class="px-3 py-2 align-top">
-                                                <input type="number" step="0.01" min="0" name="amounts[{{ $rowKey }}]" data-pay-amount
-                                                    value="{{ $oldAmounts[$rowKey] ?? '' }}" placeholder="0.00"
-                                                    class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                                @error('amounts.' . $rowKey)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
-                                            </td>
-                                            <td class="px-3 py-2 align-top">
-                                                <input type="number" step="0.01" min="0" name="total_fees[{{ $rowKey }}]"
-                                                    value="{{ $oldTotals[$rowKey] ?? '' }}" placeholder="optional"
-                                                    class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
 
-                    <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
-                        <p class="text-xs text-gray-500"><i class="fas fa-circle-info mr-1"></i>Enrolled classes are listed per child; the pay-ahead row lets you choose any class. Amounts apply to the term chosen above.</p>
-                        <p class="text-sm font-semibold text-[#0a2550]">This submission: <span id="pay-total">0.00</span></p>
-                    </div>
-
-                    @error('class_ids')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                    @error('class_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                    @error('amounts')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                    @error('extra_class_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
-                    @error('extra_amounts')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                        </tbody>
+                    </table>
                 </div>
 
+                <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
+                    <button type="button" id="add-payment-row" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 transition">
+                        <i class="fas fa-plus mr-1"></i> Add another payment
+                    </button>
+                    <p class="text-sm font-semibold text-[#0a2550]">This submission: <span id="pay-total">0.00</span></p>
+                </div>
+
+                <p class="mt-2 text-xs text-gray-500">
+                    <i class="fas fa-circle-info mr-1"></i>
+                    The full fee is only needed for the balance bar on your fees page. Pick any class — including one your child
+                    has not started yet; the school can add the learner after confirming the payment.
+                </p>
+
+                @error('lines')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                @error('lines.*.class_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
             </div>
+
+            <template id="payment-row-template">
+                <tr data-payment-row>
+                    <td class="px-3 py-2 align-top">
+                        <select name="lines[__INDEX__][learner_id]" class="w-36 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            @foreach($children as $learner)
+                                <option value="{{ $learner->id }}">{{ $learner->user->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        <select name="lines[__INDEX__][payment_type]" class="w-32 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            @foreach($types as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        <select name="lines[__INDEX__][class_id]" class="w-48 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Choose a class</option>
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}">{{ $class->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        <input type="number" step="0.01" min="0" name="lines[__INDEX__][amount]" data-line-amount placeholder="0.00" class="w-28 rounded-lg border border-gray-300 px-2 py-2 focus:ring-blue-500 focus:border-blue-500">
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        <input type="number" step="0.01" min="0" name="lines[__INDEX__][total_fee]" placeholder="optional" class="w-28 rounded-lg border border-gray-300 px-2 py-2 focus:ring-blue-500 focus:border-blue-500">
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        <input type="text" maxlength="500" name="lines[__INDEX__][purpose]" placeholder="e.g. First term tuition" class="w-52 rounded-lg border border-gray-300 px-2 py-2 focus:ring-blue-500 focus:border-blue-500">
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        <button type="button" data-remove-row class="mt-2 text-gray-500 hover:text-orange-700" title="Remove this row">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                </tr>
+            </template>
 
             <div>
                 <p class="block text-sm font-medium text-gray-700 mb-2">How did you pay? <span class="text-orange-700">*</span></p>
@@ -217,7 +219,6 @@
                     </p>
                 @endif
             </div>
-
 
             {{-- Bank transfer: the accounts the CEO added (only active ones) --}}
             <div>
@@ -286,11 +287,6 @@
                 @error('receipt')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
             </div>
 
-            <div>
-                <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
-                <textarea id="notes" name="notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">{{ old('notes') }}</textarea>
-            </div>
-
             <div class="flex flex-wrap gap-3">
                 <button type="submit" class="bg-blue-700 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition"><i class="fas fa-paper-plane mr-1"></i> Submit for verification</button>
                 <a href="{{ route('parent.payments.index') }}" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition">Cancel</a>
@@ -299,7 +295,6 @@
         @endif
     </div>
 </div>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -328,84 +323,61 @@
             });
         });
 
-        // Multi-child payment rows: a family transfer can cover several children.
-        // Only the ticked children's rows are enabled, typing an amount ticks its
-        // row, and the submission total updates live.
-        const childChecks = Array.prototype.slice.call(document.querySelectorAll('[data-child-check]'));
-        const payRows = Array.prototype.slice.call(document.querySelectorAll('[data-pay-row]'));
-        const childHeadings = Array.prototype.slice.call(document.querySelectorAll('[data-child-heading]'));
+        // Payment lines: add a row per child/class, remove blanks, total the amounts.
+        const lineBody = document.getElementById('payment-lines');
+        const rowTemplate = document.getElementById('payment-row-template');
+        const addRow = document.getElementById('add-payment-row');
         const payTotal = document.getElementById('pay-total');
+        let nextLine = {{ count($formLines) }};
 
-        function selectedChildren() {
-            return childChecks.filter(function (box) { return box.checked; }).map(function (box) {
-                return box.value;
-            });
-        }
-
-        function refreshPayRows() {
-            const chosen = selectedChildren();
-
-            childHeadings.forEach(function (heading) {
-                heading.classList.toggle('hidden', chosen.indexOf(heading.getAttribute('data-child-heading')) === -1);
-            });
+        function refreshTotal() {
+            if (!lineBody || !payTotal) return;
 
             let total = 0;
 
-            payRows.forEach(function (row) {
-                const owner = row.getAttribute('data-learner-row');
-                const allowed = !owner || chosen.indexOf(owner) !== -1;
-
-                row.classList.toggle('hidden', !allowed);
-
-                Array.prototype.forEach.call(row.querySelectorAll('input, select'), function (input) {
-                    input.disabled = !allowed;
-
-                    if (!allowed && input.type === 'checkbox') {
-                        input.checked = false;
-                    }
-                });
-
-                const check = row.querySelector('[data-pay-check]');
-                const amount = row.querySelector('[data-pay-amount]');
-                const value = amount ? parseFloat(amount.value) || 0 : 0;
-
-                if (allowed && check && amount && value > 0 && !check.checked) {
-                    check.checked = true;
-                }
-
-                if (allowed && check && check.checked) {
-                    total += value;
-                }
+            lineBody.querySelectorAll('[data-line-amount]').forEach(function (input) {
+                total += parseFloat(input.value) || 0;
             });
 
-            if (payTotal) {
-                payTotal.textContent = total.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                });
-            }
+            payTotal.textContent = total.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
         }
 
-        payRows.forEach(function (row) {
-            const check = row.querySelector('[data-pay-check]');
-            const amount = row.querySelector('[data-pay-amount]');
+        if (lineBody) {
+            lineBody.addEventListener('input', refreshTotal);
 
-            if (check && amount) {
-                check.addEventListener('change', function () {
-                    if (!check.checked) amount.value = '';
-                    refreshPayRows();
-                });
-            }
+            lineBody.addEventListener('click', function (event) {
+                const remove = event.target.closest('[data-remove-row]');
 
-            if (amount) amount.addEventListener('input', refreshPayRows);
-        });
+                if (!remove) return;
 
-        childChecks.forEach(function (box) {
-            box.addEventListener('change', refreshPayRows);
-        });
+                const row = remove.closest('[data-payment-row]');
+                if (row) row.remove();
 
-        refreshPayRows();
+                // Never leave the form without a row.
+                if (!lineBody.querySelector('[data-payment-row]') && addRow) {
+                    addRow.click();
+                }
+
+                refreshTotal();
+            });
+        }
+
+        if (addRow && rowTemplate && lineBody) {
+            addRow.addEventListener('click', function () {
+                const html = rowTemplate.innerHTML.replace(/__INDEX__/g, nextLine++);
+                lineBody.insertAdjacentHTML('beforeend', html);
+                refreshTotal();
+            });
+        }
+
+        refreshTotal();
     });
 </script>
 @endsection
+
+
+
 

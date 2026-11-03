@@ -80,7 +80,7 @@ class Payment extends Model
     ];
 
     protected $fillable = [
-        'user_id', 'learner_id', 'payment_type', 'term', 'class_id', 'amount', 'total_fee',
+        'user_id', 'learner_id', 'payment_type', 'purpose', 'term', 'class_id', 'amount', 'total_fee',
         'currency', 'payment_method', 'payment_account_id', 'paid_into', 'gateway',
         'gateway_reference', 'reference', 'status', 'notes', 'payment_date',
         'receipt_path', 'receipt_name', 'verified_at', 'verified_by',
