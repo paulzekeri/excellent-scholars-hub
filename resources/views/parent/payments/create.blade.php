@@ -75,7 +75,8 @@
                     <p class="text-xs text-gray-500 mt-1">
                         Type the amount paid against each row this transfer covers — one record is created per row, under the
                         same reference and receipt, so a single transfer can clear two or three children and subjects at once.
-                        Tick <strong>general</strong> for registration, materials or anything not tied to a class.
+                        Use the <strong>pay-ahead</strong> row to pay for a class your child has not been enrolled in yet;
+                        leave it on <strong>General payment</strong> for registration, materials or anything not tied to a class.
                     </p>
 
                     @php
@@ -98,29 +99,48 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100 bg-white">
                                 @foreach($children as $learner)
-                                    @php $generalKey = $learner->id . ':0'; @endphp
+                                    @php
+                                        // Classes the child has not started yet - the pay-ahead dropdown.
+                                        $availableClasses = $classes->reject(function ($class) use ($learner) {
+                                            return $learner->classes->contains('id', $class->id);
+                                        });
+                                        $extraClassId = (string) old('extra_class_ids.' . $learner->id, '0');
+                                        $extraAmount = old('extra_amounts.' . $learner->id);
+                                        $extraTotal = old('extra_total_fees.' . $learner->id);
+                                    @endphp
                                     <tr data-child-heading="{{ $learner->id }}" class="bg-[#EAF2FB]/70">
                                         <td colspan="4" class="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#0a2550]">{{ $learner->user->name }}</td>
                                     </tr>
                                     <tr data-pay-row data-learner-row="{{ $learner->id }}">
                                         <td class="px-3 py-2 align-top">
-                                            <input type="checkbox" name="class_ids[]" value="{{ $generalKey }}" data-pay-check
+                                            <input type="checkbox" data-pay-check
                                                 class="mt-2 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
-                                                {{ in_array($generalKey, $oldClasses, true) ? 'checked' : '' }}>
+                                                {{ ($extraAmount !== null && $extraAmount !== '') ? 'checked' : '' }}>
                                         </td>
                                         <td class="px-3 py-2 align-top">
-                                            <span class="font-medium text-gray-800">General payment</span>
-                                            <span class="block text-xs text-gray-500">Not tied to one class</span>
+                                            <select name="extra_class_ids[{{ $learner->id }}]"
+                                                class="w-full max-w-xs rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                                <option value="0" {{ $extraClassId === '0' ? 'selected' : '' }}>General payment — not tied to a class</option>
+                                                @foreach($availableClasses as $class)
+                                                    <option value="{{ $class->id }}" {{ $extraClassId === (string) $class->id ? 'selected' : '' }}>
+                                                        Pay ahead — {{ $class->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <span class="mt-1 block text-xs text-gray-500">
+                                                Pick any class to pay ahead, even one {{ $learner->user->name }} has not started yet.
+                                            </span>
+                                            @error('extra_class_ids.' . $learner->id)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
                                         </td>
                                         <td class="px-3 py-2 align-top">
-                                            <input type="number" step="0.01" min="0" name="amounts[{{ $generalKey }}]" data-pay-amount
-                                                value="{{ $oldAmounts[$generalKey] ?? '' }}" placeholder="0.00"
+                                            <input type="number" step="0.01" min="0" name="extra_amounts[{{ $learner->id }}]" data-pay-amount
+                                                value="{{ $extraAmount }}" placeholder="0.00"
                                                 class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                            @error('amounts.' . $generalKey)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
+                                            @error('extra_amounts.' . $learner->id)<span class="mt-1 block text-xs text-orange-700">{{ $message }}</span>@enderror
                                         </td>
                                         <td class="px-3 py-2 align-top">
-                                            <input type="number" step="0.01" min="0" name="total_fees[{{ $generalKey }}]"
-                                                value="{{ $oldTotals[$generalKey] ?? '' }}" placeholder="optional"
+                                            <input type="number" step="0.01" min="0" name="extra_total_fees[{{ $learner->id }}]"
+                                                value="{{ $extraTotal }}" placeholder="optional"
                                                 class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
                                         </td>
                                     </tr>
@@ -155,13 +175,15 @@
                     </div>
 
                     <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
-                        <p class="text-xs text-gray-500"><i class="fas fa-circle-info mr-1"></i>Only the classes of the children you ticked are listed. Amounts apply to the term chosen above.</p>
+                        <p class="text-xs text-gray-500"><i class="fas fa-circle-info mr-1"></i>Enrolled classes are listed per child; the pay-ahead row lets you choose any class. Amounts apply to the term chosen above.</p>
                         <p class="text-sm font-semibold text-[#0a2550]">This submission: <span id="pay-total">0.00</span></p>
                     </div>
 
                     @error('class_ids')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                     @error('class_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                     @error('amounts')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    @error('extra_class_ids.*')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    @error('extra_amounts')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
 
             </div>
@@ -335,7 +357,7 @@
 
                 row.classList.toggle('hidden', !allowed);
 
-                Array.prototype.forEach.call(row.querySelectorAll('input'), function (input) {
+                Array.prototype.forEach.call(row.querySelectorAll('input, select'), function (input) {
                     input.disabled = !allowed;
 
                     if (!allowed && input.type === 'checkbox') {

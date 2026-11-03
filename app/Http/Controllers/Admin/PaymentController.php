@@ -34,7 +34,7 @@ class PaymentController extends Controller
             'method' => $request->query('method'),
         ];
 
-        $payments = Payment::with('user', 'learner.user', 'schoolClass', 'verifiedBy', 'paymentAccount')
+        $payments = Payment::with('user', 'learner.user', 'learner.classes', 'schoolClass', 'verifiedBy', 'paymentAccount')
             ->when($filters['learner_id'], function ($query, $learnerId) {
                 $query->where('learner_id', $learnerId);
             })
@@ -174,12 +174,84 @@ class PaymentController extends Controller
         return back()->with('success', 'Payment rejected. The parent has been told why.');
     }
 
+    /**
+     * A parent can pay ahead for a class before the child is enrolled. Once the
+     * money is confirmed the CEO adds the learner to that class from here.
+     */
+    public function enroll(Payment $payment)
+    {
+        $payment->load('learner.user', 'schoolClass');
+
+        $learner = $payment->learner;
+        $class = $payment->schoolClass;
+
+        if (! $learner || ! $class) {
+            return back()->with('error', 'This payment is not linked to a class, so there is nothing to enrol.');
+        }
+
+        $name = $learner->user->name ?? 'The learner';
+
+        if ($class->learners()->where('learner_id', $learner->id)->exists()) {
+            return back()->with('error', $name . ' is already enrolled in ' . $class->name . '.');
+        }
+
+        if (! $class->hasCapacity()) {
+            return back()->with(
+                'error',
+                'Cannot enrol ' . $name . ': ' . $class->name . ' is full (' . $class->capacityLabel() . ').'
+            );
+        }
+
+        $class->learners()->attach($learner->id);
+
+        $this->notifyPayer(
+            $payment,
+            Notification::TYPE_INFO,
+            'Added to ' . $class->name,
+            sprintf(
+                '%s has been added to %s after the payment for %s was confirmed.',
+                $name,
+                $class->name,
+                $payment->feeLabel()
+            )
+        );
+
+        return back()->with('success', $name . ' has been enrolled in ' . $class->name . '.');
+    }
+
+    /**
+     * Whether the learner on this payment is enrolled in the class it pays for.
+     * Null when the payment is not tied to a class.
+     *
+     * @return array{class: Classes, learner: Learner, enrolled: bool, has_capacity: bool}|null
+     */
+    private function enrolmentState(Payment $payment): ?array
+    {
+        if (! $payment->class_id || ! $payment->learner) {
+            return null;
+        }
+
+        $class = $payment->schoolClass;
+
+        if (! $class) {
+            return null;
+        }
+
+        return [
+            'class' => $class,
+            'learner' => $payment->learner,
+            'enrolled' => $class->learners()->where('learner_id', $payment->learner->id)->exists(),
+            'has_capacity' => $class->hasCapacity(),
+        ];
+    }
+
     public function show(Payment $payment)
     {
         $payment->load('user', 'learner.user', 'schoolClass', 'verifiedBy', 'paymentAccount');
 
         return view('admin.payments.show', [
             'payment' => $payment,
+            'enrolment' => $this->enrolmentState($payment),
             'summary' => Payment::summaryFor(
                 (int) $payment->learner_id,
                 $payment->term,

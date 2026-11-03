@@ -70,7 +70,15 @@
             </div>
             <div><dt class="text-gray-500">Type</dt><dd class="font-semibold text-gray-800">{{ ucfirst($payment->payment_type) }}</dd></div>
             <div><dt class="text-gray-500">Term</dt><dd class="font-semibold text-gray-800">{{ $payment->term ?? '—' }}</dd></div>
-            <div><dt class="text-gray-500">Class</dt><dd class="font-semibold text-gray-800">{{ $payment->schoolClass->name ?? 'Not class-specific' }}</dd></div>
+            <div>
+                <dt class="text-gray-500">Class</dt>
+                <dd class="font-semibold text-gray-800">
+                    {{ $payment->schoolClass->name ?? 'Not class-specific' }}
+                    @if($enrolment && ! $enrolment['enrolled'])
+                        <span class="mt-1 block text-xs font-bold uppercase tracking-wide text-orange-700">Paid ahead — not enrolled</span>
+                    @endif
+                </dd>
+            </div>
             <div><dt class="text-gray-500">Recorded by</dt><dd class="font-semibold text-gray-800">{{ $payment->user->name ?? 'N/A' }}</dd></div>
             <div>
                 <dt class="text-gray-500">Verified</dt>
@@ -92,6 +100,39 @@
             </div>
         @endif
     </div>
+
+    @if($enrolment && ! $enrolment['enrolled'])
+        <div class="bg-white rounded-xl shadow-md p-8 mb-6 border-l-4 border-orange-500">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">
+                <i class="fas fa-user-plus text-orange-700 mr-2"></i>
+                Add {{ $enrolment['learner']->user->name }} to {{ $enrolment['class']->name }}
+            </h2>
+            <p class="text-sm text-gray-600 mb-4">
+                This payment was recorded for a class the child has not been enrolled in yet.
+                @if($payment->isPending())
+                    Check the bank, verify the payment, then add the child to the class.
+                @else
+                    The payment is confirmed — add the child to the class now.
+                @endif
+            </p>
+            <p class="text-xs text-gray-500 mb-4">Class size: {{ $enrolment['class']->capacityLabel() }}</p>
+
+            @if($enrolment['has_capacity'])
+                <form method="POST" action="{{ route('admin.payments.enroll', $payment) }}">
+                    @csrf
+                    <button type="submit" class="bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-800 transition">
+                        <i class="fas fa-user-plus mr-1"></i>
+                        Enrol {{ $enrolment['learner']->user->name }} in {{ $enrolment['class']->name }}
+                    </button>
+                </form>
+            @else
+                <p class="rounded-lg border border-orange-200 bg-orange-50 p-3 text-sm text-orange-800">
+                    <i class="fas fa-triangle-exclamation mr-1"></i>
+                    This class is full. Raise its maximum on <strong>Classes</strong> or free a place before enrolling.
+                </p>
+            @endif
+        </div>
+    @endif
 
     <div class="bg-white rounded-xl shadow-md p-8 mb-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4"><i class="fas fa-scale-balanced text-blue-600 mr-2"></i>Fee balance</h2>

@@ -130,7 +130,12 @@
                                 <span class="block text-xs text-gray-500">Paid by {{ $payment->user->name }}</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ $payment->feeLabel() }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ $payment->feeLabel() }}
+                            @if($payment->class_id && $payment->learner && ! $payment->learner->classes->pluck('id')->contains($payment->class_id))
+                                <span class="mt-1 block text-xs font-semibold text-orange-700"><i class="fas fa-user-clock mr-1"></i>Not enrolled yet</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-sm font-semibold">
                             {{ number_format($payment->amount, 2) }} {{ $payment->currency }}
                             @if($payment->total_fee)

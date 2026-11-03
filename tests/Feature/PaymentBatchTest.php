@@ -170,19 +170,98 @@ class PaymentBatchTest extends TestCase
         $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
     }
 
-    public function test_a_batch_line_must_use_the_childs_own_class(): void
+    public function test_a_ticked_row_can_pay_ahead_for_a_class_the_child_has_not_started(): void
     {
         [$parentUser, , $child] = $this->makeFamily();
         $own = $this->makeClass();
-        $other = $this->makeClass('Another Learner Class');
+        $ahead = $this->makeClass('Another Learner Class');
         $child->classes()->attach($own->id);
 
         $this->actingAs($parentUser)
+            ->post(route('parent.payments.store'), $this->batchData($child, [$ahead->id => 20000]))
+            ->assertRedirect(route('parent.payments.index'));
+
+        $payment = Payment::where('learner_id', $child->id)->firstOrFail();
+
+        // The money is allocated to the chosen class, but the child is not
+        // enrolled yet - the CEO adds them after confirming the payment.
+        $this->assertSame($ahead->id, $payment->class_id);
+        $this->assertFalse($child->classes()->where('class_id', $ahead->id)->exists());
+    }
+
+    public function test_a_batch_line_for_a_class_that_does_not_exist_is_rejected(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+
+        $this->actingAs($parentUser)
             ->from(route('parent.payments.create'))
-            ->post(route('parent.payments.store'), $this->batchData($child, [$other->id => 20000]))
-            ->assertSessionHasErrors('class_ids.' . $other->id);
+            ->post(route('parent.payments.store'), $this->batchData($child, [999999 => 20000]))
+            ->assertSessionHasErrors('class_ids.999999');
 
         $this->assertSame(0, Payment::where('learner_id', $child->id)->count());
+    }
+
+    public function test_the_pay_ahead_dropdown_records_the_chosen_class(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $enrolled = $this->makeClass('JSS2 Mathematics');
+        $ahead = $this->makeClass('JSS2 Coding');
+        $child->classes()->attach($enrolled->id);
+
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), [
+            'learner_ids' => [$child->id],
+            'payment_type' => 'tuition',
+            'term' => 'First Term',
+            'payment_method' => Payment::METHOD_TRANSFER,
+            'payment_account_id' => $this->account()->id,
+            'payment_date' => now()->toDateString(),
+            'extra_class_ids' => [$child->id => $ahead->id],
+            'extra_amounts' => [$child->id => 30000],
+            'extra_total_fees' => [$child->id => 90000],
+        ])->assertRedirect(route('parent.payments.index'))->assertSessionHas('success');
+
+        $payment = Payment::where('learner_id', $child->id)->firstOrFail();
+
+        $this->assertSame($ahead->id, $payment->class_id);
+        $this->assertSame(30000.0, $payment->amount);
+        $this->assertSame(90000.0, $payment->total_fee);
+        $this->assertFalse($child->classes()->where('class_id', $ahead->id)->exists());
+    }
+
+    public function test_the_pay_ahead_row_can_stay_a_general_payment(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+
+        $this->actingAs($parentUser)->post(route('parent.payments.store'), [
+            'learner_ids' => [$child->id],
+            'payment_type' => 'registration',
+            'term' => 'First Term',
+            'payment_method' => Payment::METHOD_TRANSFER,
+            'payment_account_id' => $this->account()->id,
+            'payment_date' => now()->toDateString(),
+            'extra_class_ids' => [$child->id => 0],
+            'extra_amounts' => [$child->id => 15000],
+        ])->assertRedirect(route('parent.payments.index'));
+
+        $payment = Payment::where('learner_id', $child->id)->firstOrFail();
+
+        $this->assertNull($payment->class_id);
+        $this->assertSame(15000.0, $payment->amount);
+    }
+
+    public function test_the_form_offers_classes_the_child_has_not_started(): void
+    {
+        [$parentUser, , $child] = $this->makeFamily();
+        $maths = $this->makeClass('JSS2 Mathematics');
+        $coding = $this->makeClass('JSS2 Coding');
+        $child->classes()->attach($maths->id);
+
+        $this->actingAs($parentUser)->get(route('parent.payments.create'))
+            ->assertOk()
+            ->assertSee('General payment')
+            ->assertSee('Pay ahead — JSS2 Coding')
+            ->assertSee('name="extra_class_ids[' . $child->id . ']"', false)
+            ->assertSee('name="extra_amounts[' . $child->id . ']"', false);
     }
 
     public function test_a_batch_line_cannot_exceed_its_total_fee(): void

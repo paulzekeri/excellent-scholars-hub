@@ -173,6 +173,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:ceo'])->group(function () {
     Route::resource('payments', AdminPaymentController::class)->only(['index', 'show']);
     Route::post('/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('payments.verify');
+    Route::post('/payments/{payment}/enroll', [AdminPaymentController::class, 'enroll'])->name('payments.enroll');
     Route::post('/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('payments.reject');
     Route::get('/payments/{payment}/receipt', [AdminPaymentController::class, 'receipt'])->name('payments.receipt');
 });
