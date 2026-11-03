@@ -129,9 +129,6 @@
                     <a href="#notifications" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-bell mr-2"></i>Notifications
                     </a>
-                    <a href="#whats-new" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
-                        <i class="fas fa-star mr-2 text-orange-700"></i>What's New
-                    </a>
                     @if($guideIsParent || $guideIsCeo)
                     <a href="#payments" class="block text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded transition">
                         <i class="fas fa-file-invoice-dollar mr-2"></i>{{ $guideIsParent ? 'Fees & Payments' : 'Verifying Fees' }}
@@ -170,6 +167,14 @@
                     <strong>Learners (Students)</strong>, and <strong>Parents/Guardians</strong> in one seamless platform.
                     It enables class management, assignment submissions, attendance tracking, learning material sharing,
                     payment recording (parents record, the CEO verifies), messaging, and progress monitoring.
+                </p>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">The public website</h3>
+                <p class="text-gray-600 mb-6">
+                    Visitors who are not signed in land on the school's public page: a rotating hero slider, programme
+                    cards built from your active classes, how-it-works steps, testimonials, the about/contact block and a
+                    <strong>Register for classes</strong> button. The <strong>Book a video-call assessment</strong> form
+                    lives there too. Signed-in users go straight to their dashboard.
                 </p>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">How to Create an Account</h3>
@@ -375,6 +380,7 @@
 
                     <p class="font-medium text-gray-700 mb-2">To edit or delete a user:</p>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li>Use the <strong>role</strong> chips (each shows how many accounts it holds), the <strong>status</strong> filter and the name / username / email search to narrow the list.</li>
                         <li>Click the <strong>Edit</strong> (pencil) icon next to a user to modify their details.</li>
                         <li>Click the <strong>Delete</strong> (trash) icon to remove a user (requires confirmation).</li>
                     </ul>
@@ -421,7 +427,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Class Code</strong> (optional), <strong>Subject</strong>, <strong>Grade Level</strong>, assign a <strong>Tutor</strong>, set <strong>Max Students</strong>, and add a <strong>Description</strong> (optional).</span>
+                            <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Class Code</strong> (optional), <strong>Subject</strong>, <strong>Grade Level</strong>, assign a <strong>Tutor</strong>, set <strong>Max Students</strong> (optional — leave blank for no limit), and add a <strong>Description</strong> (optional).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -431,6 +437,7 @@
 
                     <div class="tip-box">
                         <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> <strong>Class Code is optional.</strong> Leave it blank and the school generates a short, unique code from the class name (for example <em>MATHS-7K2QP</em>) that learners can use for enrollment.</p>
+                        <p class="text-sm text-gray-700 mt-2"><strong>💡 Tip:</strong> <strong>Max Students is optional too.</strong> Leave it blank for a class with no cap — the list and detail pages show <strong>No limit</strong>, and enrolment is never blocked by capacity.</p>
                     </div>
 
                     <p class="font-medium text-gray-700 mb-2">Enrolling Learners in a Class:</p>
@@ -838,13 +845,17 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Title</strong>, <strong>Description</strong>, select the <strong>Class</strong>, set <strong>Due Date</strong>, and <strong>Total Points</strong>.</span>
+                            <span class="text-gray-600">Fill in: <strong>Title</strong>, <strong>Description</strong>, select the <strong>Class</strong>, set <strong>Due Date</strong>, and <strong>Total Points</strong>. Under <strong>Pictures</strong> you can attach up to <strong>six images</strong> (JPG, PNG or WebP, 2 MB each).</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
                             <span class="text-gray-600">Click <strong>"Create Assignment"</strong>.</span>
                         </li>
                     </ol>
+
+                    <div class="info-box mb-4">
+                        <p class="text-sm text-gray-700"><strong>📷 Pictures:</strong> the thumbnails appear on the learners' assignment cards, in your assignment list and in administrator oversight.</p>
+                    </div>
 
                     <p class="font-medium text-gray-700 mb-2">To grade submissions:</p>
                     <ol class="space-y-2">
@@ -1187,9 +1198,10 @@
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">2.</span>
                             <span class="text-gray-600">
-                                Tick <strong>every class</strong> the payment covers (plus <em>General payment</em> for registration or
-                                materials) and type what you paid against each one. One balance is kept per class, so a single transfer
-                                can clear two or three subjects at once. Only your own children's classes are offered.
+                                Tick <strong>every class</strong> the payment covers and type what you paid against each one. One
+                                balance is kept per class, so a single transfer can clear two or three subjects at once. The
+                                <em>pay-ahead</em> dropdown lets you choose any class &mdash; even one your child has not started
+                                yet &mdash; and <em>General payment</em> covers registration or materials not tied to a class.
                             </span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
@@ -1395,138 +1407,6 @@
                 </ul>
             </section>
 
-            <!-- ========== WHAT'S NEW ========== -->
-            <section id="whats-new" class="guide-section bg-white rounded-xl shadow-md p-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">
-                    <i class="fas fa-star text-orange-700 mr-2"></i>What's new in this release
-                </h2>
-                <p class="text-gray-600 mb-6">
-                    Everything below was added after the last review meeting. Each item links to the detailed section
-                    further down this guide.
-                </p>
-
-                <div class="overflow-x-auto mb-8">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-[#EAF2FB]">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Area</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">What changed</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Who</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @if($guideIsParent || $guideIsCeo)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Fees</td><td class="px-4 py-3 text-gray-600">Parents record their own payments (installments, receipt upload, per term and per class) and choose <strong>bank transfer</strong>, <strong>cash</strong> or <strong>card</strong>. One transfer can be recorded <strong>once for several children</strong> — tick each child, then each class — and the CEO checks the bank or cash book and clicks <strong>Payment received</strong> — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">Parents, CEO</td></tr>
-                            @endif
-                            @if($guideIsCeo)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Bank accounts</td><td class="px-4 py-3 text-gray-600">New <strong>Finance → Bank accounts</strong> screen: the CEO adds, edits, switches off or deletes the accounts parents transfer into. Only switched-on accounts appear on the parent form, with a copy-number button — see <a href="#payments" class="text-blue-700 underline">Fees</a>.</td><td class="px-4 py-3 text-gray-600">CEO</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Messages</td><td class="px-4 py-3 text-gray-600">Categorised sending to parents, tutors, students, one class or everyone — see <a href="#broadcasts" class="text-blue-700 underline">Broadcasts</a>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            @if($guideIsTutor || $guideIsLearner)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Inbox</td><td class="px-4 py-3 text-gray-600">Tutors and learners now have their own inbox and can reply.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners</td></tr>
-                            @endif
-                            @if($guideIsAdmin || $guideIsTutor || $guideIsParent)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learning goals</td><td class="px-4 py-3 text-gray-600">Tutors write goals in a <strong>large text area</strong> (up to 5,000 characters) with a free <strong>Improve wording</strong> AI assistant. The school shares each goal with <strong>individual parents, learners and tutors</strong> — see <a href="#learning-goals" class="text-blue-700 underline">Learning goals</a>. Picking people by name no longer ticks the <em>Every parent/learner/tutor</em> boxes, so the chips show only who was really chosen. Long goals show the opening lines with a <strong>Read the full goal</strong> toggle on the admin and tutor lists, and the learner/parent pages show the whole text. Shared goals appear on the parent's child page, the learner's dashboard and the tutor's Goals screen.</td><td class="px-4 py-3 text-gray-600">Tutors, Admin, CEO, Parents, Learners</td></tr>
-                            @endif
-                            @if($guideIsLearner)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Learner panel</td><td class="px-4 py-3 text-gray-600">"Live now / Up next" panel at the top of the dashboard — see <a href="#dashboard-extras" class="text-blue-700 underline">Dashboard extras</a>.</td><td class="px-4 py-3 text-gray-600">Learners</td></tr>
-                            @endif
-                            @if($guideIsAdmin || $guideIsTutor)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Assessment calls</td><td class="px-4 py-3 text-gray-600">Parents can request an assessment on the website; the school books the Meet/Zoom call, invites the tutor and emails/WhatsApps the guardian the join link. After the call the tutor or school records the result (outcome, strengths, focus areas, recommended class, report), which moves the enquiry to Assessed or Awaiting enrolment.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Admissions</td><td class="px-4 py-3 text-gray-600">Capture WhatsApp/phone enquiries before an account exists, track them on the pipeline and log every call on the timeline &mdash; <strong>People &rarr; Admissions</strong>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Conversion</td><td class="px-4 py-3 text-gray-600">Turn an <em>Awaiting enrolment</em> enquiry into parent + learner accounts, enrol the child in the recommended class and email the logins &mdash; <strong>Convert to learner</strong> on the enquiry.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Reporting</td><td class="px-4 py-3 text-gray-600">Monthly classes per tutor with a month picker and a six-month trend, counting classes <strong>ticked as completed</strong> &mdash; tick them from Schedules.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Profiles &amp; testimonials</td><td class="px-4 py-3 text-gray-600">Update your name, email and photo from <strong>My profile</strong> (person icon in the top bar) and submit a testimonial, choosing whether your photo may be published. The CEO approves what appears on the website.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                            @if($guideIsCeo)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Testimonials review</td><td class="px-4 py-3 text-gray-600">Approve or reject member testimonials before they appear on the landing page &mdash; <strong>Communication &rarr; Testimonials</strong>.</td><td class="px-4 py-3 text-gray-600">CEO</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmations</td><td class="px-4 py-3 text-gray-600">Publish the weekly motivation and switch older posts on/off &mdash; <strong>Communication &rarr; Affirmations</strong>.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Affirmation</td><td class="px-4 py-3 text-gray-600">The school's weekly message (or a rotating fallback) appears in a colourful card on every dashboard.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                            @if($guideIsAdmin || $guideIsTutor || $guideIsLearner || $guideIsParent)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Assignments</td><td class="px-4 py-3 text-gray-600">Tutors can attach up to six pictures to an assignment.</td><td class="px-4 py-3 text-gray-600">Tutors, Learners, Parents</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Classes</td><td class="px-4 py-3 text-gray-600">Maximum students and the <strong>Class Code</strong> are both optional (blank code = auto-generated, blank maximum = unlimited).</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            @if($guideIsAdmin || $guideIsTutor)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Schedules</td><td class="px-4 py-3 text-gray-600">Set a lesson once with <strong>Repeat &rarr; Every week on the days &amp; times I choose</strong>: add a row per day (10:00 am Monday, 2:00 pm Wednesday, 6:00 pm Friday) plus <em>Repeats from</em> / <em>Repeat until</em> dates, and each day repeats weekly at its own time. The list has a filter bar for <strong>Class</strong>, <strong>Tutor</strong>, <strong>Start Time (day)</strong> and <strong>Status</strong> (plus <em>Today</em> and <em>Reset</em> shortcuts). Choose <strong>Automatic video room (Jitsi Meet)</strong> to generate a free meeting link once and reuse it for the series. Weekly sessions are flagged on the Schedules list.</td><td class="px-4 py-3 text-gray-600">Admin, CEO, Tutors</td></tr>
-                            @endif
-                            @if($guideIsAdmin)
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Users</td><td class="px-4 py-3 text-gray-600">The Users page now filters by <strong>role</strong> (quick chips show the count per role), plus status and a name/username/email search.</td><td class="px-4 py-3 text-gray-600">Admin, CEO</td></tr>
-                            @endif
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Website</td><td class="px-4 py-3 text-gray-600">Public landing page with sliders, programmes, testimonials and registration.</td><td class="px-4 py-3 text-gray-600">Visitors</td></tr>
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Branding</td><td class="px-4 py-3 text-gray-600">Blue, white and orange colour scheme across the whole platform.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Registration</td><td class="px-4 py-3 text-gray-600">The public sign-up form now opens with <strong>I am a — Learner / Tutor</strong> as its first field. Picking Learner re-words the shared inputs (<strong>Learner Full Name</strong>, <strong>Learner Username</strong>, <strong>Learner Email</strong>, <strong>Learner Phone</strong>) and reveals the separate <strong>Parent/Guardian Details</strong> block; picking Tutor keeps the tutor wording and hides the guardian block.</td><td class="px-4 py-3 text-gray-600">Visitors</td></tr>
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Usernames</td><td class="px-4 py-3 text-gray-600">Sign in with an email <strong>or</strong> a unique username. A child with no email still needs a guardian email, which receives their login details and password-reset links.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Passwords</td><td class="px-4 py-3 text-gray-600">Forgot-password reset by email (one-time link, 60 minutes), plus a school-administration fallback that generates the link from <strong>Users</strong> when mail is not configured. Accounts created by the school must choose their own password at first sign-in.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                            <tr><td class="px-4 py-3 font-medium text-gray-800">Help</td><td class="px-4 py-3 text-gray-600">This guide is now role-aware: it only shows the sections and FAQ answers for the screens your account can open.</td><td class="px-4 py-3 text-gray-600">Everyone</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                @if($guideIsTutor || $guideIsAdmin)
-                <h3 class="text-lg font-semibold text-gray-700 mb-3">Pictures on assignments</h3>
-                <ol class="space-y-2 mb-4">
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">As a tutor open <strong>Assignments → New Assignment</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Fill in the title, class, due date and description as usual.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Under <strong>Pictures</strong> select up to six images (JPG, PNG or WebP, 2 MB each), then click <strong>Create Assignment</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Thumbnails appear on the learner's assignment cards, in the tutor's assignment list and in administrator oversight.</span></li>
-                </ol>
-                @endif
-
-                @if($guideIsAdmin)
-                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Classes without a maximum</h3>
-                <p class="text-gray-600 mb-4">
-                    On <strong>Classes → Create / Edit</strong> you can now leave <strong>Max Students</strong> blank. Such a
-                    class shows <strong>No limit</strong> in the list and detail pages, and enrolment is never blocked by capacity.
-                </p>
-                @endif
-
-                <h3 class="text-lg font-semibold text-gray-700 mb-3">Public website</h3>
-                <p class="text-gray-600 mb-6">
-                    Visitors who are not signed in now land on the school's public page: a rotating hero slider, programme
-                    cards built from your active classes, how-it-works steps, testimonials, the about/contact block and a
-                    <strong>Register for classes</strong> button. Signed-in users still go straight to their dashboard.
-                </p>
-
-                @if($guideIsParent || $guideIsCeo)
-                <h3 class="text-lg font-semibold text-gray-700 mb-3">Parents record fees, the CEO verifies</h3>
-                <p class="text-gray-600 mb-4">
-                    @if($guideIsParent)
-                        You now record your own payments from <strong>Finance → Fees &amp; Payments</strong>, choosing only
-                        your own children and that child's classes. A submission waits as <strong>Pending verification</strong>
-                        until the CEO checks the bank statement (transfer) or the cash book (cash); it then becomes
-                        <strong>Verified</strong> and the fee is marked complete once its balance reaches zero. Each payment
-                        records <strong>how</strong> you paid: a <strong>bank transfer</strong> into one of the school
-                        accounts, <strong>cash</strong> at the office, or <strong>card</strong> (Paystack, coming soon).
-                    @else
-                        The <strong>Record Payment</strong> button has left your screen. Parents now enter what they paid from
-                        <strong>Finance → Fees &amp; Payments</strong>, choosing only their own children and that child's classes;
-                        the submission waits as <strong>Pending verification</strong>. You open
-                        <strong>Finance → Payments</strong>, check the amount and reference against the bank or cash book and
-                        click <strong>Payment received</strong> — the installment becomes <strong>Verified</strong> and the fee
-                        is marked complete once its balance reaches zero. Anything that cannot be matched is rejected with a
-                        reason, which the parent sees on their fee screen. Each payment also records <strong>how</strong> the
-                        money was paid: a <strong>bank transfer</strong> into one of the school accounts, <strong>cash</strong>
-                        at the office, or <strong>card</strong> (Paystack, coming soon). Maintain the transfer accounts under
-                        <strong>Finance → Bank accounts</strong>.
-                    @endif
-                </p>
-                @endif
-            </section>
-
-
             <!-- ========== PAYMENTS, PART PAYMENTS & RECEIPTS ========== -->
             @if($guideIsParent || $guideIsCeo)
             <section id="payments" class="guide-section bg-white rounded-xl shadow-md p-8">
@@ -1549,7 +1429,7 @@
                 <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Step 1 — record your payment</h3>
                 <ol class="space-y-2 mb-4">
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Fees &amp; Payments</strong> and click <strong>Record a payment</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Tick <strong>every child</strong> this transfer covers (only your own children are ever listed), then type the amount paid against each child and class row &mdash; one transfer is recorded once for the whole family, not once per child.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Tick <strong>every child</strong> this transfer covers (only your own children are ever listed), then type the amount paid against each child and class row &mdash; one transfer is recorded once for the whole family, not once per child. To pay <strong>ahead of a class</strong> your child has not been enrolled in yet, pick that class in the <em>pay-ahead</em> dropdown; leave it on <strong>General payment</strong> for registration, materials or anything not tied to a class.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Choose the <strong>payment type</strong> and <strong>term</strong>; each row takes the <strong>amount paid now</strong> and, if known, the <strong>total fee</strong>. A single installment can never be larger than the total fee.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Pay by <strong>bank transfer</strong> — the school accounts are listed with a copy button, and you must pick the one you used (cash is not accepted, as the school is online-only; card stays disabled as <em>coming soon</em> until Paystack is connected). Then add the reference (the transfer narration), the date and the <strong>receipt or teller slip</strong> (PDF or image, up to 5 MB).</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">On submit the record is stored as <strong>Pending verification</strong> — you can never mark your own payment as paid.</span></li>
@@ -1563,8 +1443,9 @@
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">1.</span><span class="text-gray-600">Open <strong>Finance → Payments</strong> and click <strong>Awaiting verification</strong> to see the queue.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">2.</span><span class="text-gray-600">Compare the amount, date and reference with the bank statement for a transfer (the record shows the account it was paid into) — or with the cash book for cash. The parent's receipt is downloadable from the record.</span></li>
                     <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">3.</span><span class="text-gray-600">Money is there → click <strong>Payment received</strong>. The installment becomes <strong>Verified</strong> (status <em>completed</em>), the fee balance drops with it, and a zero balance marks the learner's fee <strong>Payment complete</strong>.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">Money is not there → open the record, use <strong>Cannot match it in the bank?</strong>, type the reason and click <strong>Reject payment</strong>. The parent is notified, the record turns <strong>Rejected</strong> and the balance is untouched.</span></li>
-                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">Both actions stamp <strong>who verified or rejected it and when</strong>, shown in the <em>Check</em> column and on the detail page.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">4.</span><span class="text-gray-600">If the parent <strong>paid ahead</strong> for a class the child has not been enrolled in yet, the record shows <strong>Paid ahead — not enrolled</strong> and an <strong>Enrol … in …</strong> button. Check the class still has a place and click it to add the learner — the parent is notified and the child appears on the class list straight away.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">5.</span><span class="text-gray-600">Money is not there → open the record, use <strong>Cannot match it in the bank?</strong>, type the reason and click <strong>Reject payment</strong>. The parent is notified, the record turns <strong>Rejected</strong> and the balance is untouched.</span></li>
+                    <li class="flex items-start gap-2 text-sm"><span class="text-blue-600 font-bold">6.</span><span class="text-gray-600">Both actions stamp <strong>who verified or rejected it and when</strong>, shown in the <em>Check</em> column and on the detail page.</span></li>
                 </ol>
                 @endif
 
