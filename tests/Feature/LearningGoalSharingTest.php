@@ -208,4 +208,56 @@ class LearningGoalSharingTest extends TestCase
         $this->assertSame(0, $goal->recipients()->count());
         $this->assertNull($goal->shared_at);
     }
+
+    public function test_the_parent_dashboard_lists_a_goal_shared_with_them_by_name(): void
+    {
+        [$admin, $goal, $people] = $this->scenario();
+
+        $this->actingAs($admin)->post(route('admin.learning-goals.share', $goal), [
+            'share_form' => 1,
+            'parent_ids' => [$people['parent']->id],
+        ])->assertRedirect();
+
+        $this->actingAs($people['parent'])->get(route('parent.dashboard'))
+            ->assertOk()
+            ->assertSee('Learning goals shared with you')
+            ->assertSee('Master variables and expressions')
+            ->assertSee('Goal Learner One')
+            ->assertSee('Share Class')
+            ->assertSee('Learning Goals');
+
+        // The child's own Learning Goals tab keeps showing it as well.
+        $this->actingAs($people['parent'])
+            ->get(route('parent.child.progress', ['learner' => $goal->learner, 'tab' => 'goals']))
+            ->assertOk()
+            ->assertSee('Master variables and expressions');
+    }
+
+    public function test_the_parent_dashboard_lists_class_goals_shared_with_parents(): void
+    {
+        [, $goal, $people] = $this->scenario();
+
+        // A class-wide goal (no individual learner) shared with parents.
+        $goal->update([
+            'learner_id' => null,
+            'shared_with_parent' => true,
+            'share_all_parent' => true,
+        ]);
+
+        $this->actingAs($people['parent'])->get(route('parent.dashboard'))
+            ->assertOk()
+            ->assertSee('Learning goals shared with you')
+            ->assertSee('Master variables and expressions')
+            ->assertSee('Share Class');
+    }
+
+    public function test_the_parent_dashboard_does_not_show_unshared_goals(): void
+    {
+        [, , $people] = $this->scenario();
+
+        $this->actingAs($people['parent'])->get(route('parent.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Learning goals shared with you')
+            ->assertDontSee('Master variables and expressions');
+    }
 }

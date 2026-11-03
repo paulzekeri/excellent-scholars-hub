@@ -1563,9 +1563,10 @@
                 @if($guideIsParent)
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">For parents — where to find them</h3>
                 <p class="text-gray-600 mb-3">
-                    On the parent dashboard open a child and choose the <strong>Learning Goals</strong> tab (the orange
-                    counter). Only goals the school shared with you (by name, or with all parents of that class) appear
-                    there, showing the goal, the tutor, the term and any attachment.
+                    Goals the school shares with you appear straight away in the <strong>Learning goals shared with you</strong>
+                    panel on the parent dashboard — the latest five, with the child, class, term, tutor and any attachment.
+                    Open a child and choose the <strong>Learning Goals</strong> tab (the orange counter) for that child's
+                    complete list. Only goals the school shared with you (by name, or with all parents of that class) appear.
                 </p>
                 @endif
 

@@ -45,11 +45,17 @@ class DashboardController extends Controller
             return [$child->id => $this->statsFor($child)];
         });
 
+        // Goals the school shared with this parent, across every child, so the
+        // dashboard can show them without opening a child first.
+        $sharedGoals = $this->dashboardGoals($children);
+
         return view('parent.dashboard', [
             'children' => $children,
             'childStats' => $childStats,
             'totalChildren' => $children->count(),
             'totalMissedClasses' => $childStats->sum('missedClasses'),
+            'sharedGoals' => $sharedGoals->take(5),
+            'sharedGoalsCount' => $sharedGoals->count(),
         ]);
     }
 
@@ -229,6 +235,46 @@ class DashboardController extends Controller
             })
             ->latest('shared_at')
             ->latest();
+    }
+
+    /**
+     * Every goal the school shared with this parent, across all their children.
+     * The child detail screens show one child at a time; this is what the
+     * dashboard lists straight away.
+     *
+     * @param  Collection<int, Learner>  $children
+     * @return Collection<int, LearningGoal>
+     */
+    private function dashboardGoals(Collection $children)
+    {
+        if ($children->isEmpty()) {
+            return collect();
+        }
+
+        $learnerIds = $children->pluck('id')->all();
+        $classIds = $children->flatMap(function (Learner $child) {
+            return $child->classes->pluck('id');
+        })->unique()->values()->all();
+
+        $parentUserId = auth()->id();
+
+        return LearningGoal::with(['learner.user', 'tutor.user', 'schoolClass'])
+            ->where(function ($query) use ($learnerIds, $classIds, $parentUserId) {
+                $query->where(function ($legacy) use ($learnerIds, $classIds) {
+                    $legacy->where('shared_with_parent', true)
+                        ->where(function ($scope) use ($learnerIds, $classIds) {
+                            $scope->whereIn('learner_id', $learnerIds)
+                                ->orWhere(function ($inner) use ($classIds) {
+                                    $inner->whereNull('learner_id')->whereIn('class_id', $classIds);
+                                });
+                        });
+                })->orWhereHas('recipients', function ($share) use ($parentUserId) {
+                    $share->where('user_id', $parentUserId);
+                });
+            })
+            ->latest('shared_at')
+            ->latest('id')
+            ->get();
     }
 
     /**

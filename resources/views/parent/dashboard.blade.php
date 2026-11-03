@@ -62,6 +62,61 @@
         </div>
     @endif
 
+    @if($sharedGoals->isNotEmpty())
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-bullseye text-orange-700 mr-2"></i>Learning goals shared with you
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        Goals your children's tutors set and the school approved for you.
+                        @if($sharedGoalsCount > $sharedGoals->count())
+                            Showing the latest {{ $sharedGoals->count() }} of {{ $sharedGoalsCount }}.
+                        @endif
+                    </p>
+                </div>
+                <span class="self-start rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-700">
+                    {{ $sharedGoalsCount }} goal{{ $sharedGoalsCount === 1 ? '' : 's' }}
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                @foreach($sharedGoals as $goal)
+                    <div class="rounded-lg border border-gray-200 p-4">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="min-w-0 flex-1">
+                                @include('partials.goal-text', ['goal' => $goal, 'limit' => 220])
+
+                                <p class="mt-2 text-sm text-gray-500">
+                                    @if($goal->learner)
+                                        <a href="{{ route('parent.child.progress', ['learner' => $goal->learner, 'tab' => 'goals']) }}"
+                                           class="font-medium text-blue-700 hover:text-orange-700">{{ $goal->learner->user->name ?? 'Learner' }}</a>
+                                    @endif
+                                    @if($goal->schoolClass) · {{ $goal->schoolClass->name }} @endif
+                                    @if($goal->term) · {{ $goal->term }} @endif
+                                </p>
+
+                                <div class="mt-2 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                                    <span><i class="fas fa-chalkboard-teacher mr-1"></i>{{ $goal->tutor->user->name ?? 'Tutor' }}</span>
+                                    @if($goal->shared_at)
+                                        <span><i class="far fa-calendar mr-1"></i>Shared {{ $goal->shared_at->format('M d, Y') }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @if($goal->file_path)
+                                <a href="{{ asset('storage/' . $goal->file_path) }}" target="_blank"
+                                   class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-4 py-2 text-white transition hover:bg-blue-800">
+                                    <i class="fas fa-download mr-1"></i> Attachment
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         @forelse($children as $child)
             @php $stats = $childStats[$child->id]; @endphp
@@ -89,7 +144,7 @@
                     </div>
 
                     <p class="text-xs font-semibold text-[#0a2550] uppercase tracking-wide mb-2">Tap a card to see the details</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'schedule']) }}"
                            class="block rounded-lg border border-gray-200 p-3 hover:border-blue-400 hover:bg-blue-50 transition"
                            title="View {{ $child->user->name }}'s class schedule">
@@ -129,6 +184,16 @@
                             </div>
                             <p class="text-2xl font-bold text-gray-800 mt-1">{{ $stats['materials'] }}</p>
                             <p class="text-xs text-gray-500 leading-tight">Materials Shared</p>
+                        </a>
+                        <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'goals']) }}"
+                           class="block rounded-lg border border-gray-200 p-3 hover:border-orange-400 hover:bg-orange-50 transition"
+                           title="View learning goals shared with you for {{ $child->user->name }}">
+                            <div class="flex items-center justify-between">
+                                <i class="fas fa-bullseye text-orange-600"></i>
+                                <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                            </div>
+                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $stats['goals'] }}</p>
+                            <p class="text-xs text-gray-500 leading-tight">Learning Goals</p>
                         </a>
                     </div>
 
