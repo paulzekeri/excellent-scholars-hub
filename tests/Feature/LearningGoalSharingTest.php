@@ -226,11 +226,12 @@ class LearningGoalSharingTest extends TestCase
             ->assertSee('Share Class')
             ->assertSee('Learning Goals');
 
-        // The child's own Learning Goals tab keeps showing it as well.
+        // The child's own Learning Goals tab keeps showing it as well, with the class.
         $this->actingAs($people['parent'])
             ->get(route('parent.child.progress', ['learner' => $goal->learner, 'tab' => 'goals']))
             ->assertOk()
-            ->assertSee('Master variables and expressions');
+            ->assertSee('Master variables and expressions')
+            ->assertSee('Share Class');
     }
 
     public function test_the_parent_dashboard_lists_class_goals_shared_with_parents(): void

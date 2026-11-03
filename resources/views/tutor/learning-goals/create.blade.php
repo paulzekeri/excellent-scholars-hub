@@ -26,14 +26,23 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Class</label>
-                    <select name="class_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">All classes / general goal</option>
+                    <label class="block text-sm font-medium text-gray-700">Class <span class="text-orange-700">*</span></label>
+                    @php
+                        $selectedClass = old('class_id', $classes->count() === 1 ? (string) $classes->first()->id : '');
+                    @endphp
+                    <select name="class_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" disabled {{ (string) $selectedClass === '' ? 'selected' : '' }}>Choose one of your classes</option>
                         @foreach($classes as $class)
-                            <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                            <option value="{{ $class->id }}" {{ (string) $selectedClass === (string) $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                         @endforeach
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">Optional — the school chooses exactly who receives the goal.</p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Only the classes you teach are listed. Everyone the goal is shared with sees which class it belongs to.
+                    </p>
+                    @if($classes->isEmpty())
+                        <p class="mt-1 text-xs text-orange-700">You are not assigned to a class yet — ask an administrator to add you to one.</p>
+                    @endif
+                    @error('class_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Term</label>

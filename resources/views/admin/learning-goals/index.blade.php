@@ -81,7 +81,7 @@
                                 @include('partials.goal-text', ['goal' => $goal, 'limit' => 220])
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600">
-                                {{ $goal->learner->user->name ?? 'General goal' }}
+                                {{ $goal->learner->user->name ?? 'Whole class' }}
                                 @if($goal->schoolClass)
                                     <span class="block text-xs text-gray-500">{{ $goal->schoolClass->name }}</span>
                                 @endif

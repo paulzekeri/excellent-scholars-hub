@@ -599,7 +599,7 @@
                             <div class="flex-1">
                                 <h3 class="font-semibold text-gray-800 whitespace-pre-line">{{ $goal->goalText() }}</h3>
                                 <p class="text-sm text-gray-500 mt-1">
-                                    {{ $goal->learner->user->name ?? 'General goal' }}
+                                    {{ $goal->learner->user->name ?? 'Whole class' }}
                                     @if($goal->schoolClass) · {{ $goal->schoolClass->name }} @endif
                                     @if($goal->term) · {{ $goal->term }} @endif
                                 </p>

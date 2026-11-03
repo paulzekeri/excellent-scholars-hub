@@ -156,7 +156,7 @@
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <p class="font-medium text-gray-800 whitespace-pre-line">{{ $goal->goalExcerpt(160) }}</p>
                             <span class="text-xs text-gray-500">
-                                {{ $goal->schoolClass->name ?? 'General' }} · {{ $goal->term ?: 'No term' }}
+                                {{ $goal->schoolClass->name ?? 'No class' }} · {{ $goal->term ?: 'No term' }}
                             </span>
                         </div>
                         @if($goal->target)

@@ -21,7 +21,7 @@
                     <div class="min-w-0">
                         <h2 class="font-semibold text-gray-800 whitespace-pre-line">{{ $goal->goalText() }}</h2>
                         <p class="text-xs text-gray-500 mt-1">
-                            {{ $goal->schoolClass->name ?? 'General goal' }}
+                            {{ $goal->schoolClass->name ?? 'No class' }}
                             @if($goal->term) · {{ $goal->term }} @endif
                             @if($goal->tutor && $goal->tutor->user) · set by {{ $goal->tutor->user->name }} @endif
                         </p>

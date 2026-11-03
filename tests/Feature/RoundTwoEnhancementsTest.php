@@ -187,6 +187,46 @@ class RoundTwoEnhancementsTest extends TestCase
             ->assertSee('Family English');
     }
 
+    public function test_a_goal_needs_one_of_the_tutors_own_classes(): void
+    {
+        $tutorUser = $this->makeUser('tutor', 'Goal Class Tutor');
+        $tutor = Tutor::create(['user_id' => $tutorUser->id]);
+        $own = $this->makeClass($tutor, 'Own Goal Class');
+
+        $otherTutorUser = $this->makeUser('tutor', 'Other Goal Tutor');
+        $otherTutor = Tutor::create(['user_id' => $otherTutorUser->id]);
+        $other = $this->makeClass($otherTutor, 'Other Goal Class');
+
+        // The dropdown lists the tutor's own classes only - no "general goal" row.
+        $this->actingAs($tutorUser)->get(route('tutor.learning-goals.create'))
+            ->assertOk()
+            ->assertSee('Own Goal Class')
+            ->assertDontSee('Other Goal Class')
+            ->assertDontSee('All classes / general goal')
+            ->assertSee('name="class_id"', false);
+
+        // A goal has to pick one of them.
+        $this->actingAs($tutorUser)->post(route('tutor.learning-goals.store'), [
+            'title' => 'A goal with no class',
+        ])->assertSessionHasErrors('class_id');
+
+        $this->actingAs($tutorUser)->post(route('tutor.learning-goals.store'), [
+            'title' => 'A goal for a class I do not teach',
+            'class_id' => $other->id,
+        ])->assertSessionHasErrors('class_id');
+
+        $this->assertSame(0, LearningGoal::where('tutor_id', $tutor->id)->count());
+
+        $this->actingAs($tutorUser)->post(route('tutor.learning-goals.store'), [
+            'title' => 'A goal for my own class',
+            'class_id' => $own->id,
+        ])->assertRedirect(route('tutor.learning-goals.index'));
+
+        $goal = LearningGoal::where('tutor_id', $tutor->id)->firstOrFail();
+
+        $this->assertSame($own->id, $goal->class_id);
+    }
+
     public function test_learning_goals_take_long_text_and_are_shared_with_chosen_people(): void
     {
         $tutorUser = $this->makeUser('tutor', 'Long Goal Tutor');
@@ -200,6 +240,9 @@ class RoundTwoEnhancementsTest extends TestCase
             ->assertOk()
             ->assertSee('Improve wording (free AI)')
             ->assertSee('<textarea name="title"', false)
+            ->assertSee('Choose one of your classes')
+            ->assertSee('Long Goal Class')
+            ->assertDontSee('All classes / general goal')
             ->assertDontSee('What success looks like')
             ->assertDontSee('name="learner_id"', false);
 

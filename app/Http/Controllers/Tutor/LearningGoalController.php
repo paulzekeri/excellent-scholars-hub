@@ -68,13 +68,16 @@ class LearningGoalController extends Controller
             'target' => 'nullable|string|max:255',
             'term' => 'nullable|string|max:50',
             'class_id' => [
-                'nullable',
+                'required',
                 Rule::exists('classes', 'id')->where(function ($query) use ($tutor) {
                     $query->where('tutor_id', $tutor->id);
                 }),
             ],
             'learner_id' => 'nullable|exists:learners,id',
             'file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:8192',
+        ], [
+            'class_id.required' => 'Choose the class this goal is for.',
+            'class_id.exists' => 'Choose one of the classes you teach.',
         ]);
 
         if (! empty($validated['learner_id'])) {
