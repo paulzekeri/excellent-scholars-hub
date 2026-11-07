@@ -36,7 +36,7 @@
         };
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    @livewireStyles
+    {{-- Laravel Livewire is no longer installed: nothing in this app used it. --}}
 </head>
 <body class="bg-[#F5F8FC] font-sans antialiased">
     <style>

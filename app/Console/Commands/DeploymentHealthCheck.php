@@ -53,17 +53,17 @@ class DeploymentHealthCheck extends Command
     {
         $version = PHP_VERSION;
 
-        if (version_compare($version, '7.3', '>=') && version_compare($version, '8.2', '<')) {
+        if (version_compare($version, '8.3', '>=') && version_compare($version, '8.6', '<')) {
             $this->pass("PHP {$version}");
         } else {
-            $this->fail("PHP {$version}", 'Laravel 8 needs PHP 7.3 - 8.1. Pick 8.0 or 8.1 in cPanel → MultiPHP Manager.');
+            $this->recordFailure("PHP {$version}", 'Laravel 13 needs PHP 8.3 - 8.5. Pick 8.4 (ea-php84) in cPanel → MultiPHP Manager.');
         }
 
         foreach (['pdo_mysql', 'mbstring', 'openssl', 'fileinfo', 'tokenizer', 'xml', 'ctype'] as $extension) {
             if (extension_loaded($extension)) {
                 $this->pass("Extension {$extension}");
             } else {
-                $this->fail("Extension {$extension}", 'Enable it in cPanel → Select PHP Version → Extensions.');
+                $this->recordFailure("Extension {$extension}", 'Enable it in cPanel → Select PHP Version → Extensions.');
             }
         }
     }
@@ -73,7 +73,7 @@ class DeploymentHealthCheck extends Command
         if ((string) config('app.key') !== '') {
             $this->pass('APP_KEY is set');
         } else {
-            $this->fail('APP_KEY is set', 'Run `php artisan key:generate`.');
+            $this->recordFailure('APP_KEY is set', 'Run `php artisan key:generate`.');
         }
 
         $environment = app()->environment();
@@ -86,7 +86,7 @@ class DeploymentHealthCheck extends Command
         $url = (string) config('app.url');
 
         if (! preg_match('#^https?://#', $url)) {
-            $this->fail("APP_URL = '{$url}'", 'APP_URL must be the full site URL, e.g. https://uat-esh.lit-grp.com');
+            $this->recordFailure("APP_URL = '{$url}'", 'APP_URL must be the full site URL, e.g. https://uat-esh.lit-grp.com');
         } elseif (strpos($url, 'localhost') !== false) {
             $this->caution("APP_URL = {$url}", 'Change APP_URL to the deployed domain.');
         } else {
@@ -101,7 +101,7 @@ class DeploymentHealthCheck extends Command
         try {
             DB::connection()->getPdo();
         } catch (Throwable $e) {
-            $this->fail('Database connection', $e->getMessage());
+            $this->recordFailure('Database connection', $e->getMessage());
             $this->line('  Skipping migration and account checks.');
 
             return;
@@ -124,10 +124,10 @@ class DeploymentHealthCheck extends Command
             if (empty($pending)) {
                 $this->pass('Migrations up to date ('.count($ran).' ran)');
             } else {
-                $this->fail(count($pending).' pending migration(s)', 'Run `php artisan migrate --force`. Missing: '.implode(', ', array_slice($pending, 0, 5)));
+                $this->recordFailure(count($pending).' pending migration(s)', 'Run `php artisan migrate --force`. Missing: '.implode(', ', array_slice($pending, 0, 5)));
             }
         } catch (Throwable $e) {
-            $this->fail('Migration status', $e->getMessage());
+            $this->recordFailure('Migration status', $e->getMessage());
         }
     }
 
@@ -144,9 +144,9 @@ class DeploymentHealthCheck extends Command
 
         foreach ($paths as $label => $path) {
             if (! is_dir($path)) {
-                $this->fail("{$label} exists", "Missing directory: {$path}");
+                $this->recordFailure("{$label} exists", "Missing directory: {$path}");
             } elseif (! is_writable($path)) {
-                $this->fail("{$label} is writable", "Run: chmod -R ug+rwX {$path}");
+                $this->recordFailure("{$label} is writable", "Run: chmod -R ug+rwX {$path}");
             } else {
                 $this->pass("{$label} is writable");
             }
@@ -157,7 +157,7 @@ class DeploymentHealthCheck extends Command
         if (file_exists($link) || is_link($link)) {
             $this->pass('public/storage link exists');
         } else {
-            $this->fail('public/storage link exists', 'Run `php artisan storage:link` so materials and submissions download.');
+            $this->recordFailure('public/storage link exists', 'Run `php artisan storage:link` so materials and submissions download.');
         }
 
         $upload = (string) ini_get('upload_max_filesize');
@@ -183,7 +183,7 @@ class DeploymentHealthCheck extends Command
             if ($staff > 0) {
                 $this->pass("{$staff} CEO/administrator login(s)");
             } else {
-                $this->fail('At least one CEO/administrator login', 'Run `php artisan esh:create-admin --role=ceo`.');
+                $this->recordFailure('At least one CEO/administrator login', 'Run `php artisan esh:create-admin --role=ceo`.');
             }
 
             $demoEmails = ['ceo@esh.com', 'admin@esh.com', 'tutor@esh.com', 'learner@esh.com', 'parent@esh.com'];
@@ -193,7 +193,7 @@ class DeploymentHealthCheck extends Command
                 $this->caution("{$demo} demo account(s) present", 'Every demo login uses the password "password" - remove them before go-live.');
             }
         } catch (Throwable $e) {
-            $this->fail('Account check', $e->getMessage());
+            $this->recordFailure('Account check', $e->getMessage());
         }
     }
 
@@ -224,7 +224,7 @@ class DeploymentHealthCheck extends Command
         $this->line('  [OK]   '.$label.($detail !== '' ? "  ({$detail})" : ''));
     }
 
-    private function fail($label, $detail = '')
+    private function recordFailure($label, $detail = '')
     {
         $this->failures++;
         $this->error('  [FAIL] '.$label.($detail !== '' ? "  {$detail}" : ''));

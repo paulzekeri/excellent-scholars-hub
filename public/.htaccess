@@ -1,8 +1,20 @@
+# =====================================================================
+# PHP version for this domain (cPanel) - works when the document root
+# points at public/ directly, in which case the app's root .htaccess
+# (which carries the same block) is never read.
+# Guarded by the lsapi module check below, so XAMPP is unaffected.
+# =====================================================================
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Same plain form cPanel writes for this account (SmartWeb's LiteSpeed ignores
+# the "…___lsphp" variant and falls back to the default PHP).
+AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
+# php -- END cPanel-generated handler, do not edit
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
-
     RewriteEngine On
 
     # Handle Authorization Header

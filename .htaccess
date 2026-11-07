@@ -13,6 +13,30 @@
 # http://localhost/excellent-scholars-hub/public/.
 # =====================================================================
 
+# =====================================================================
+# PHP version for this domain (cPanel)
+# ---------------------------------------------------------------------
+# cPanel applies a domain's MultiPHP selection by writing a handler block
+# into the document root's .htaccess. This repository ships its own
+# .htaccess and the deploy overwrites the server copy, which erased that
+# block: Apache then fell back to the account default (PHP 8.1) and
+# Laravel 13 refused to boot with
+#   "Your Composer dependencies require a PHP version >= 8.3.0".
+#
+# Pinning it here means a deploy SETS the version instead of erasing it.
+# The block only applies when the server runs LiteSpeed/LSAPI, so XAMPP
+# (which has no such module) is completely unaffected. It is a no-op on a
+# PHP-FPM domain, where cPanel keeps the version in the vhost instead.
+# =====================================================================
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Uses the same form cPanel writes for this account's other domains
+# (application/x-httpd-ea-php81 ...). SmartWeb's LiteSpeed honours the PLAIN
+# handler name; the "…___lsphp" variant is unknown there and silently falls
+# back to the account default PHP. Keep this line identical in form.
+AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
+# php -- END cPanel-generated handler, do not edit
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 

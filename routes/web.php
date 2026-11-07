@@ -43,31 +43,7 @@ use App\Models\Testimonial;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        $user = auth()->user();
-        if ($user->isAdministrator()) return redirect()->route('admin.dashboard');
-        if ($user->isTutor()) return redirect()->route('tutor.dashboard');
-        if ($user->isParent()) return redirect()->route('parent.dashboard');
-        if ($user->isLearner()) return redirect()->route('learner.dashboard');
-    }
-
-    // Public marketing page: sliders, programmes, testimonials, about, register.
-    return view('landing', [
-        'programmes' => \App\Models\Classes::with('tutor.user')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->take(6)
-            ->get(),
-        // Approved member testimonials (note 10); the view falls back to samples.
-        'testimonials' => Testimonial::with('user.role')
-            ->where('status', Testimonial::STATUS_APPROVED)
-            ->whereNotNull('approved_at')
-            ->latest('approved_at')
-            ->take(6)
-            ->get(),
-    ]);
-});
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
 
 Auth::routes(['verify' => false, 'reset' => true, 'confirm' => false]);
 
@@ -91,9 +67,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
     
     // User Guide
-    Route::get('/help/user-guide', function () {
-        return view('help.user-guide');
-    })->name('help.user-guide');
+    Route::get('/help/user-guide', [\App\Http\Controllers\HomeController::class, 'userGuide'])
+        ->name('help.user-guide');
 
     // My profile + testimonial submission (note 10)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

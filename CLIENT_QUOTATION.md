@@ -11,7 +11,7 @@
 
 ## 📋 Executive Summary
 
-Excellent Scholars Hub (ESH) is a fully-functional, web-based Learning Management System (LMS) built on **Laravel 8** with **MySQL** database and **Tailwind CSS** frontend. The platform serves **four user roles** — Administrators, Tutors, Learners (Students), and Parents/Guardians — with role-specific dashboards and capabilities.
+Excellent Scholars Hub (ESH) is a fully-functional, web-based Learning Management System (LMS) built on **Laravel 13** (PHP 8.4) with **MySQL** database and **Tailwind CSS** frontend. The platform serves **four user roles** — Administrators, Tutors, Learners (Students), and Parents/Guardians — with role-specific dashboards and capabilities.
 
 ---
 
@@ -175,7 +175,7 @@ Excellent Scholars Hub (ESH) is a fully-functional, web-based Learning Managemen
 
 | Component | Technology |
 |-----------|-----------|
-| Backend Framework | Laravel 8 (PHP 7.3+/8.0+) |
+| Backend Framework | Laravel 13 (PHP 8.4) |
 | Database | MySQL |
 | Frontend | Tailwind CSS, Blade Templates |
 | UI Icons | Font Awesome 5 |

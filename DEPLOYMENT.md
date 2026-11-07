@@ -15,9 +15,10 @@ that host but applies to any cPanel + MySQL + Apache environment.
 
 ## 0. What the app needs
 
-* **PHP 8.0 or 8.1** (Laravel 8 does not support 8.2+). Select it per-domain in
-  *MultiPHP Manager*. Required extensions: `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`,
-  `tokenizer`, `xml`, `ctype` (all standard on cPanel).
+* **PHP 8.4** (`ea-php84`). Laravel 13 supports PHP 8.3 - 8.5 and 8.4 is what SmartWeb's
+  *MultiPHP Manager* offers; PHP 8.4 gets security fixes until **31 Dec 2028**. Select it
+  per-domain in *MultiPHP Manager*. Required extensions: `pdo_mysql`, `mbstring`, `openssl`,
+  `fileinfo`, `tokenizer`, `xml`, `ctype` (all standard on cPanel).
 * **MySQL 5.7+/MariaDB 10.3+** database + user, created in *cPanel → MySQL® Databases*
   (grant ALL on the app database only).
 * **No Composer on the server**: the Actions workflow builds `vendor/` on the runner (§2) and the
@@ -39,7 +40,7 @@ that host but applies to any cPanel + MySQL + Apache environment.
    forwards every request into `public/`, so the document root does **not** have to be changed and
    `.env`, `app/`, `vendor/` stay unreachable from a URL. Pointing the document root straight at
    `public/` also works if cPanel lets you set it.
-2. **MultiPHP Manager** → assign **PHP 8.1** (or 8.0) to `uat-esh.lit-grp.com`.
+2. **MultiPHP Manager** → assign **PHP 8.4** (`ea-php84`) to `uat-esh.lit-grp.com`.
 3. **MultiPHP INI Editor** → set `upload_max_filesize=100M`, `post_max_size=104M`,
    `max_execution_time=300`, `memory_limit=256M` for that domain.
 4. **MySQL® Databases** → create database `esh_uat` and user `esh_uat` with a strong password; add
@@ -212,7 +213,7 @@ the document root, root `.htaccess` → `public/`).
    `https://github.com/tcntiu-debug/excellent-scholars-hub.git`, branch `main`, repository path
    `repositories/esh-uat`.
 2. The committed `.cpanel.yml` already targets `/home/litgrpco/uat-esh.lit-grp.com` and
-   `/opt/cpanel/ea-php81/root/usr/bin/php`; change those two values for a different account or PHP
+   `/opt/cpanel/ea-php84/root/usr/bin/php`; change those two values for a different account or PHP
    version.
 3. Create `~/uat-esh.lit-grp.com/.env` once (from `.env.uat.example`, see §2.3) — the pipeline never
    overwrites `.env`, `storage/` uploads or `vendor/`.
@@ -260,7 +261,7 @@ Run the built-in check first (works over SSH or cPanel Terminal):
 cd ~/uat-esh.lit-grp.com && php artisan esh:health
 ```
 
-It verifies PHP 7.3–8.1 + extensions, `APP_KEY`, `APP_URL`, DB connectivity, pending migrations,
+It verifies PHP 8.3 - 8.5 + extensions, `APP_KEY`, `APP_URL`, DB connectivity, pending migrations,
 writable `storage`/`bootstrap/cache`, the `public/storage` link, upload limits, an existing
 CEO/admin login and — as a warning — leftover demo accounts. Exit code is non-zero when something
 must be fixed.
