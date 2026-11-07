@@ -170,7 +170,13 @@ jobs:
           set net:reconnect-interval-base 5
           set mirror:parallel-transfer-count 4
           mkdir -p "${REMOTE_DIR%/}"
-          mirror -R --verbose=1 --no-perms --no-symlinks --dotfiles "$STAGE/" "${REMOTE_DIR%/}"
+          mirror -R --verbose=1 --no-perms --no-symlinks "$STAGE/" "${REMOTE_DIR%/}"
+          cd "${REMOTE_DIR%/}"
+          # lftp 4.9 has no --dotfiles, and `mirror` skips hidden files, so the
+          # front controller (.htaccess) and the PHP limits (.user.ini) are
+          # pushed explicitly. They are the only dot-files the app needs.
+          put "$STAGE/.htaccess" -o .htaccess
+          put "$STAGE/.user.ini" -o .user.ini
           bye
           LFTP
           rc=$?
@@ -403,6 +409,20 @@ jobs:
           SCRIPT=$(cat <<'EOS'
           set -eu
           cd "__REMOTE_DIR__"
+          echo "--- remote layout ---"
+          pwd
+          ls -1 | head -20
+          echo "--- PHP handler on disk ---"
+          for f in .htaccess public/.htaccess; do
+            if [ -f "$f" ]; then
+              echo "  [$f]"
+              grep -n -i -E 'AddHandler|SetHandler|lsapi|php8' "$f" | head -6 || echo "    (no handler lines)"
+            else
+              echo "  [$f] missing"
+            fi
+          done
+          echo "--- what the web server serves ---"
+          if [ -f public/index.php ]; then echo "  public/index.php present"; fi
           # `php` on a cPanel box follows the *system* default, not the domain's
           # MultiPHP selection, so prefer the EasyApache build this release runs on
           # instead of whatever PATH happens to resolve to.
