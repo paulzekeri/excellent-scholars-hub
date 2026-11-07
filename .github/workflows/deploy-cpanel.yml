@@ -430,9 +430,17 @@ jobs:
             echo "Fix: create .env in this folder (DEPLOYMENT.md section 2.2), or set the UAT_ENV_CONTENT secret and re-run this workflow." >&2
             exit 5
           fi
+          # Caches written by the PREVIOUS release can reference classes this
+          # release removed: the Laravel 8 deploy cached
+          # Fruitcake\Cors\CorsServiceProvider, which the upgrade dropped, so
+          # every artisan command - even config:clear - aborts while booting.
+          # Deleting the files needs no PHP, so do it before anything else.
+          rm -f bootstrap/cache/*.php
           grep -q '^APP_KEY=base64:' .env || echo "WARNING: APP_KEY is missing from .env - run: $PHP artisan key:generate --force" >&2
-          echo "Clearing cached config so artisan uses the current .env"
+          echo "Rebuilding caches for this release"
           "$PHP" artisan config:clear >/dev/null 2>&1 || true
+          "$PHP" artisan view:clear >/dev/null 2>&1 || true
+          "$PHP" artisan package:discover
           "$PHP" artisan migrate --force --seed
           "$PHP" artisan storage:link || true
           if [ ! -e public/storage ]; then
