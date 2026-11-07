@@ -170,7 +170,7 @@ jobs:
           set net:reconnect-interval-base 5
           set mirror:parallel-transfer-count 4
           mkdir -p "${REMOTE_DIR%/}"
-          mirror -R --verbose=1 --no-perms --no-symlinks "$STAGE/" "${REMOTE_DIR%/}"
+          mirror -R --verbose=1 --no-perms --no-symlinks --dotfiles "$STAGE/" "${REMOTE_DIR%/}"
           bye
           LFTP
           rc=$?
