@@ -56,9 +56,10 @@ permissions:
   actions: read
 
 env:
-  # Laravel 8 supports PHP 7.3 - 8.1. Building on 8.0 keeps vendor/ runnable on a
-  # cPanel domain set to 8.0 *or* 8.1 (see DEPLOYMENT.md section 0).
-  PHP_VERSION: '8.0'
+  # Laravel 13 requires PHP 8.3 - 8.5. Build on 8.4 to match the cPanel domain
+  # (ea-php84, see DEPLOYMENT.md section 0). The vendor/ tree this produces also
+  # runs on 8.3 and 8.5, so the account can move up without a rebuild.
+  PHP_VERSION: '8.4'
 
 jobs:
   deploy:

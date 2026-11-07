@@ -21,7 +21,7 @@ Phone/Email:
 
 ## **PROJECT OVERVIEW**
 
-LIT Dynamics LTD is pleased to present this quotation for the deployment and delivery of the Excellent Scholars Hub (ESH) Learning Management System (LMS). The platform is a complete web-based educational management system built with Laravel 8, MySQL, and Tailwind CSS.
+LIT Dynamics LTD is pleased to present this quotation for the deployment and delivery of the Excellent Scholars Hub (ESH) Learning Management System (LMS). The platform is a complete web-based educational management system built with Laravel 13 (PHP 8.4), MySQL, and Tailwind CSS.
 
 ## **SYSTEM FEATURES INCLUDED**
 
@@ -42,7 +42,7 @@ LIT Dynamics LTD is pleased to present this quotation for the deployment and del
 * Responsive mobile-friendly interface  
 * Email integration  
 * In-app user guide/documentation  
-* Laravel 8 backend architecture  
+* Laravel 13 backend architecture (PHP 8.4 — under vendor security support)  
 * MySQL database setup  
 * Deployment assistance
 

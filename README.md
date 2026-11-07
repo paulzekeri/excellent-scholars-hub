@@ -1,6 +1,6 @@
 # Excellent Scholars Hub (ESH)
 
-A web-based Learning Management System (LMS) built on **Laravel 8**, **MySQL** and **Tailwind CSS**, with
+A web-based Learning Management System (LMS) built on **Laravel 13** (PHP 8.4), **MySQL** and **Tailwind CSS**, with
 role-specific dashboards for the **CEO**, **Administrators**, **Tutors**, **Learners** and **Parents/Guardians**.
 
 The full end-user documentation lives inside the app at **Help → User Guide** (`/help/user-guide`).

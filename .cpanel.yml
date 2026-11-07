@@ -12,8 +12,8 @@ deployment:
   tasks:
     # App folder = the document root of uat-esh.lit-grp.com on this account.
     - export APP_PATH=/home/litgrpco/uat-esh.lit-grp.com
-    # PHP 8.1 from EasyApache; falls back to the account default binary.
-    - export PHP_BIN=/opt/cpanel/ea-php81/root/usr/bin/php
+    # PHP 8.4 from EasyApache; falls back to the account default binary.
+    - export PHP_BIN=/opt/cpanel/ea-php84/root/usr/bin/php
     - test -x $PHP_BIN || export PHP_BIN=/usr/local/bin/php
     - /bin/mkdir -p $APP_PATH
     # Application code only: .env, storage/ uploads and vendor/ stay untouched.

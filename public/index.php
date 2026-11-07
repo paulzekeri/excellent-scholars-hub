@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
@@ -38,18 +38,12 @@ require __DIR__.'/../vendor/autoload.php';
 | Run The Application
 |--------------------------------------------------------------------------
 |
-| Once we have the application, we can handle the incoming request using
-| the application's HTTP kernel. Then, we will send the response back
-| to this client's browser, allowing them to enjoy our application.
+| The HTTP kernel is no longer bound in bootstrap/app.php on Laravel 11+;
+| the configured application handles the incoming request itself.
 |
 */
 
+/** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-$kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
+$app->handleRequest(Request::capture());

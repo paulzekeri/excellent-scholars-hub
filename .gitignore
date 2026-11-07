@@ -16,3 +16,5 @@ yarn-error.log
 /esh_lms.sql
 /users.sql
 /deploy/*.zip
+
+/.phpunit.cache
