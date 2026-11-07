@@ -15,47 +15,36 @@ use Illuminate\Support\Facades\Storage;
 class OversightController extends Controller
 {
     /**
-     * View all attendance records across all classes.
+     * View attendance records, optionally limited to a single class.
+     *
+     * The "Filter by Class" dropdown submits ?class_id=N to this action, and
+     * /attendance/class/{classId} reaches the same view.
      */
-    public function attendance()
+    public function attendance(Request $request)
     {
         $classes = Classes::with('tutor.user')->get();
 
-        $attendance = Attendance::with(['classSchedule.class', 'learner.user'])
-            ->join('class_schedules', 'attendance.class_schedule_id', '=', 'class_schedules.id')
-            ->select('attendance.*', 'class_schedules.class_id', 'class_schedules.start_time')
-            ->orderBy('class_schedules.start_time', 'desc')
-            ->paginate(50);
-
-        return view('admin.oversight.attendance', compact('attendance', 'classes'));
+        return $this->attendanceView($classes, $this->matchClass($classes, $request->input('class_id')));
     }
 
     /**
-     * View all assignments and submissions across all classes.
+     * View all assignments and submissions, optionally limited to one class.
      */
-    public function assignments()
+    public function assignments(Request $request)
     {
         $classes = Classes::all();
 
-        $assignments = Assignment::with(['class', 'tutor.user', 'submissions.learner.user'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
-
-        return view('admin.oversight.assignments', compact('assignments', 'classes'));
+        return $this->assignmentsView($classes, $this->matchClass($classes, $request->input('class_id')));
     }
 
     /**
-     * View all learning materials across all classes.
+     * View all learning materials, optionally limited to one class.
      */
-    public function materials()
+    public function materials(Request $request)
     {
         $classes = Classes::all();
 
-        $materials = LearningMaterial::with(['class', 'tutor.user'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
-
-        return view('admin.oversight.materials', compact('materials', 'classes'));
+        return $this->materialsView($classes, $this->matchClass($classes, $request->input('class_id')));
     }
 
     /**
@@ -64,16 +53,8 @@ class OversightController extends Controller
     public function attendanceByClass($classId)
     {
         $classes = Classes::with('tutor.user')->get();
-        $selectedClass = Classes::findOrFail($classId);
 
-        $attendance = Attendance::with(['classSchedule.class', 'learner.user'])
-            ->join('class_schedules', 'attendance.class_schedule_id', '=', 'class_schedules.id')
-            ->where('class_schedules.class_id', $classId)
-            ->select('attendance.*', 'class_schedules.class_id', 'class_schedules.start_time')
-            ->orderBy('class_schedules.start_time', 'desc')
-            ->paginate(50);
-
-        return view('admin.oversight.attendance', compact('attendance', 'classes', 'selectedClass'));
+        return $this->attendanceView($classes, Classes::findOrFail($classId));
     }
 
     /**
@@ -82,14 +63,8 @@ class OversightController extends Controller
     public function assignmentsByClass($classId)
     {
         $classes = Classes::all();
-        $selectedClass = Classes::findOrFail($classId);
 
-        $assignments = Assignment::with(['class', 'tutor.user', 'submissions.learner.user'])
-            ->where('class_id', $classId)
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
-
-        return view('admin.oversight.assignments', compact('assignments', 'classes', 'selectedClass'));
+        return $this->assignmentsView($classes, Classes::findOrFail($classId));
     }
 
     /**
@@ -98,14 +73,64 @@ class OversightController extends Controller
     public function materialsByClass($classId)
     {
         $classes = Classes::all();
-        $selectedClass = Classes::findOrFail($classId);
 
-        $materials = LearningMaterial::with(['class', 'tutor.user'])
-            ->where('class_id', $classId)
+        return $this->materialsView($classes, Classes::findOrFail($classId));
+    }
+
+    private function attendanceView($classes, $selectedClass)
+    {
+        $attendance = Attendance::with(['classSchedule.class', 'learner.user'])
+            ->join('class_schedules', 'attendance.class_schedule_id', '=', 'class_schedules.id')
+            ->when($selectedClass, function ($query) use ($selectedClass) {
+                $query->where('class_schedules.class_id', $selectedClass->id);
+            })
+            ->select('attendance.*', 'class_schedules.class_id', 'class_schedules.start_time')
+            ->orderBy('class_schedules.start_time', 'desc')
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('admin.oversight.attendance', compact('attendance', 'classes', 'selectedClass'));
+    }
+
+    private function assignmentsView($classes, $selectedClass)
+    {
+        $assignments = Assignment::with(['class', 'tutor.user', 'submissions.learner.user'])
+            ->when($selectedClass, function ($query) use ($selectedClass) {
+                $query->where('class_id', $selectedClass->id);
+            })
             ->orderBy('created_at', 'desc')
-            ->paginate(50);
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('admin.oversight.assignments', compact('assignments', 'classes', 'selectedClass'));
+    }
+
+    private function materialsView($classes, $selectedClass)
+    {
+        $materials = LearningMaterial::with(['class', 'tutor.user'])
+            ->when($selectedClass, function ($query) use ($selectedClass) {
+                $query->where('class_id', $selectedClass->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(50)
+            ->withQueryString();
 
         return view('admin.oversight.materials', compact('materials', 'classes', 'selectedClass'));
+    }
+
+    /**
+     * Match the submitted class_id against the loaded classes. Blank or unknown
+     * values fall back to "All Classes" so a stale link still renders.
+     */
+    private function matchClass($classes, $classId)
+    {
+        if ($classId === null || $classId === '') {
+            return null;
+        }
+
+        return $classes->first(function ($class) use ($classId) {
+            return (int) $class->id === (int) $classId;
+        });
     }
 
     /**
