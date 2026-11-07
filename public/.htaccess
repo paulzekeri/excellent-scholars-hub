@@ -2,7 +2,7 @@
 # PHP version for this domain (cPanel) - works when the document root
 # points at public/ directly, in which case the app's root .htaccess
 # (which carries the same block) is never read.
-# Guarded by <IfModule lsapi_module>, so XAMPP is unaffected.
+# Guarded by the lsapi module check below, so XAMPP is unaffected.
 # =====================================================================
 
 # php -- BEGIN cPanel-generated handler, do not edit
