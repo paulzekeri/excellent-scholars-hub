@@ -177,6 +177,7 @@ jobs:
           # pushed explicitly. They are the only dot-files the app needs.
           put "$STAGE/.htaccess" -o .htaccess
           put "$STAGE/.user.ini" -o .user.ini
+          put "$STAGE/public/.htaccess" -o public/.htaccess
           bye
           LFTP
           rc=$?
