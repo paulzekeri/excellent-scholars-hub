@@ -403,12 +403,26 @@ jobs:
           SCRIPT=$(cat <<'EOS'
           set -eu
           cd "__REMOTE_DIR__"
-          PHP="$(command -v php || echo /usr/local/bin/php)"
-          if [ ! -x "$PHP" ]; then
-            echo "No php binary found (tried PATH and /usr/local/bin/php)." >&2
+          # `php` on a cPanel box follows the *system* default, not the domain's
+          # MultiPHP selection, so prefer the EasyApache build this release runs on
+          # instead of whatever PATH happens to resolve to.
+          PHP=""
+          for candidate in /opt/cpanel/ea-php84/root/usr/bin/php \
+                          /opt/cpanel/ea-php83/root/usr/bin/php \
+                          "$(command -v php 2>/dev/null || true)" \
+                          /usr/local/bin/php; do
+            if [ -n "$candidate" ] && [ -x "$candidate" ]; then PHP="$candidate"; break; fi
+          done
+          if [ -z "$PHP" ]; then
+            echo "No php binary found (tried ea-php84, ea-php83, PATH and /usr/local/bin/php)." >&2
             exit 3
           fi
           echo "PHP $("$PHP" -r 'echo PHP_VERSION;') at $PHP"
+          if [ "$("$PHP" -r 'echo PHP_VERSION_ID;')" -lt 80300 ]; then
+            echo "This release needs PHP 8.3+ but $PHP reports $("$PHP" -r 'echo PHP_VERSION;')." >&2
+            echo "Set the domain to PHP 8.4 (ea-php84) in cPanel > MultiPHP Manager, then re-run this workflow." >&2
+            exit 6
+          fi
           if [ ! -f .env ]; then
             echo "No .env in $(pwd)." >&2
             echo "Laravel is therefore using the 'forge'/'localhost' defaults from config/database.php, which is why migrate reports:" >&2
@@ -447,6 +461,9 @@ jobs:
             echo "::warning title=No SSH command execution::Files were deployed, but the artisan post-deploy steps could not run over SSH (exit 255). Run them once in cPanel > Terminal inside ${REMOTE_DIR%/}: php artisan migrate --force --seed && php artisan storage:link && php artisan config:cache && php artisan view:cache && php artisan esh:health"
           elif [ "$rc" -eq 5 ]; then
             echo "::error title=No .env on the server::The code is live, but ${REMOTE_DIR%/} has no .env, so Laravel used the 'forge'@'localhost' defaults and migrate could not connect. Create the file (DEPLOYMENT.md section 2.2) or set the UAT_ENV_CONTENT secret, then re-run this workflow."
+            exit 1
+          elif [ "$rc" -eq 6 ]; then
+            echo "::error title=Server PHP is too old::The files are deployed, but the artisan step ran on a PHP older than 8.3, so the site will show a 500 until the domain is fixed. Set ${REMOTE_DIR%/} to PHP 8.4 (ea-php84) in cPanel > MultiPHP Manager, then re-run this workflow."
             exit 1
           else
             echo "::error title=Post-deploy commands failed (exit $rc)::see the log above - the code is deployed but the database or caches may be stale"
