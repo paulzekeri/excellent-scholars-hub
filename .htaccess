@@ -30,14 +30,11 @@
 # =====================================================================
 
 # php -- BEGIN cPanel-generated handler, do not edit
-<IfModule lsapi_module>
-    AddHandler application/x-httpd-ea-php84___lsphp .php .php8 .phtml
-</IfModule>
-<If "%{HTTP_HOST} =~ /lit-grp\.com$/">
-    <IfModule !lsapi_module>
-        AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
-    </IfModule>
-</If>
+# Uses the same form cPanel writes for this account's other domains
+# (application/x-httpd-ea-php81 ...). SmartWeb's LiteSpeed honours the PLAIN
+# handler name; the "…___lsphp" variant is unknown there and silently falls
+# back to the account default PHP. Keep this line identical in form.
+AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
 # php -- END cPanel-generated handler, do not edit
 
 <IfModule mod_rewrite.c>

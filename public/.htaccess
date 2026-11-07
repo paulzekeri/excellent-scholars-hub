@@ -6,14 +6,9 @@
 # =====================================================================
 
 # php -- BEGIN cPanel-generated handler, do not edit
-<IfModule lsapi_module>
-    AddHandler application/x-httpd-ea-php84___lsphp .php .php8 .phtml
-</IfModule>
-<If "%{HTTP_HOST} =~ /lit-grp\.com$/">
-    <IfModule !lsapi_module>
-        AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
-    </IfModule>
-</If>
+# Same plain form cPanel writes for this account (SmartWeb's LiteSpeed ignores
+# the "…___lsphp" variant and falls back to the default PHP).
+AddHandler application/x-httpd-ea-php84 .php .php8 .phtml
 # php -- END cPanel-generated handler, do not edit
 
 <IfModule mod_rewrite.c>
