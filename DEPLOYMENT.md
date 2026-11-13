@@ -7,8 +7,8 @@ below applies to any cPanel host.
 
 | Environment | Branch | URL | App folder | Demo accounts |
 |---|---|---|---|---|
-| Production | `main` | `https://eshglobal.org` | `/home/<account>/eshglobal.org` (document root) | **never** (`SEED_DEMO_ACCOUNTS=false`) |
-| UAT | `uat` | `https://uat.eshglobal.org` | `/home/<account>/uat.eshglobal.org` | yes (`SEED_DEMO_ACCOUNTS=true`) |
+| Production | `main` | `https://eshglobal.org` | `/home/<account>/public_html` (primary domain's document root) | **never** (`SEED_DEMO_ACCOUNTS=false`) |
+| UAT | `uat` | `https://uat.eshglobal.org` | `/home/<account>/public_html/uat.eshglobal.org` | yes (`SEED_DEMO_ACCOUNTS=true`) |
 
 > **DNS + SSL first:** both domains must resolve to their server and have certificates
 > (*SSL/TLS Status → Run AutoSSL*) before `SESSION_SECURE_COOKIE=true` — and before the install button /
@@ -51,7 +51,7 @@ below applies to any cPanel host.
 ## 1. Create the domain and database (cPanel UI)
 
 1. **Domains → Create A New Domain** → `eshglobal.org`, and keep the document root cPanel
-   proposes (`/home/litgrpco/eshglobal.org`). The repository ships a root `.htaccess` that
+   proposes (`/home/eshgloba/public_html`). The repository ships a root `.htaccess` that
    forwards every request into `public/`, so the document root does **not** have to be changed and
    `.env`, `app/`, `vendor/` stay unreachable from a URL. Pointing the document root straight at
    `public/` also works if cPanel lets you set it.
@@ -82,14 +82,14 @@ environment:
 | UAT | `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`, `UAT_CPANEL_PASSWORD` |
 
 Nothing else is configured. The app folders are fixed in the workflows —
-`~/eshglobal.org/` (production) and `~/uat.eshglobal.org/` (UAT) on port 22 — and `.env` is created
+`~/public_html` (production) and `~/public_html/uat.eshglobal.org` (UAT) on port 22 — and `.env` is created
 once by hand on the server (§2.3). If cPanel creates a different folder, change the `REMOTE_DIR`
 value in the matching workflow.
 
 ### 2.2 What a deploy does
 
 1. `composer install --no-dev --optimize-autoloader` on the runner, so `vendor/` needs no server shell.
-2. `rsync` a staged tree, then `lftp` mirrors it to `~/eshglobal.org/` over SFTP. Never
+2. `rsync` a staged tree, then `lftp` mirrors it to `~/public_html/` over SFTP. Never
    uploaded: `.env`, `storage/` uploads, `public/storage`, `bootstrap/cache/*.php`, `.well-known`.
 3. Prunes exactly the files `git rm` removed since the last successful run.
 4. Over SSH (the same shell *cPanel → Terminal* uses): `config:clear`, `migrate --force --seed`,
@@ -127,7 +127,7 @@ and the run fails with:
 SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost' (using password: NO)
 ```
 
-That message means **"there is no `.env` in `~/eshglobal.org`"** — it is not a wrong database
+That message means **"there is no `.env` in `~/public_html`"** — it is not a wrong database
 password. Create the file once, with either:
 
 The file is never deployed (the mirror excludes it), so create it once by hand:
@@ -144,7 +144,7 @@ Values that matter on the live site:
 | `APP_ENV` / `APP_DEBUG` | `production` / `false` |
 | `APP_URL` | `https://eshglobal.org` |
 | `APP_KEY` | 51 characters: `base64:` + 44. A trailing CR on this line makes every request fail. |
-| `DB_DATABASE` / `DB_USERNAME` | `litgrpco_esh_uat` (create it in *MySQL® Databases*) |
+| `DB_DATABASE` / `DB_USERNAME` | `eshgloba_esh_uat` (the cPanel prefix plus the name you create in *MySQL® Databases*) |
 | `DB_PASSWORD` | that database user's password |
 | `MAIL_MAILER` | `log` (the live site sends no mail). Password-reset emails need a working mailer; while this is `log`, the CEO/administrator generates a one-time reset link from **Admin → Users → Reset password**. |
 | `SESSION_SECURE_COOKIE` | `true` |
@@ -158,16 +158,15 @@ After editing `.env` by hand run `php artisan config:clear` (each deploy does th
 If Actions is not an option, the same layout can be maintained by hand:
 
 ```bash
-# 1. Get the code (first deploy only)
-cd ~
-git clone https://github.com/paulzekeri/excellent-scholars-hub.git eshglobal.org
-cd eshglobal.org
+# 1. Get the code (first deploy only; the document root starts empty)
+cd ~/public_html
+git clone https://github.com/paulzekeri/excellent-scholars-hub.git .
 
 # 2. PHP dependencies (vendor/ is git-ignored)
 composer install --no-dev --optimize-autoloader --no-interaction
 
-# 3. Environment file — copy the UAT template and fill in the blanks
-cp .env.uat.example .env
+# 3. Environment file — copy the matching template and fill in the blanks
+cp .env.production.example .env      # use .env.uat.example inside the UAT folder
 chmod 600 .env
 #    edit .env: DB_DATABASE, DB_USERNAME, DB_PASSWORD, APP_URL, MAIL_FROM_ADDRESS
 php artisan key:generate --force
@@ -191,14 +190,14 @@ php artisan view:cache
 # 7. Installable app + phone alerts (optional; full guide in PWA.md)
 php artisan push:keys          # paste the two printed lines into .env, then rebuild the config cache
 #    cron entry (once on the server):
-#    * * * * * cd /home/litgrpco/eshglobal.org && php artisan schedule:run >> /dev/null 2>&1
+#    * * * * * cd /home/eshgloba/public_html && php artisan schedule:run >> /dev/null 2>&1
 #    https:// is required: service workers and the install prompt do not exist on plain HTTP.
 ```
 
 ### Later deploys (same server)
 
 ```bash
-cd ~/eshglobal.org
+cd ~/public_html
 git pull --ff-only origin main
 composer install --no-dev --optimize-autoloader --no-interaction
 php artisan migrate --force
@@ -211,15 +210,17 @@ php artisan push:send --prune   # optional: deliver queued phone alerts now, pru
 
 ### Document root
 
-The folder the subdomain points at **is** the app root, and the repository's root `.htaccess`
-forwards every request into `public/`. Two supported layouts:
+The folder each domain points at **is** the app root, and the repository's root `.htaccess`
+forwards every request into `public/`. In this account that is:
 
-* Default (what the Actions pipeline and `.cpanel.yml` use): document root
-  `/home/litgrpco/eshglobal.org`, with `.htaccess`, `.env` and `public/` inside it. Nothing to
-  configure in cPanel beyond creating the subdomain.
-* Stricter: set the document root to `/home/litgrpco/eshglobal.org/public` in
-  *Domains → Manage*. The `.htaccess` in `public/` then handles everything and the root
-  `.htaccess` is simply never reached.
+* Production (`eshglobal.org`, the primary domain): `/home/eshgloba/public_html`
+* UAT (`uat.eshglobal.org`, a subdomain): `/home/eshgloba/public_html/uat.eshglobal.org`
+  (cPanel places subdomains of the primary domain **inside** `public_html`; confirm the exact path
+  in *Domains → Manage*).
+
+Those are the `REMOTE_DIR` values in the two workflows. A stricter layout sets the document root to
+`<docroot>/public` in *Domains → Manage*; the `public/.htaccess` then handles everything and the root
+`.htaccess` is never reached.
 
 `.env` and the upload folders are protected either way: dotfiles are hidden by LiteSpeed, and the
 root `.htaccess` returns 403 for `.env`, `.log`, `.sql`, `.sh`, `.yml`, `artisan` and `composer.*`.
@@ -233,10 +234,10 @@ the document root, root `.htaccess` → `public/`).
 1. *cPanel → Git™ Version Control → Create* → clone
    `https://github.com/paulzekeri/excellent-scholars-hub.git`, branch `main`, repository path
    `repositories/esh-uat`.
-2. The committed `.cpanel.yml` already targets `/home/litgrpco/eshglobal.org` and
+2. The committed `.cpanel.yml` already targets `/home/eshgloba/public_html` and
    `/opt/cpanel/ea-php84/root/usr/bin/php`; change those two values for a different account or PHP
    version.
-3. Create `~/eshglobal.org/.env` once (from `.env.uat.example`, see §2.3) — the pipeline never
+3. Create `~/public_html/.env` once (from `.env.uat.example`, see §2.3) — the pipeline never
    overwrites `.env`, `storage/` uploads or `vendor/`.
 4. Run *Pull or Deploy → Update from Remote → Deploy HEAD Commit*.
 
@@ -279,7 +280,7 @@ powershell -ExecutionPolicy Bypass -File deploy\build-release.ps1
 Run the built-in check first (works over SSH or cPanel Terminal):
 
 ```bash
-cd ~/eshglobal.org && php artisan esh:health
+cd ~/public_html && php artisan esh:health
 ```
 
 It verifies PHP 8.3 - 8.5 + extensions, `APP_KEY`, `APP_URL`, DB connectivity, pending migrations,
@@ -310,13 +311,13 @@ Then walk through the app on `https://eshglobal.org`:
 a test push can never touch production data.
 
 1. **Create the domain:** *cPanel → Domains → Create A New Domain* → `uat.eshglobal.org`, keep the
-   folder cPanel proposes (`/home/<account>/uat.eshglobal.org`), assign **PHP 8.4**, the same 100M INI
+   folder cPanel proposes (`/home/<account>/public_html/uat.eshglobal.org`), assign **PHP 8.4**, the same 100M INI
    limits as §1, and run AutoSSL for it.
 2. **Separate database/user** (never the production one), then create its `.env` by hand from
    `.env.uat.example`: `APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`,
    `APP_URL=https://uat.eshglobal.org`, `SESSION_SECURE_COOKIE=true`.
 3. **Repository secrets** in the new repo: `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`,
-   `UAT_CPANEL_PASSWORD` — that is all; the workflow targets `~/uat.eshglobal.org/` on port 22.
+   `UAT_CPANEL_PASSWORD` — that is all; the workflow targets `~/public_html/uat.eshglobal.org/` on port 22.
 4. **Deploy:** `git push origin uat` (create the branch from `main` first with
    `git push origin main:uat`). The workflow mirrors the tree, runs `migrate --force --seed`,
    `storage:link`, the caches and `esh:health` against the UAT database.
@@ -343,7 +344,7 @@ a test push can never touch production data.
 
 **Rollback:** revert the commit and push (`git revert <sha> && git push`) — the workflow republishes
 the previous code and its prune step removes the files the revert deleted. Manual installs:
-`git checkout <previous-commit>` in `~/eshglobal.org`, then `composer install --no-dev` and
+`git checkout <previous-commit>` in `~/public_html`, then `composer install --no-dev` and
 `php artisan config:cache && php artisan view:cache`. Schema changes: `php artisan migrate:rollback
 --step=1` (only migrations from the last batch). Restore the pre-deploy database dump if the rollback
 touches data.

@@ -10,9 +10,9 @@
 # root and the repository's root .htaccess forwards requests into public/.
 deployment:
   tasks:
-    # App folder = the document root of eshglobal.org on this account
-    # (adjust the cPanel user/path when the account changes).
-    - export APP_PATH=/home/litgrpco/eshglobal.org
+    # App folder = the document root of eshglobal.org (the primary domain uses
+    # public_html; a subdomain would be public_html/<subdomain>).
+    - export APP_PATH=/home/eshgloba/public_html
     # PHP 8.4 from EasyApache; falls back to the account default binary.
     - export PHP_BIN=/opt/cpanel/ea-php84/root/usr/bin/php
     - test -x $PHP_BIN || export PHP_BIN=/usr/local/bin/php

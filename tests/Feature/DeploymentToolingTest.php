@@ -126,7 +126,7 @@ class DeploymentToolingTest extends TestCase
         $this->assertStringContainsString('secrets.CPANEL_PASSWORD', $workflow);
         $this->assertStringNotContainsString('vars.', $workflow, 'Only the three required secrets are configured; no optional variables.');
         $this->assertStringNotContainsString('ENV_CONTENT', $workflow, 'The .env is created by hand; the workflow never writes it.');
-        $this->assertStringContainsString("'eshglobal.org/'", $workflow, 'Production deploys to the eshglobal.org document root.');
+        $this->assertStringContainsString("'public_html/'", $workflow, 'Production deploys to the primary domain document root.');
         $this->assertStringContainsString('Report remote layout', $workflow, 'A wrong remote directory must be visible in the log.');
         $this->assertStringContainsString('artisan storage:link', $workflow);
         $this->assertStringContainsString('artisan esh:health', $workflow);
@@ -139,7 +139,7 @@ class DeploymentToolingTest extends TestCase
         $this->assertStringContainsString('secrets.UAT_CPANEL_PASSWORD', $uatWorkflow);
         $this->assertStringNotContainsString('vars.', $uatWorkflow, 'Only the three required secrets are configured; no optional variables.');
         $this->assertStringNotContainsString('ENV_CONTENT', $uatWorkflow, 'The .env is created by hand; the workflow never writes it.');
-        $this->assertStringContainsString("'uat.eshglobal.org/'", $uatWorkflow);
+        $this->assertStringContainsString("'public_html/uat.eshglobal.org/'", $uatWorkflow);
         $this->assertStringContainsString("      - uat", $uatWorkflow, 'The UAT pipeline must listen to the uat branch, not main.');
         $this->assertStringNotContainsString("      - main", $uatWorkflow);
 

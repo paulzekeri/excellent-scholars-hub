@@ -13,7 +13,7 @@ name: Deploy to cPanel
 # the files `git rm` removed from the repository.
 #
 # LAYOUT ON THE SERVER
-#   The cPanel document root (default /home/<account>/eshglobal.org) holds the
+#   The cPanel document root (default /home/<account>/public_html) holds the
 #   whole Laravel app and the repository's root .htaccess forwards every request
 #   into public/. So app/, config/, storage/, vendor/ and .env are never reachable
 #   from a URL, and the document root does not have to be changed in cPanel.
@@ -23,7 +23,7 @@ name: Deploy to cPanel
 #   CPANEL_USER      that cPanel username
 #   CPANEL_PASSWORD  matching cPanel/SSH password
 #
-# Nothing else needs configuring: the deploy always targets ~/eshglobal.org/ on
+# Nothing else needs configuring: the deploy always targets the primary domain folder ~/public_html/ on
 # port 22, and .env is created once by hand on the server (DEPLOYMENT.md §2.3).
 #
 # NEVER uploaded (they only exist on the server): .env, storage/ uploads,
@@ -125,7 +125,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: '22'
-          REMOTE_DIR: 'eshglobal.org/'
+          REMOTE_DIR: 'public_html/'
         run: |
           set -euo pipefail
           sudo apt-get update -qq
@@ -193,7 +193,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: '22'
-          REMOTE_DIR: 'eshglobal.org/'
+          REMOTE_DIR: 'public_html/'
           BEFORE_SHA: ${{ github.event.before }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -269,7 +269,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: '22'
-          REMOTE_DIR: 'eshglobal.org/'
+          REMOTE_DIR: 'public_html/'
         run: |
           set -euo pipefail
           sudo apt-get install -y -qq sshpass
@@ -299,7 +299,7 @@ jobs:
             [ -f "$HOME/$d/public/index.php" ] && echo "  $d/public/index.php exists"
           done
           echo "--- .env files (keys only, no values) ---"
-          for envf in "$HOME/__REMOTE_DIR__/.env" "$HOME/public_html/eshglobal.org/.env"; do
+          for envf in "$HOME/__REMOTE_DIR__/.env" "$HOME/public_html/.env"; do
             [ -f "$envf" ] || { echo "  ${envf#$HOME/} -> missing"; continue; }
             echo "  ${envf#$HOME/}: $(wc -c < "$envf") bytes, $(grep -c '' "$envf") lines, $(tr -cd '\r' < "$envf" | wc -c) CR bytes"
             echo "    keys: $(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' "$envf" | tr '\n' ' ')"
@@ -326,7 +326,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: '22'
-          REMOTE_DIR: 'eshglobal.org/'
+          REMOTE_DIR: 'public_html/'
         run: |
           set -euo pipefail
           sudo apt-get install -y -qq sshpass
@@ -434,10 +434,10 @@ jobs:
             echo "| Site | https://eshglobal.org |"
             echo "| Commit | \`${GITHUB_SHA:0:12}\` |"
             echo "| Transport | \`sftp\` (lftp mirror) |"
-            echo "| Remote directory | \`${REMOTE_DIR:-eshglobal.org/}\` |"
+            echo "| Remote directory | \`${REMOTE_DIR:-public_html/}\` |"
             echo "| Run | ${{ github.run_id }} (attempt ${{ github.run_attempt }}) |"
             echo ""
             echo "Check the site, then walk the smoke-test matrix in DEPLOYMENT.md section 5."
           } >> "$GITHUB_STEP_SUMMARY"
         env:
-          REMOTE_DIR: 'eshglobal.org/'
+          REMOTE_DIR: 'public_html/'
