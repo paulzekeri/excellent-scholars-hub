@@ -231,7 +231,7 @@ class EnquiryController extends Controller
     /** Administrators and the CEO can own an enquiry. */
     private function owners()
     {
-        return User::whereHas('role', function ($query) {
+        return User::visible()->whereHas('role', function ($query) {
             $query->whereIn('slug', ['admin', 'ceo']);
         })->orderBy('name')->get();
     }

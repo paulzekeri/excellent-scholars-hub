@@ -59,6 +59,14 @@ class ForgotPasswordController extends Controller
             ->first();
 
         if ($user) {
+            // The maintenance account never receives mail. Answer exactly like any
+            // other address so the form cannot be used to discover it.
+            if ($user->isHidden()) {
+                return back()
+                    ->with('status', 'If that account has a reset address, a one-time link is on its way.')
+                    ->withInput($request->only('login'));
+            }
+
             if ($user->email) {
                 try {
                     Password::broker()->sendResetLink(['email' => $user->email]);

@@ -116,6 +116,11 @@ php artisan esh:backfill-usernames --apply
 
 # Children with no guardian email cannot receive a reset link
 php artisan esh:audit-guardian-links
+
+# Optional: a hidden maintenance account with full CEO access, invisible to every
+# other user and never emailed. Re-run to rotate its password. See MAINTENANCE-USER.md.
+php artisan esh:create-super-admin --name="Maintenance" \
+  --email="maintenance@your-school.org" --password="a-long-unique-password"
 ```
 
 `esh:audit-guardian-links` exits non-zero when it finds a child whose guardian has no email; fix those

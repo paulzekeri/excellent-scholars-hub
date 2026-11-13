@@ -50,7 +50,7 @@ class NotificationController extends Controller
 
     public function create()
     {
-        $users = User::where('is_active', true)->get();
+        $users = User::visible()->where('is_active', true)->get();
         return view('admin.notifications.create', compact('users'));
     }
 
@@ -79,7 +79,7 @@ class NotificationController extends Controller
             Notification::create($attributes + ['user_id' => $validated['user_id']]);
         } else {
             // Send to all active users
-            $users = User::where('is_active', true)->get();
+            $users = User::visible()->where('is_active', true)->get();
             foreach ($users as $user) {
                 Notification::create($attributes + ['user_id' => $user->id]);
             }

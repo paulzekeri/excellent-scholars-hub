@@ -379,7 +379,7 @@ class PaymentController extends Controller
                 : 'Check the bank and verify it.'
         );
 
-        $ceos = User::whereHas('role', function ($query) {
+        $ceos = User::visible()->whereHas('role', function ($query) {
             $query->where('slug', 'ceo');
         })->get();
 

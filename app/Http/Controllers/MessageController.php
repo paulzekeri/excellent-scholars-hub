@@ -195,7 +195,7 @@ class MessageController extends Controller
         ]);
 
         // Every reviewer (administrators and the CEO) gets a nudge.
-        $reviewers = User::whereHas('role', function ($query) {
+        $reviewers = User::visible()->whereHas('role', function ($query) {
             $query->whereIn('slug', ['admin', 'ceo']);
         })->where('is_active', true)->get();
 
@@ -287,7 +287,7 @@ class MessageController extends Controller
     private function contactQuery(?string $category = null)
     {
         $me = auth()->user();
-        $query = User::where('is_active', true)->where('id', '!=', $me->id);
+        $query = User::visible()->where('is_active', true)->where('id', '!=', $me->id);
 
         if ($me->isAdministrator()) {
             $map = [

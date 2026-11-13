@@ -53,7 +53,7 @@ class DashboardController extends Controller
         });
 
         $data = [
-            'totalUsers' => User::count(),
+            'totalUsers' => User::visible()->count(),
             'totalTutors' => Tutor::count(),
             'totalLearners' => Learner::count(),
             'totalClasses' => Classes::count(),
@@ -61,7 +61,7 @@ class DashboardController extends Controller
             // Payments are CEO-only, so only the CEO sees payment figures.
             'totalPayments' => $user->canManagePayments() ? Payment::count() : null,
             'unreadMessages' => $user->unreadMessagesCount(),
-            'recentUsers' => User::with('role')->latest()->take(5)->get(),
+            'recentUsers' => User::visible()->with('role')->latest()->take(5)->get(),
             'upcomingClasses' => ClassSchedule::with('class', 'tutor.user')
                 ->where('start_time', '>', now())
                 ->orderBy('start_time')

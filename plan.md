@@ -148,6 +148,12 @@
       (scheduled every minute), and `Notification::booted()` queues a push for every in-app notification. A server
       with no VAPID keys stays completely silent. Tests: `WebPushTest`, `ProgressiveWebAppTest`; setup, cron and
       troubleshooting in `PWA.md`
+- [x] **Hidden maintenance account** — `users.is_hidden` (migration `add_is_hidden_to_users_table`) plus
+      `php artisan esh:create-super-admin`: a CEO-role account with full access that is filtered out of every
+      user list, role count, dashboard total, messaging contact picker, broadcast/notification fan-out and
+      enquiry owner dropdown, never receives password-reset mail, and returns 404 if another administrator
+      tries to edit/delete/reset it. Re-running the command rotates its password. Tests: `SuperAdminTest`;
+      docs: `MAINTENANCE-USER.md`
 - [x] **Blue / white / orange branding** — navy/blue structure with orange actions and **sun-yellow highlights**;
       indigo, purple and red removed from every view (orange now carries warnings and attention too)
 - [x] **Flyer look and feel** — Poppins headings + Inter body (`Caveat` script on the marketing page only), the

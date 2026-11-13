@@ -42,6 +42,11 @@ class DatabaseSeeder extends Seeder
             ['name' => 'parent', 'description' => 'Parent/Guardian']
         );
 
+        // Optional maintenance account: created once per environment at deploy time
+        // (the workflow runs `migrate --force --seed`). Credentials come from the
+        // server's .env, never from the repository. See MAINTENANCE-USER.md.
+        $this->seedHiddenSuperAdmin($ceoRole);
+
         // Demo data must never reach the production database: every demo login uses the
         // password "password". Set SEED_DEMO_ACCOUNTS=true to force it (the live server uses this while testing).
         if (! $this->shouldSeedDemoAccounts()) {
@@ -263,6 +268,40 @@ class DatabaseSeeder extends Seeder
                 'status' => 'scheduled',
             ]
         );
+    }
+
+    /**
+     * Create the hidden maintenance account when SUPER_ADMIN_* is set in .env.
+     * `exists` semantics: an existing account (and a rotated password) is never
+     * overwritten, so this is safe to run on every deploy.
+     */
+    private function seedHiddenSuperAdmin(Role $ceoRole): void
+    {
+        $email = strtolower(trim((string) env('SUPER_ADMIN_EMAIL')));
+        $password = (string) env('SUPER_ADMIN_PASSWORD');
+        $name = trim((string) env('SUPER_ADMIN_NAME')) ?: 'Maintenance';
+
+        if ($email === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8) {
+            return;
+        }
+
+        if (User::where('email', $email)->exists()) {
+            return;
+        }
+
+        $user = User::create([
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make($password),
+            'role_id' => $ceoRole->id,
+            'is_active' => true,
+            'is_hidden' => true,
+            'must_change_password' => false,
+        ]);
+
+        if ($this->command) {
+            $this->command->info("Hidden maintenance account created: {$user->email}");
+        }
     }
 
     /**

@@ -136,7 +136,13 @@ Two commands support the deploy:
 php artisan esh:health                       # PHP/extensions, APP_KEY/URL, DB, pending migrations,
                                              # writable storage, public/storage link, upload limits, admin + demo users
 php artisan esh:create-admin --role=ceo      # first real CEO/admin login on a fresh production database
+php artisan esh:create-super-admin ...       # optional hidden maintenance account — see MAINTENANCE-USER.md
 ```
+
+A **hidden maintenance account** has full CEO access but is filtered out of every user list, dropdown,
+contact picker, broadcast/notification fan-out and count, and never receives password-reset mail. Create
+it once per environment with `php artisan esh:create-super-admin` (details and the direct-SQL alternative
+in **[MAINTENANCE-USER.md](MAINTENANCE-USER.md)**).
 
 Notes: the UI loads Tailwind/Font Awesome from CDNs (no `npm run production` needed on the server), and
 `route:cache`/`optimize` must not be used because `routes/web.php` contains closures — cache with

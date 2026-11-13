@@ -165,7 +165,7 @@ class MessageController extends Controller
             $parentIds = Learner::whereIn('id', $learnerIds)->whereNotNull('parent_id')->pluck('parent_id');
             $parentUserIds = ParentModel::whereIn('id', $parentIds)->pluck('user_id');
 
-            return User::where('is_active', true)
+            return User::visible()->where('is_active', true)
                 ->whereIn('id', $learnerUserIds->merge($parentUserIds)->push($class->tutor->user_id)->filter()->unique())
                 ->get();
         }
@@ -176,7 +176,7 @@ class MessageController extends Controller
             Message::AUDIENCE_LEARNERS => ['learner'],
         ][$audience] ?? ['parent', 'tutor', 'learner'];
 
-        return User::where('is_active', true)
+        return User::visible()->where('is_active', true)
             ->whereHas('role', function ($query) use ($slugs) {
                 $query->whereIn('slug', $slugs);
             })

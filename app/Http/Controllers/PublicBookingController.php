@@ -69,7 +69,7 @@ class PublicBookingController extends Controller
     /** Every administrator and the CEO should see a new public request. */
     private function notifyStaff(Enquiry $enquiry): void
     {
-        $staff = User::whereHas('role', function ($query) {
+        $staff = User::visible()->whereHas('role', function ($query) {
             $query->whereIn('slug', ['admin', 'ceo']);
         })->get();
 

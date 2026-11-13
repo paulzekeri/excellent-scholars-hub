@@ -30,7 +30,7 @@ class UserController extends Controller
         $search = trim((string) $request->query('q'));
         $status = $request->query('status');
 
-        $users = User::with(['role', 'learner.parent.user', 'parent.children'])
+        $users = User::visible()->with(['role', 'learner.parent.user', 'parent.children'])
             ->when($role && $role !== 'all', function ($query) use ($role) {
                 $query->whereHas('role', function ($roleQuery) use ($role) {
                     $roleQuery->where('slug', $role);
@@ -59,7 +59,7 @@ class UserController extends Controller
             'roleFilter' => $role,
             'search' => $search,
             'statusFilter' => $status,
-            'roleCounts' => User::selectRaw('role_id, COUNT(*) as total')
+            'roleCounts' => User::visible()->selectRaw('role_id, COUNT(*) as total')
                 ->groupBy('role_id')
                 ->pluck('total', 'role_id'),
         ]);
@@ -486,6 +486,10 @@ class UserController extends Controller
 
     private function ensureUserManageable(User $user)
     {
+        // The maintenance account does not exist as far as the UI is concerned:
+        // even a hand-typed URL must look like a missing record.
+        abort_if($user->isHidden(), 404);
+
         if ($user->isCeo() && !auth()->user()->isCeo()) {
             abort(403, 'Only the CEO can manage a CEO account.');
         }

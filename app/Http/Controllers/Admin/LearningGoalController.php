@@ -50,7 +50,7 @@ class LearningGoalController extends Controller
             ->withQueryString();
 
         // The people the school can pick from, grouped by role.
-        $people = User::with('role')
+        $people = User::visible()->with('role')
             ->whereHas('role', function ($query) {
                 $query->whereIn('slug', ['parent', 'learner', 'tutor']);
             })
