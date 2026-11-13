@@ -140,9 +140,14 @@ jobs:
             --exclude='.gitignore' --exclude='.gitattributes' \
             --exclude='.env' --exclude='.env.*' \
             --exclude='.cpanel.yml' \
-            --exclude='deploy' --exclude='tests' --exclude='phpunit.xml' \
-            --exclude='README.md' --exclude='DEPLOYMENT.md' --exclude='plan.md' \
-            --exclude='esh_lms.sql' --exclude='*.zip' \
+            --exclude='deploy' --exclude='tests' --exclude='tools' --exclude='scripts' \
+            --exclude='phpunit.xml' --exclude='phpunit.xml.dist' --exclude='.phpunit.cache' \
+            --exclude='.phpunit.result.cache' \
+            --exclude='*.md' --exclude='package.json' --exclude='package-lock.json' \
+            --exclude='webpack.mix.js' --exclude='server.php' --exclude='new addition.txt' \
+            --exclude='image with the organisation colours.jpg' \
+            --exclude='.editorconfig' --exclude='.styleci.yml' \
+            --exclude='esh_lms.sql' --exclude='users.sql' --exclude='*.zip' \
             --exclude='public/storage' --exclude='public/hot' \
             --exclude='storage/app/public/*' \
             --exclude='storage/framework/cache/*' \
