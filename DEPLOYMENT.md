@@ -21,9 +21,9 @@ below applies to any cPanel host.
    (Alternative: create an empty `paulzekeri/excellent-scholars-hub` and `git push --mirror` to it.)
 2. In this workspace the remote is already updated:
    `git remote -v` → `https://github.com/paulzekeri/excellent-scholars-hub.git`.
-3. **Secrets and variables are per-repository** — create them again in the new repo
-   (*Settings → Secrets and variables → Actions*): production `CPANEL_*` + `ENV_CONTENT`, UAT
-   `UAT_CPANEL_*` + `UAT_ENV_CONTENT` (see §2.1 and §6).
+3. **Secrets are per-repository** — create them again in the new repo
+   (*Settings → Secrets and variables → Actions*): production `CPANEL_HOST/USER/PASSWORD`, UAT
+   `UAT_CPANEL_HOST/USER/PASSWORD` (see §2.1 and §6). Nothing else is needed.
 4. Enable Actions, keep `main` as the default branch, and create a **`uat`** branch for UAT deploys.
 
 ## 0. What the app needs
@@ -73,19 +73,18 @@ installed on the account and no SSH session is opened by hand.
 ### 2.1 One-time repository setup
 
 *Settings → Secrets and variables → Actions* in
-<https://github.com/paulzekeri/excellent-scholars-hub>:
+<https://github.com/paulzekeri/excellent-scholars-hub> — only the three required secrets per
+environment:
 
-| Kind | Name | Value |
-|---|---|---|
-| Secret | `CPANEL_HOST` | host of the account that serves `eshglobal.org` |
-| Secret | `CPANEL_USER` | that cPanel username |
-| Secret | `CPANEL_PASSWORD` | its cPanel/SSH password |
-| Secret (optional) | `ENV_CONTENT` | the complete production `.env` as text — written once, only when `.env` is missing (CRLF stripped, `chmod 600`) |
-| Variable (optional) | `CPANEL_SSH_PORT` | `22` (the default) |
-| Variable (optional) | `CPANEL_REMOTE_DIR` | `eshglobal.org/` (the default) |
-| Secret | `UAT_CPANEL_HOST` / `UAT_CPANEL_USER` / `UAT_CPANEL_PASSWORD` | the same three for `uat.eshglobal.org` (§6) |
-| Secret (optional) | `UAT_ENV_CONTENT` | the UAT `.env` body (from `.env.uat.example`) |
-| Variable (optional) | `UAT_CPANEL_REMOTE_DIR` | `uat.eshglobal.org/` (the default) |
+| Environment | Secrets |
+|---|---|
+| Production | `CPANEL_HOST`, `CPANEL_USER`, `CPANEL_PASSWORD` |
+| UAT | `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`, `UAT_CPANEL_PASSWORD` |
+
+Nothing else is configured. The app folders are fixed in the workflows —
+`~/eshglobal.org/` (production) and `~/uat.eshglobal.org/` (UAT) on port 22 — and `.env` is created
+once by hand on the server (§2.3). If cPanel creates a different folder, change the `REMOTE_DIR`
+value in the matching workflow.
 
 ### 2.2 What a deploy does
 
@@ -93,14 +92,11 @@ installed on the account and no SSH session is opened by hand.
 2. `rsync` a staged tree, then `lftp` mirrors it to `~/eshglobal.org/` over SFTP. Never
    uploaded: `.env`, `storage/` uploads, `public/storage`, `bootstrap/cache/*.php`, `.well-known`.
 3. Prunes exactly the files `git rm` removed since the last successful run.
-4. If `~/eshglobal.org/.env` is missing **and** the optional `ENV_CONTENT` secret is set,
-   writes it once from that secret (`chmod 600`, Windows CRLF stripped). An existing `.env` is never
-   modified; without the secret the step prints a note and moves on.
-5. Over SSH (the same shell *cPanel → Terminal* uses): `config:clear`, `migrate --force --seed`,
+4. Over SSH (the same shell *cPanel → Terminal* uses): `config:clear`, `migrate --force --seed`,
    `storage:link`, `config:cache`, `view:cache`, `esh:health`. If the account refuses shell commands
    the step only warns and prints the commands to paste into *cPanel → Terminal*. A missing `.env`
    stops the step with `::error title=No .env on the server` before touching the database.
-6. Writes a summary table to the workflow run page.
+5. Writes a summary table to the workflow run page.
 
 #### One-time data steps after the usernames migration
 
@@ -134,13 +130,12 @@ SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost' (using passwor
 That message means **"there is no `.env` in `~/eshglobal.org`"** — it is not a wrong database
 password. Create the file once, with either:
 
-* **Automated:** add the repository secret `ENV_CONTENT`, paste the whole `.env` body (same keys
-  as `.env.uat.example`) and re-run the workflow. The *Bootstrap server .env* step writes it, strips
-  CRLF and sets `chmod 600`; later runs leave it untouched.
-* **Manual:** *cPanel → File Manager* → `eshglobal.org` → **+ File** → name it `.env` → paste
-  the body (the template is `.env.uat.example` in the repository; it is intentionally **not**
-  uploaded to the server) → then, if `APP_KEY` is empty, run
-  `php artisan key:generate --force` in *cPanel → Terminal*.
+The file is never deployed (the mirror excludes it), so create it once by hand:
+
+* *cPanel → File Manager* → `eshglobal.org` → **+ File** → name it `.env` → paste the body from
+  `.env.production.example` (production) or `.env.uat.example` (UAT; both templates are intentionally
+  **not** uploaded) → then, if `APP_KEY` is empty, run `php artisan key:generate --force` in
+  *cPanel → Terminal*.
 
 Values that matter on the live site:
 
@@ -317,13 +312,11 @@ a test push can never touch production data.
 1. **Create the domain:** *cPanel → Domains → Create A New Domain* → `uat.eshglobal.org`, keep the
    folder cPanel proposes (`/home/<account>/uat.eshglobal.org`), assign **PHP 8.4**, the same 100M INI
    limits as §1, and run AutoSSL for it.
-2. **Separate database/user** (never the production one), then create its `.env` from
+2. **Separate database/user** (never the production one), then create its `.env` by hand from
    `.env.uat.example`: `APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`,
-   `APP_URL=https://uat.eshglobal.org`, `SESSION_SECURE_COOKIE=true`. Set the `UAT_ENV_CONTENT` secret
-   and the workflow writes it once, exactly like production.
-3. **Repository secrets/variables** in the new repo: `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`,
-   `UAT_CPANEL_PASSWORD`; optionally `UAT_CPANEL_REMOTE_DIR` (`uat.eshglobal.org/`, the default) and
-   `UAT_CPANEL_SSH_PORT`.
+   `APP_URL=https://uat.eshglobal.org`, `SESSION_SECURE_COOKIE=true`.
+3. **Repository secrets** in the new repo: `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`,
+   `UAT_CPANEL_PASSWORD` — that is all; the workflow targets `~/uat.eshglobal.org/` on port 22.
 4. **Deploy:** `git push origin uat` (create the branch from `main` first with
    `git push origin main:uat`). The workflow mirrors the tree, runs `migrate --force --seed`,
    `storage:link`, the caches and `esh:health` against the UAT database.

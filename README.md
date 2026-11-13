@@ -116,8 +116,8 @@ The repository is **`https://github.com/paulzekeri/excellent-scholars-hub`** (mo
 Both build `vendor/` on the runner, mirror the tree over SFTP (never `.env`, uploads, `public/storage`
 or `bootstrap/cache`), prune files removed from the repo, then run
 `migrate`/`storage:link`/caches/`esh:health` over SSH. Secrets and variables are per-repository, so
-they must be created again in the new account (production `CPANEL_*` + `ENV_CONTENT`, UAT
-`UAT_CPANEL_*` + `UAT_ENV_CONTENT`). The full runbook — transfer checklist, secrets, domain/PHP/database
+they must be created again in the new account (production `CPANEL_HOST/USER/PASSWORD`, UAT
+`UAT_CPANEL_HOST/USER/PASSWORD` — nothing else). The full runbook — transfer checklist, secrets, domain/PHP/database
 setup, the cPanel Git pipeline (`.cpanel.yml`), the release-zip fallback (`deploy/build-release.ps1`),
 the smoke-test matrix and rollback — is in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
@@ -397,7 +397,7 @@ sitting, then the school only confirms the money arrived.
   `migrate --force --seed`, `storage:link`, `config:cache`, `view:cache` and `esh:health` over SSH. Never
   uploads `.env`, `storage/` uploads or `public/storage`.
 - **`.github/workflows/deploy-cpanel-uat.yml`** — the same pipeline for UAT on push to `uat`
-  (`~/uat.eshglobal.org/`, `UAT_CPANEL_*` secrets, `UAT_ENV_CONTENT`).
+  (`~/uat.eshglobal.org/`, `UAT_CPANEL_*` secrets).
 - **`.htaccess` (repository root)** — forwards every request into `public/` and returns 403 for `.env`,
   `artisan`, `composer.*`, `*.log`, `*.sql`, `*.sh`, `*.yml`, so the app can live inside the document root.
 - **`.user.ini`** — 100 MB upload limits, 256 MB memory and `session.upload_progress.enabled=0`.

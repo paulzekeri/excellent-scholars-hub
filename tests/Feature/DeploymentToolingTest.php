@@ -121,8 +121,11 @@ class DeploymentToolingTest extends TestCase
 
         $workflow = file_get_contents($root.'/.github/workflows/deploy-cpanel.yml');
         $this->assertStringContainsString("--exclude='.env'", $workflow, 'The pipeline must never overwrite the server .env.');
-        $this->assertStringContainsString('Bootstrap server .env', $workflow, 'A first deploy needs a way to create .env on the server.');
-        $this->assertStringContainsString('secrets.ENV_CONTENT', $workflow);
+        $this->assertStringContainsString('secrets.CPANEL_HOST', $workflow);
+        $this->assertStringContainsString('secrets.CPANEL_USER', $workflow);
+        $this->assertStringContainsString('secrets.CPANEL_PASSWORD', $workflow);
+        $this->assertStringNotContainsString('vars.', $workflow, 'Only the three required secrets are configured; no optional variables.');
+        $this->assertStringNotContainsString('ENV_CONTENT', $workflow, 'The .env is created by hand; the workflow never writes it.');
         $this->assertStringContainsString("'eshglobal.org/'", $workflow, 'Production deploys to the eshglobal.org document root.');
         $this->assertStringContainsString('Report remote layout', $workflow, 'A wrong remote directory must be visible in the log.');
         $this->assertStringContainsString('artisan storage:link', $workflow);
@@ -132,7 +135,10 @@ class DeploymentToolingTest extends TestCase
 
         // The UAT pipeline is the same work on a separate branch, domain and secrets.
         $uatWorkflow = file_get_contents($root.'/.github/workflows/deploy-cpanel-uat.yml');
-        $this->assertStringContainsString('secrets.UAT_ENV_CONTENT', $uatWorkflow);
+        $this->assertStringContainsString('secrets.UAT_CPANEL_HOST', $uatWorkflow);
+        $this->assertStringContainsString('secrets.UAT_CPANEL_PASSWORD', $uatWorkflow);
+        $this->assertStringNotContainsString('vars.', $uatWorkflow, 'Only the three required secrets are configured; no optional variables.');
+        $this->assertStringNotContainsString('ENV_CONTENT', $uatWorkflow, 'The .env is created by hand; the workflow never writes it.');
         $this->assertStringContainsString("'uat.eshglobal.org/'", $uatWorkflow);
         $this->assertStringContainsString("      - uat", $uatWorkflow, 'The UAT pipeline must listen to the uat branch, not main.');
         $this->assertStringNotContainsString("      - main", $uatWorkflow);
