@@ -398,7 +398,7 @@ jobs:
           "$PHP" artisan view:clear >/dev/null 2>&1 || true
           "$PHP" artisan package:discover
           "$PHP" artisan migrate --force --seed
-          "$PHP" artisan storage:link || true
+          [ -e public/storage ] || "$PHP" artisan storage:link || true
           if [ ! -e public/storage ]; then
             echo "public/storage is missing - material and submission downloads would 404." >&2
             exit 4
