@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Demo data must never reach the production database: every demo login uses the
-        // password "password". Set SEED_DEMO_ACCOUNTS=true to force it (UAT uses this).
+        // password "password". Set SEED_DEMO_ACCOUNTS=true to force it (the live server uses this while testing).
         if (! $this->shouldSeedDemoAccounts()) {
             if ($this->command) {
                 $this->command->warn('Demo users, class and schedule were skipped (SEED_DEMO_ACCOUNTS is off).');
@@ -266,8 +266,8 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * Demo accounts are seeded on local/UAT installs; a production install must opt in
-     * explicitly (SEED_DEMO_ACCOUNTS=true) because the demo passwords are public.
+     * Demo accounts are seeded on local/testing installs; the live server must opt
+     * in explicitly (SEED_DEMO_ACCOUNTS=true) because the demo passwords are public.
      */
     private function shouldSeedDemoAccounts(): bool
     {

@@ -86,7 +86,7 @@ class DeploymentHealthCheck extends Command
         $url = (string) config('app.url');
 
         if (! preg_match('#^https?://#', $url)) {
-            $this->recordFailure("APP_URL = '{$url}'", 'APP_URL must be the full site URL, e.g. https://uat-esh.lit-grp.com');
+            $this->recordFailure("APP_URL = '{$url}'", 'APP_URL must be the full site URL, e.g. https://eshglobal.org');
         } elseif (strpos($url, 'localhost') !== false) {
             $this->caution("APP_URL = {$url}", 'Change APP_URL to the deployed domain.');
         } else {

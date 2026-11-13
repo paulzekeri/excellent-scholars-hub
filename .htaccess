@@ -1,8 +1,8 @@
 # =====================================================================
 # ESH LMS - cPanel front controller
 # ---------------------------------------------------------------------
-# The cPanel document root for uat-esh.lit-grp.com is a normal folder
-# (/home/litgrpco/uat-esh.lit-grp.com) that receives the whole Laravel
+# The cPanel document root for eshglobal.org is a normal folder
+# (/home/litgrpco/eshglobal.org) that receives the whole Laravel
 # application, because changing the document root to public/ is not always
 # possible. This file therefore lives in that folder and forwards every
 # request into public/, so app/, config/, database/, storage/, vendor/ and

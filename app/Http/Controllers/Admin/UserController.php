@@ -356,8 +356,8 @@ class UserController extends Controller
     /**
      * Send a one-time reset link to a user who forgot their password.
      *
-     * When the installation has no working mailer (UAT uses the `log` driver),
-     * the link is shown to the administrator instead so nobody is locked out.
+     * When the installation has no working mailer (the live server uses the `log`
+     * driver), the link is shown to the administrator instead so nobody is locked out.
      * The link is single-use and expires after `auth.passwords.users.expire`.
      */
     public function sendPasswordReset(User $user)
@@ -401,7 +401,7 @@ class UserController extends Controller
 
     /**
      * Reset a child who has no mailbox: the one-time link goes to the guardian,
-     * or is flashed for the administrator when mail cannot deliver (UAT).
+     * or is flashed for the administrator when mail cannot deliver (as on the live server).
      */
     private function sendGuardianResetLink(User $user)
     {

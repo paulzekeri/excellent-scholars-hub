@@ -130,7 +130,7 @@ field on parent side should have what class the payment is for and it should be 
 
 2. categorised sending of message by Parent / tutors / students / per class
 
-3. https://uat-esh.lit-grp.com/learner/dashboard the ongoing class or next immediate class should be on the panel so there are two many clicks
+3. https://eshglobal.org/learner/dashboard the ongoing class or next immediate class should be on the panel so there are two many clicks
 to get to enter class. 
 
 4.Teachers to be able to upload files or images with assignment 

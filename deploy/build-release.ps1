@@ -9,7 +9,7 @@
     caches, public/storage (recreated on the server with `php artisan storage:link`).
 
 .PARAMETER OutFile
-    Destination zip. Defaults to deploy\esh-uat-release.zip.
+    Destination zip. Defaults to deploy\eshglobal-release.zip.
 
 .PARAMETER SkipVendor
     Leave vendor/ out - use this when the server runs `composer install` itself.
@@ -30,7 +30,7 @@ $ErrorActionPreference = 'Stop'
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
 
 if (-not $OutFile) {
-    $OutFile = Join-Path $scriptDir 'esh-uat-release.zip'
+    $OutFile = Join-Path $scriptDir 'eshglobal-release.zip'
 }
 
 $root = Split-Path -Parent $scriptDir

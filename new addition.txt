@@ -11,7 +11,7 @@ allow receipt upload / alow them to chose payment per term or class etc
 
 categorised sending of message by Parent / tutors / students / per class
 
-https://uat-esh.lit-grp.com/learner/dashboard the ongoing or nearest class should be on the panel
+https://eshglobal.org/learner/dashboard the ongoing or nearest class should be on the panel
 
 teachers to be able to upload pictures with assignment 
 the max number of students should not be mandatory

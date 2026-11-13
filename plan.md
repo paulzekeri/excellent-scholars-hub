@@ -79,9 +79,9 @@
 - [x] Documentation updated (`README.md`, in-app user guide)
 
 ## Phase 10: Deployment
-- [x] UAT target confirmed: `uat-esh.lit-grp.com` (cPanel account `litgrpco`; the document root holds the app and the
+- [x] Live target confirmed: `eshglobal.org` (cPanel account `litgrpco`; the document root holds the app and the
       root `.htaccess` forwards every request into `public/`, so no docroot change is needed)
-- [x] `.env.uat.example` / `.env.production.example` templates (secure cookies, UAT-only demo seeding)
+- [x] `.env.uat.example` / `.env.production.example` templates (secure cookies, demo seeding only while testing)
 - [x] `.github/workflows/deploy-cpanel.yml`: push to `main` → Composer install → SFTP mirror (`lftp`) → prune deleted
       files → `migrate --force --seed`, `storage:link`, `config:cache`, `view:cache`, `esh:health` over SSH
       (same pattern as `tcntiu-debug/Smart-Church`, which publishes `dev.lit-grp.com` on push)

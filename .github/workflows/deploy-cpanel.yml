@@ -1,8 +1,8 @@
-name: Deploy to cPanel (UAT)
+name: Deploy to cPanel
 
 # ---------------------------------------------------------------------------
 # Push to main  ->  build the app on the runner  ->  publish over SFTP to
-# https://uat-esh.lit-grp.com  ->  run the artisan post-deploy steps.
+# https://eshglobal.org  ->  run the artisan post-deploy steps.
 #
 # Same mechanism as tcntiu-debug/Smart-Church (.github/workflows/deploy-cpanel.yml),
 # which is how dev.lit-grp.com is published: nobody logs in by hand, the GitHub
@@ -10,7 +10,7 @@ name: Deploy to cPanel (UAT)
 # the files `git rm` removed from the repository.
 #
 # LAYOUT ON THE SERVER
-#   The cPanel document root (default /home/litgrpco/uat-esh.lit-grp.com) holds the
+#   The cPanel document root (default /home/litgrpco/eshglobal.org) holds the
 #   whole Laravel app and the repository's root .htaccess forwards every request
 #   into public/. So app/, config/, storage/, vendor/ and .env are never reachable
 #   from a URL, and the document root does not have to be changed in cPanel.
@@ -22,14 +22,14 @@ name: Deploy to cPanel (UAT)
 #
 # Optional repository secret:
 #   UAT_ENV_CONTENT  the complete server .env file as text. It is used ONCE,
-#                    and only when uat-esh.lit-grp.com/.env is missing or empty;
+#                    and only when eshglobal.org/.env is missing or empty;
 #                    CRLF endings are stripped before it is written (chmod 600).
 #                    Leave it unset when .env is managed by hand in File Manager.
 #
 # Optional repository variables (same screen, "Variables" tab):
 #   CPANEL_SSH_PORT    22 (default)
 #   CPANEL_REMOTE_DIR  app folder RELATIVE to the account home
-#                      (default: uat-esh.lit-grp.com/)
+#                      (default: eshglobal.org/)
 #
 # NEVER uploaded (they only exist on the server): .env, storage/ uploads,
 # public/storage, bootstrap/cache/*.php, .well-known.
@@ -47,7 +47,7 @@ on:
         default: Manual deployment
 
 concurrency:
-  group: cpanel-deploy-uat-${{ github.ref }}
+  group: cpanel-deploy-eshglobal-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -130,7 +130,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
-          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
         run: |
           set -euo pipefail
           sudo apt-get update -qq
@@ -198,7 +198,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
-          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
           BEFORE_SHA: ${{ github.event.before }}
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -274,7 +274,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
-          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
         run: |
           set -euo pipefail
           sudo apt-get install -y -qq sshpass
@@ -285,7 +285,7 @@ jobs:
           echo "upload target $HOME/__REMOTE_DIR__:"
           ls -A "$HOME/__REMOTE_DIR__" 2>&1 | head -10 | sed 's/^/    /'
           echo "--- candidate document roots ---"
-          for d in public_html uat-esh.lit-grp.com public_html/uat-esh.lit-grp.com uat-esh.lit-grp.com/public_html; do
+          for d in public_html eshglobal.org public_html/eshglobal.org eshglobal.org/public_html; do
             if [ -d "$HOME/$d" ]; then
               echo "  $d -> $(ls -A "$HOME/$d" | wc -l) entries: $(ls -A "$HOME/$d" | head -6 | tr '\n' ' ')"
             else
@@ -296,15 +296,15 @@ jobs:
           uapi --user="$(id -un)" DomainInfo list_domains --output=json 2>/dev/null \
             | tr ',' '\n' \
             | grep -E '"(domain|documentroot)"' \
-            | grep -i -B1 -A2 'uat-esh' \
+            | grep -i -B1 -A2 'eshglobal' \
             | head -20 || echo "  (uapi unavailable)"
           echo "--- index files under the docroot candidates ---"
-          for d in public_html uat-esh.lit-grp.com public_html/uat-esh.lit-grp.com; do
+          for d in public_html eshglobal.org public_html/eshglobal.org; do
             [ -f "$HOME/$d/index.php" ] && echo "  $d/index.php exists"
             [ -f "$HOME/$d/public/index.php" ] && echo "  $d/public/index.php exists"
           done
           echo "--- .env files (keys only, no values) ---"
-          for envf in "$HOME/__REMOTE_DIR__/.env" "$HOME/public_html/uat-esh.lit-grp.com/.env"; do
+          for envf in "$HOME/__REMOTE_DIR__/.env" "$HOME/public_html/eshglobal.org/.env"; do
             [ -f "$envf" ] || { echo "  ${envf#$HOME/} -> missing"; continue; }
             echo "  ${envf#$HOME/}: $(wc -c < "$envf") bytes, $(grep -c '' "$envf") lines, $(tr -cd '\r' < "$envf" | wc -c) CR bytes"
             echo "    keys: $(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p' "$envf" | tr '\n' ' ')"
@@ -341,7 +341,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
-          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
           ENV_CONTENT: ${{ secrets.UAT_ENV_CONTENT }}
         run: |
           set -euo pipefail
@@ -402,7 +402,7 @@ jobs:
           SSH_HOST: ${{ secrets.CPANEL_HOST }}
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
-          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
         run: |
           set -euo pipefail
           sudo apt-get install -y -qq sshpass
@@ -507,13 +507,13 @@ jobs:
             echo ""
             echo "| Field | Value |"
             echo "| --- | --- |"
-            echo "| Site | https://uat-esh.lit-grp.com |"
+            echo "| Site | https://eshglobal.org |"
             echo "| Commit | \`${GITHUB_SHA:0:12}\` |"
             echo "| Transport | \`sftp\` (lftp mirror) |"
-            echo "| Remote directory | \`${REMOTE_DIR:-uat-esh.lit-grp.com/}\` |"
+            echo "| Remote directory | \`${REMOTE_DIR:-eshglobal.org/}\` |"
             echo "| Run | ${{ github.run_id }} (attempt ${{ github.run_attempt }}) |"
             echo ""
             echo "Check the site, then walk the smoke-test matrix in DEPLOYMENT.md section 5."
           } >> "$GITHUB_STEP_SUMMARY"
         env:
-          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'uat-esh.lit-grp.com/' }}
+          REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
