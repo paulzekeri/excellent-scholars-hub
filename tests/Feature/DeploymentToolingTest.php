@@ -122,12 +122,20 @@ class DeploymentToolingTest extends TestCase
         $workflow = file_get_contents($root.'/.github/workflows/deploy-cpanel.yml');
         $this->assertStringContainsString("--exclude='.env'", $workflow, 'The pipeline must never overwrite the server .env.');
         $this->assertStringContainsString('Bootstrap server .env', $workflow, 'A first deploy needs a way to create .env on the server.');
-        $this->assertStringContainsString('secrets.UAT_ENV_CONTENT', $workflow);
+        $this->assertStringContainsString('secrets.ENV_CONTENT', $workflow);
+        $this->assertStringContainsString("'eshglobal.org/'", $workflow, 'Production deploys to the eshglobal.org document root.');
         $this->assertStringContainsString('Report remote layout', $workflow, 'A wrong remote directory must be visible in the log.');
         $this->assertStringContainsString('artisan storage:link', $workflow);
         $this->assertStringContainsString('artisan esh:health', $workflow);
         $this->assertStringContainsString('artisan config:clear', $workflow, 'A cached config would hide edits to .env.');
         $this->assertStringContainsString("PHP_VERSION: '8.4'", $workflow, 'Laravel 13 runs on PHP 8.3 - 8.5; 8.4 matches the cPanel domain.');
+
+        // The UAT pipeline is the same work on a separate branch, domain and secrets.
+        $uatWorkflow = file_get_contents($root.'/.github/workflows/deploy-cpanel-uat.yml');
+        $this->assertStringContainsString('secrets.UAT_ENV_CONTENT', $uatWorkflow);
+        $this->assertStringContainsString("'uat.eshglobal.org/'", $uatWorkflow);
+        $this->assertStringContainsString("      - uat", $uatWorkflow, 'The UAT pipeline must listen to the uat branch, not main.');
+        $this->assertStringNotContainsString("      - main", $uatWorkflow);
 
         // Laravel 13 *can* cache routes — the pipeline may even run `artisan optimize`.
         // That only holds while no route *action* is a closure, because closures

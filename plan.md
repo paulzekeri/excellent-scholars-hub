@@ -79,11 +79,17 @@
 - [x] Documentation updated (`README.md`, in-app user guide)
 
 ## Phase 10: Deployment
-- [x] Live target confirmed: `eshglobal.org` (cPanel account `litgrpco`; the document root holds the app and the
+- [x] Repository moved to the **`paulzekeri`** GitHub account
+      (`https://github.com/paulzekeri/excellent-scholars-hub`); local `origin` points there. Secrets and
+      variables are per-repository and must be recreated in the new account.
+- [x] Production target confirmed: `https://eshglobal.org` (branch `main`; the document root holds the app and the
       root `.htaccess` forwards every request into `public/`, so no docroot change is needed)
-- [x] `.env.uat.example` / `.env.production.example` templates (secure cookies, demo seeding only while testing)
-- [x] `.github/workflows/deploy-cpanel.yml`: push to `main` → Composer install → SFTP mirror (`lftp`) → prune deleted
-      files → `migrate --force --seed`, `storage:link`, `config:cache`, `view:cache`, `esh:health` over SSH
+- [x] UAT target: `https://uat.eshglobal.org` (branch `uat`, separate database, demo accounts seeded)
+- [x] `.env.uat.example` (UAT) / `.env.production.example` (production) templates (secure cookies, demo seeding only
+      on UAT/testing)
+- [x] `.github/workflows/deploy-cpanel.yml` (production, `main`) and `deploy-cpanel-uat.yml` (UAT, `uat`): Composer
+      install → SFTP mirror (`lftp`) → prune deleted files → `migrate --force --seed`, `storage:link`,
+      `config:cache`, `view:cache`, `esh:health` over SSH
       (same pattern as `tcntiu-debug/Smart-Church`, which publishes `dev.lit-grp.com` on push)
 - [x] root `.htaccess` front controller (403 for `.env`/`artisan`/`composer.*`/`*.sql|log|sh|yml`) + `.user.ini`
       (100M uploads, 256M memory, `session.upload_progress.enabled=0`)

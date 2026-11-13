@@ -105,21 +105,29 @@ php artisan esh:create-admin --role=ceo
 
 ## Deployment
 
-The live site is **`https://eshglobal.org`** — a cPanel domain whose document root holds the whole app
-(the repository's root `.htaccess` forwards every request into `public/`). Every push to `main` is published
-by **GitHub Actions** (`.github/workflows/deploy-cpanel.yml`: build `vendor/`, SFTP mirror, prune, then
-`migrate`/`storage:link`/caches/`esh:health` over SSH) — the same pipeline pattern used for `dev.lit-grp.com`.
-The full runbook — secrets, domain/PHP/database setup, the cPanel Git pipeline (`.cpanel.yml`), the
-release-zip fallback (`deploy/build-release.ps1`), the smoke-test matrix, running a separate staging copy and
-rollback — is in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+The repository is **`https://github.com/paulzekeri/excellent-scholars-hub`** (moved from
+`tcntiu-debug/excellent-scholars-hub`). Two cPanel environments deploy from it with GitHub Actions:
+
+| Environment | Branch | URL | Workflow |
+|---|---|---|---|
+| Production | `main` | `https://eshglobal.org` | `.github/workflows/deploy-cpanel.yml` |
+| UAT | `uat` | `https://uat.eshglobal.org` | `.github/workflows/deploy-cpanel-uat.yml` |
+
+Both build `vendor/` on the runner, mirror the tree over SFTP (never `.env`, uploads, `public/storage`
+or `bootstrap/cache`), prune files removed from the repo, then run
+`migrate`/`storage:link`/caches/`esh:health` over SSH. Secrets and variables are per-repository, so
+they must be created again in the new account (production `CPANEL_*` + `ENV_CONTENT`, UAT
+`UAT_CPANEL_*` + `UAT_ENV_CONTENT`). The full runbook — transfer checklist, secrets, domain/PHP/database
+setup, the cPanel Git pipeline (`.cpanel.yml`), the release-zip fallback (`deploy/build-release.ps1`),
+the smoke-test matrix and rollback — is in **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 Environment templates:
 
 | File | Use |
 |---|---|
 | `.env.example` | local development |
-| `.env.uat.example` | the live server / testing (`APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`) |
-| `.env.production.example` | go-live (`SEED_DEMO_ACCOUNTS=false`, `LOG_LEVEL=warning`) |
+| `.env.uat.example` | UAT at `uat.eshglobal.org` (`APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`) |
+| `.env.production.example` | production at `eshglobal.org` (`SEED_DEMO_ACCOUNTS=false`, `LOG_LEVEL=warning`) |
 
 Two commands support the deploy:
 
@@ -384,19 +392,21 @@ sitting, then the school only confirms the money arrived.
 
 
 ### Deployment kit (`eshglobal.org`)
-- **`.github/workflows/deploy-cpanel.yml`** — push-to-`main` pipeline: Composer install with `--no-dev`, SFTP
-  mirror (`lftp`) to `~/eshglobal.org/`, pruning of files removed from the repo, then `migrate --force
-  --seed`, `storage:link`, `config:cache`, `view:cache` and `esh:health` over SSH. Never uploads `.env`,
-  `storage/` uploads or `public/storage`.
+- **`.github/workflows/deploy-cpanel.yml`** — production pipeline on push to `main`: Composer install with
+  `--no-dev`, SFTP mirror (`lftp`) to `~/eshglobal.org/`, pruning of files removed from the repo, then
+  `migrate --force --seed`, `storage:link`, `config:cache`, `view:cache` and `esh:health` over SSH. Never
+  uploads `.env`, `storage/` uploads or `public/storage`.
+- **`.github/workflows/deploy-cpanel-uat.yml`** — the same pipeline for UAT on push to `uat`
+  (`~/uat.eshglobal.org/`, `UAT_CPANEL_*` secrets, `UAT_ENV_CONTENT`).
 - **`.htaccess` (repository root)** — forwards every request into `public/` and returns 403 for `.env`,
   `artisan`, `composer.*`, `*.log`, `*.sql`, `*.sh`, `*.yml`, so the app can live inside the document root.
 - **`.user.ini`** — 100 MB upload limits, 256 MB memory and `session.upload_progress.enabled=0`.
-- **`DEPLOYMENT.md`** — cPanel runbook: secrets, domain/PHP/MySQL setup, GitHub Actions deploy, cPanel Git
-  pipeline, release zip, smoke-test matrix, optional separate staging copy, rollback and troubleshooting.
+- **`DEPLOYMENT.md`** — cPanel runbook: repository transfer, secrets, domain/PHP/MySQL setup, GitHub Actions
+  deploy for production and UAT, cPanel Git pipeline, release zip, smoke-test matrix, rollback and troubleshooting.
 - **`.cpanel.yml`** — fallback cPanel *Git™ Version Control* tasks (composer install, `migrate --force --seed`,
   `storage:link`, config/view caches, `esh:health`) that never overwrite `.env` or `storage/` uploads.
-- **`.env.uat.example` / `.env.production.example`** — environment templates (`eshglobal.org`, secure cookies,
-  demo seeding only while testing).
+- **`.env.uat.example` / `.env.production.example`** — environment templates for `uat.eshglobal.org` and
+  `eshglobal.org` (secure cookies, demo seeding only on UAT/testing).
 - **`php artisan esh:health`** — post-deploy check of PHP/extensions, `APP_KEY`/`APP_URL`, database, pending migrations,
   writable `storage`/`bootstrap/cache`, `public/storage` link, upload limits, admin logins and leftover demo accounts.
 - **`php artisan esh:create-admin`** — creates the first CEO/administrator login (and the role rows) on a fresh

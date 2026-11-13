@@ -4,24 +4,27 @@ name: Deploy to cPanel
 # Push to main  ->  build the app on the runner  ->  publish over SFTP to
 # https://eshglobal.org  ->  run the artisan post-deploy steps.
 #
+# This is the PRODUCTION workflow (https://eshglobal.org, `main` branch). The UAT
+# site (https://uat.eshglobal.org) deploys from deploy-cpanel-uat.yml on `uat`.
+#
 # Same mechanism as tcntiu-debug/Smart-Church (.github/workflows/deploy-cpanel.yml),
 # which is how dev.lit-grp.com is published: nobody logs in by hand, the GitHub
 # runner builds vendor/, mirrors a staged tree over SFTP (lftp) and then deletes
 # the files `git rm` removed from the repository.
 #
 # LAYOUT ON THE SERVER
-#   The cPanel document root (default /home/litgrpco/eshglobal.org) holds the
+#   The cPanel document root (default /home/<account>/eshglobal.org) holds the
 #   whole Laravel app and the repository's root .htaccess forwards every request
 #   into public/. So app/, config/, storage/, vendor/ and .env are never reachable
 #   from a URL, and the document root does not have to be changed in cPanel.
 #
 # Required repository secrets   (Settings -> Secrets and variables -> Actions):
-#   CPANEL_HOST      SSH/SFTP host - 147.124.220.162 or ftp.lit-grp.com
-#   CPANEL_USER      cPanel username - litgrpco
+#   CPANEL_HOST      SSH/SFTP host of the account that hosts eshglobal.org
+#   CPANEL_USER      that cPanel username
 #   CPANEL_PASSWORD  matching cPanel/SSH password
 #
 # Optional repository secret:
-#   UAT_ENV_CONTENT  the complete server .env file as text. It is used ONCE,
+#   ENV_CONTENT      the complete server .env file as text. It is used ONCE,
 #                    and only when eshglobal.org/.env is missing or empty;
 #                    CRLF endings are stripped before it is written (chmod 600).
 #                    Leave it unset when .env is managed by hand in File Manager.
@@ -331,7 +334,7 @@ jobs:
       # config/database.php - which is what `Access denied for user
       # 'forge'@'localhost'` in the migrate output means.
       #
-      # This step bootstraps it exactly once from the optional UAT_ENV_CONTENT
+      # This step bootstraps it exactly once from the optional ENV_CONTENT
       # secret. CRLF endings are stripped (a pasted APP_KEY with a trailing CR is
       # what made earlier hand-made files invalid) and the file is chmod 600.
       # As soon as .env exists it is never touched again.
@@ -342,11 +345,11 @@ jobs:
           SSH_USER: ${{ secrets.CPANEL_USER }}
           SSH_PORT: ${{ vars.CPANEL_SSH_PORT || 22 }}
           REMOTE_DIR: ${{ vars.CPANEL_REMOTE_DIR || 'eshglobal.org/' }}
-          ENV_CONTENT: ${{ secrets.UAT_ENV_CONTENT }}
+          ENV_CONTENT: ${{ secrets.ENV_CONTENT }}
         run: |
           set -euo pipefail
           if [ -z "${ENV_CONTENT:-}" ]; then
-            echo "UAT_ENV_CONTENT is not set: skipping the .env bootstrap, the file must already exist on the server."
+            echo "ENV_CONTENT is not set: skipping the .env bootstrap, the file must already exist on the server."
             exit 0
           fi
           sudo apt-get install -y -qq sshpass
@@ -448,7 +451,7 @@ jobs:
             echo "No .env in $(pwd)." >&2
             echo "Laravel is therefore using the 'forge'/'localhost' defaults from config/database.php, which is why migrate reports:" >&2
             echo "  SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost'" >&2
-            echo "Fix: create .env in this folder (DEPLOYMENT.md section 2.2), or set the UAT_ENV_CONTENT secret and re-run this workflow." >&2
+            echo "Fix: create .env in this folder (DEPLOYMENT.md section 2.2), or set the ENV_CONTENT secret and re-run this workflow." >&2
             exit 5
           fi
           # Caches written by the PREVIOUS release can reference classes this
@@ -489,7 +492,7 @@ jobs:
           elif [ "$rc" -eq 255 ]; then
             echo "::warning title=No SSH command execution::Files were deployed, but the artisan post-deploy steps could not run over SSH (exit 255). Run them once in cPanel > Terminal inside ${REMOTE_DIR%/}: php artisan migrate --force --seed && php artisan storage:link && php artisan config:cache && php artisan view:cache && php artisan esh:health"
           elif [ "$rc" -eq 5 ]; then
-            echo "::error title=No .env on the server::The code is live, but ${REMOTE_DIR%/} has no .env, so Laravel used the 'forge'@'localhost' defaults and migrate could not connect. Create the file (DEPLOYMENT.md section 2.2) or set the UAT_ENV_CONTENT secret, then re-run this workflow."
+            echo "::error title=No .env on the server::The code is live, but ${REMOTE_DIR%/} has no .env, so Laravel used the 'forge'@'localhost' defaults and migrate could not connect. Create the file (DEPLOYMENT.md section 2.2) or set the ENV_CONTENT secret, then re-run this workflow."
             exit 1
           elif [ "$rc" -eq 6 ]; then
             echo "::error title=Server PHP is too old::The files are deployed, but the artisan step ran on a PHP older than 8.3, so the site will show a 500 until the domain is fixed. Set ${REMOTE_DIR%/} to PHP 8.4 (ea-php84) in cPanel > MultiPHP Manager, then re-run this workflow."

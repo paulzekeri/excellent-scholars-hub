@@ -1,20 +1,30 @@
-# Deployment Guide — ESH LMS (cPanel / live site)
+# Deployment Guide — ESH LMS (cPanel / production + UAT)
 
-The live site is a **cPanel** account on `lit-grp.com` (server `147.124.220.162`, panel at
-<https://cpanel.lit-grp.com>, SSH/FTP/cPanel ports open). Everything below is written for that host
-but applies to any cPanel + MySQL + Apache environment.
+The repository lives at **https://github.com/paulzekeri/excellent-scholars-hub** (moved from
+`tcntiu-debug/excellent-scholars-hub`). Both environments are **cPanel** accounts with MySQL and Apache
+(example host `147.124.220.162`, panel <https://cpanel.lit-grp.com>, SSH/FTP ports open); everything
+below applies to any cPanel host.
 
-| Environment | URL | App path | Database | Demo accounts |
+| Environment | Branch | URL | App folder | Demo accounts |
 |---|---|---|---|---|
-| Live (production) | `https://eshglobal.org` | `/home/litgrpco/eshglobal.org` (document root) | the database created in §1 (e.g. `litgrpco_esh_live`) | **never** once real data is loaded (`SEED_DEMO_ACCOUNTS=false`); `true` only while testing |
+| Production | `main` | `https://eshglobal.org` | `/home/<account>/eshglobal.org` (document root) | **never** (`SEED_DEMO_ACCOUNTS=false`) |
+| UAT | `uat` | `https://uat.eshglobal.org` | `/home/<account>/uat.eshglobal.org` | yes (`SEED_DEMO_ACCOUNTS=true`) |
 
-> **Historical names:** the workflow secret `UAT_ENV_CONTENT` and the template `.env.uat.example`
-> keep their old "UAT" names so the pipeline and the existing server configuration keep working; both
-> now belong to the live site at `https://eshglobal.org`.
+> **DNS + SSL first:** both domains must resolve to their server and have certificates
+> (*SSL/TLS Status → Run AutoSSL*) before `SESSION_SECURE_COOKIE=true` — and before the install button /
+> phone alerts can work, since service workers require HTTPS.
 
-> **DNS + SSL first:** `eshglobal.org` must resolve to `147.124.220.162`, and AutoSSL must have issued
-> its certificate (*SSL/TLS Status → Run AutoSSL*), before `SESSION_SECURE_COOKIE=true` — and before
-> the install button / phone alerts can work, since service workers require HTTPS.
+## Moving the repository to the `paulzekeri` account
+
+1. On GitHub: repository → *Settings → General → Danger Zone → Transfer ownership* to `paulzekeri`.
+   GitHub keeps redirects from the old URL, so existing clones keep working.
+   (Alternative: create an empty `paulzekeri/excellent-scholars-hub` and `git push --mirror` to it.)
+2. In this workspace the remote is already updated:
+   `git remote -v` → `https://github.com/paulzekeri/excellent-scholars-hub.git`.
+3. **Secrets and variables are per-repository** — create them again in the new repo
+   (*Settings → Secrets and variables → Actions*): production `CPANEL_*` + `ENV_CONTENT`, UAT
+   `UAT_CPANEL_*` + `UAT_ENV_CONTENT` (see §2.1 and §6).
+4. Enable Actions, keep `main` as the default branch, and create a **`uat`** branch for UAT deploys.
 
 ## 0. What the app needs
 
@@ -55,23 +65,27 @@ but applies to any cPanel + MySQL + Apache environment.
 
 ## 2. Deploy on every push (GitHub Actions) — recommended
 
-`.github/workflows/deploy-cpanel.yml` publishes the app on every push to `main`: the runner builds
-`vendor/`, mirrors the staged tree over SFTP and then runs the artisan steps on the server. Nothing
-has to be installed on the account and no SSH session is opened by hand.
+`.github/workflows/deploy-cpanel.yml` publishes production on every push to `main`;
+`.github/workflows/deploy-cpanel-uat.yml` publishes UAT on every push to `uat`. Both build `vendor/`,
+mirror the staged tree over SFTP and then run the artisan steps on the server. Nothing has to be
+installed on the account and no SSH session is opened by hand.
 
 ### 2.1 One-time repository setup
 
 *Settings → Secrets and variables → Actions* in
-<https://github.com/tcntiu-debug/excellent-scholars-hub>:
+<https://github.com/paulzekeri/excellent-scholars-hub>:
 
 | Kind | Name | Value |
 |---|---|---|
-| Secret | `CPANEL_HOST` | `147.124.220.162` (or `ftp.lit-grp.com`) |
-| Secret | `CPANEL_USER` | `litgrpco` |
-| Secret | `CPANEL_PASSWORD` | the cPanel/SSH password |
-| Secret (optional) | `UAT_ENV_CONTENT` | the complete server `.env` as text — written once, only when `.env` is missing (CRLF stripped, `chmod 600`) |
+| Secret | `CPANEL_HOST` | host of the account that serves `eshglobal.org` |
+| Secret | `CPANEL_USER` | that cPanel username |
+| Secret | `CPANEL_PASSWORD` | its cPanel/SSH password |
+| Secret (optional) | `ENV_CONTENT` | the complete production `.env` as text — written once, only when `.env` is missing (CRLF stripped, `chmod 600`) |
 | Variable (optional) | `CPANEL_SSH_PORT` | `22` (the default) |
 | Variable (optional) | `CPANEL_REMOTE_DIR` | `eshglobal.org/` (the default) |
+| Secret | `UAT_CPANEL_HOST` / `UAT_CPANEL_USER` / `UAT_CPANEL_PASSWORD` | the same three for `uat.eshglobal.org` (§6) |
+| Secret (optional) | `UAT_ENV_CONTENT` | the UAT `.env` body (from `.env.uat.example`) |
+| Variable (optional) | `UAT_CPANEL_REMOTE_DIR` | `uat.eshglobal.org/` (the default) |
 
 ### 2.2 What a deploy does
 
@@ -79,7 +93,7 @@ has to be installed on the account and no SSH session is opened by hand.
 2. `rsync` a staged tree, then `lftp` mirrors it to `~/eshglobal.org/` over SFTP. Never
    uploaded: `.env`, `storage/` uploads, `public/storage`, `bootstrap/cache/*.php`, `.well-known`.
 3. Prunes exactly the files `git rm` removed since the last successful run.
-4. If `~/eshglobal.org/.env` is missing **and** the optional `UAT_ENV_CONTENT` secret is set,
+4. If `~/eshglobal.org/.env` is missing **and** the optional `ENV_CONTENT` secret is set,
    writes it once from that secret (`chmod 600`, Windows CRLF stripped). An existing `.env` is never
    modified; without the secret the step prints a note and moves on.
 5. Over SSH (the same shell *cPanel → Terminal* uses): `config:clear`, `migrate --force --seed`,
@@ -120,7 +134,7 @@ SQLSTATE[HY000] [1045] Access denied for user 'forge'@'localhost' (using passwor
 That message means **"there is no `.env` in `~/eshglobal.org`"** — it is not a wrong database
 password. Create the file once, with either:
 
-* **Automated:** add the repository secret `UAT_ENV_CONTENT`, paste the whole `.env` body (same keys
+* **Automated:** add the repository secret `ENV_CONTENT`, paste the whole `.env` body (same keys
   as `.env.uat.example`) and re-run the workflow. The *Bootstrap server .env* step writes it, strips
   CRLF and sets `chmod 600`; later runs leave it untouched.
 * **Manual:** *cPanel → File Manager* → `eshglobal.org` → **+ File** → name it `.env` → paste
@@ -151,7 +165,7 @@ If Actions is not an option, the same layout can be maintained by hand:
 ```bash
 # 1. Get the code (first deploy only)
 cd ~
-git clone https://github.com/tcntiu-debug/excellent-scholars-hub.git eshglobal.org
+git clone https://github.com/paulzekeri/excellent-scholars-hub.git eshglobal.org
 cd eshglobal.org
 
 # 2. PHP dependencies (vendor/ is git-ignored)
@@ -222,7 +236,7 @@ Commit* — use it when cPanel itself clones the repository. It produces the sam
 the document root, root `.htaccess` → `public/`).
 
 1. *cPanel → Git™ Version Control → Create* → clone
-   `https://github.com/tcntiu-debug/excellent-scholars-hub.git`, branch `main`, repository path
+   `https://github.com/paulzekeri/excellent-scholars-hub.git`, branch `main`, repository path
    `repositories/esh-uat`.
 2. The committed `.cpanel.yml` already targets `/home/litgrpco/eshglobal.org` and
    `/opt/cpanel/ea-php84/root/usr/bin/php`; change those two values for a different account or PHP
@@ -295,27 +309,29 @@ Then walk through the app on `https://eshglobal.org`:
 | 11 | Any broken URL | Laravel 404 page, never a stack trace (`APP_DEBUG=false`) |
 | 12 | `https://eshglobal.org/.env`, `/artisan`, `/composer.json`, `/app/Models/User.php` | **403** for the dotfile/blocked names, **404** for the app path — the root `.htaccess` forwards into `public/`, so no source file is served |
 
-## 6. Running a separate staging copy (optional)
+## 6. UAT at `uat.eshglobal.org`
 
-The live site is the deployment described above. If you later want a staging copy so a test push can
-never touch live data:
+`.github/workflows/deploy-cpanel-uat.yml` is the same pipeline for a second, throw-away environment, so
+a test push can never touch production data.
 
-1. **Back up first**: *cPanel → Backup* (or phpMyAdmin export) of the live DB, plus a copy of the
-   live app folder.
-2. Create a **separate** database/user and domain (e.g. `staging.eshglobal.org`) — never point it at
-   the live database. Its document root becomes the staging app folder
-   (`/home/litgrpco/staging.eshglobal.org`).
-3. Deploy a branch other than `main`: copy `.github/workflows/deploy-cpanel.yml` to
-   `deploy-cpanel-staging.yml`, change the secret names (`STAGING_CPANEL_*`), `CPANEL_REMOTE_DIR`
-   (`staging.eshglobal.org/`) and restrict it to `on.push.branches: [staging]` so a staging push can
-   never reach live (the same split Smart-Church uses). Create its `.env` from `.env.uat.example`
-   (`APP_ENV=production`, `APP_DEBUG=false`, `LOG_LEVEL=warning`, `SEED_DEMO_ACCOUNTS=true`, that
-   domain's `APP_URL`) and run:
-   * `php artisan migrate --force --seed`;
-   * `php artisan storage:link` and `php artisan esh:health`.
-4. Protect it (cPanel → *Directory Privacy*) so it is not indexed, and point AutoSSL at it too.
-5. Re-run the §5 table against the live site with real accounts after each deploy, and against staging
-   before promoting a risky change.
+1. **Create the domain:** *cPanel → Domains → Create A New Domain* → `uat.eshglobal.org`, keep the
+   folder cPanel proposes (`/home/<account>/uat.eshglobal.org`), assign **PHP 8.4**, the same 100M INI
+   limits as §1, and run AutoSSL for it.
+2. **Separate database/user** (never the production one), then create its `.env` from
+   `.env.uat.example`: `APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`,
+   `APP_URL=https://uat.eshglobal.org`, `SESSION_SECURE_COOKIE=true`. Set the `UAT_ENV_CONTENT` secret
+   and the workflow writes it once, exactly like production.
+3. **Repository secrets/variables** in the new repo: `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`,
+   `UAT_CPANEL_PASSWORD`; optionally `UAT_CPANEL_REMOTE_DIR` (`uat.eshglobal.org/`, the default) and
+   `UAT_CPANEL_SSH_PORT`.
+4. **Deploy:** `git push origin uat` (create the branch from `main` first with
+   `git push origin main:uat`). The workflow mirrors the tree, runs `migrate --force --seed`,
+   `storage:link`, the caches and `esh:health` against the UAT database.
+5. **Verify:** walk the §5 table against `https://uat.eshglobal.org` with the demo accounts, then merge
+   into `main` to publish production.
+6. Keep the UAT copy private if you like (cPanel → *Directory Privacy*), and remember it needs its own
+   `php artisan push:keys` pair (or copy the production pair) plus the `schedule:run` cron for phone
+   alerts — see `PWA.md`.
 
 ## 7. Rollback & troubleshooting
 
