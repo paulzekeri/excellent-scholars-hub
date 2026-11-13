@@ -493,7 +493,7 @@
             <h3 class="mt-1 font-display text-xl font-bold text-white">Talk to us</h3>
             <ul class="mt-4 space-y-3 text-blue-50 text-sm">
                 <li><i class="fas fa-phone text-sun mr-3"></i><a href="tel:+2348119656244" class="transition hover:text-sun">+234 811 965 6244</a></li>
-                <li><i class="fas fa-envelope text-sun mr-3"></i><a href="mailto:excellentscholars2@gmail.com" class="transition hover:text-sun">excellentscholars2@gmail.com</a></li>
+                <li><i class="fas fa-envelope text-sun mr-3"></i><a href="mailto:admin@eshglobal.org" class="transition hover:text-sun">admin@eshglobal.org</a></li>
                 <li><i class="fas fa-video text-sun mr-3"></i>All classes and assessments run live online (Google Meet or Zoom)</li>
                 <li><i class="fas fa-clock text-sun mr-3"></i>Monday – Saturday, 8:00am – 6:00pm</li>
             </ul>
