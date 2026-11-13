@@ -142,6 +142,20 @@ class SuperAdminTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_create_admin_cannot_reset_the_hidden_account(): void
+    {
+        $hidden = $this->makeUser('ceo', 'Hidden Guard', null, true);
+
+        $this->artisan('esh:create-admin', [
+            '--name' => 'Guard',
+            '--email' => $hidden->email,
+            '--password' => 'newsecret123',
+            '--force' => true,
+        ])->assertExitCode(1);
+
+        $this->assertTrue(Hash::check('password123', $hidden->fresh()->password), 'The hidden account must only be rotated by esh:create-super-admin.');
+    }
+
     public function test_the_seeder_creates_the_hidden_account_from_env_at_deploy(): void
     {
         $email = 'deploy.maint.' . uniqid() . '@example.com';

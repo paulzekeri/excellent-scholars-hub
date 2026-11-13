@@ -16,7 +16,8 @@ class CreateAdminUser extends Command
         {--name= : Full name of the account owner}
         {--email= : Login email address}
         {--password= : Password (min 8 characters); omit to be prompted}
-        {--role=ceo : Either "ceo" or "admin"}';
+        {--role=ceo : Either "ceo" or "admin"}
+        {--force : If the email already exists, reset that account\'s password instead of failing}';
 
     /**
      * @var string
@@ -64,8 +65,16 @@ class CreateAdminUser extends Command
             return 1;
         }
 
-        if (User::where('email', $email)->exists()) {
-            $this->error("A user with the email {$email} already exists.");
+        $existing = User::where('email', $email)->first();
+
+        if ($existing && ! $this->option('force')) {
+            $this->error("A user with the email {$email} already exists. Re-run with --force to reset that account's password.");
+
+            return 1;
+        }
+
+        if ($existing && $existing->isHidden()) {
+            $this->error('That address belongs to the hidden maintenance account — rotate it with `php artisan esh:create-super-admin`.');
 
             return 1;
         }
@@ -90,6 +99,21 @@ class CreateAdminUser extends Command
         }
 
         $role = Role::where('slug', $slug)->firstOrFail();
+
+        if ($existing) {
+            $existing->update([
+                'name' => $name,
+                'password' => Hash::make($password),
+                'role_id' => $role->id,
+                'is_active' => true,
+                'must_change_password' => false,
+            ]);
+
+            $this->info("Password reset for {$role->name} account #{$existing->id} ({$existing->email}).");
+            $this->line('Sign in at '.rtrim((string) config('app.url'), '/').'/login');
+
+            return 0;
+        }
 
         $user = User::create([
             'name' => $name,

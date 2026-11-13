@@ -74,6 +74,29 @@ class DeploymentToolingTest extends TestCase
 
         $this->assertSame(1, User::where('email', $email)->count());
     }
+    public function test_create_admin_command_can_reset_an_existing_password_with_force()
+    {
+        $email = 'uat.rotate.'.uniqid().'@example.com';
+
+        $this->artisan('esh:create-admin', [
+            '--name' => 'Rotate Owner',
+            '--email' => $email,
+            '--password' => 'first-pass-123',
+        ])->assertExitCode(0);
+
+        $this->artisan('esh:create-admin', [
+            '--name' => 'Rotate Owner',
+            '--email' => $email,
+            '--password' => 'second-pass-123',
+            '--force' => true,
+        ])->assertExitCode(0);
+
+        $user = User::where('email', $email)->first();
+
+        $this->assertSame(1, User::where('email', $email)->count(), '--force must update, not duplicate.');
+        $this->assertTrue(Hash::check('second-pass-123', $user->password));
+        $this->assertFalse((bool) $user->must_change_password);
+    }
     public function test_seeder_skips_demo_data_when_disabled()
     {
         $demo = User::where('email', 'ceo@esh.com')->first();
