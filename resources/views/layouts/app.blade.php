@@ -9,6 +9,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <meta name="theme-color" content="#0a2550">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
@@ -36,6 +38,15 @@
         };
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {{-- Web Push: the public half of the VAPID pair is public by definition and is
+         what lets this browser subscribe (public/assets/js/esh-pwa.js). --}}
+    @php $eshPushKey = app(\App\Services\WebPushService::class)->publicKey(); @endphp
+    @if($eshPushKey && \Illuminate\Support\Facades\Route::has('push.status'))
+        <meta name="esh-push-key" content="{{ $eshPushKey }}">
+        <meta name="esh-push-status-url" content="{{ route('push.status') }}">
+        <meta name="esh-push-subscribe-url" content="{{ route('push.subscribe') }}">
+        <meta name="esh-push-unsubscribe-url" content="{{ route('push.unsubscribe') }}">
+    @endif
     {{-- Laravel Livewire is no longer installed: nothing in this app used it. --}}
 </head>
 <body class="bg-[#F5F8FC] font-sans antialiased">
@@ -176,6 +187,9 @@
             });
         });
     </script>
+    {{-- Registers the service worker, captures Chrome's install prompt and keeps a
+         Web Push subscription fresh — see PWA.md. --}}
+    <script src="{{ asset('assets/js/esh-pwa.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

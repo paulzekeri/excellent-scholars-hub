@@ -74,6 +74,26 @@ class ClassScheduleService
     }
 
     /**
+     * The Monday that starts the week containing $value. A blank, hand-typed or
+     * broken value falls back to the current week, so a bad `?week=` link can
+     * never break the admin or tutor schedules screens.
+     */
+    public static function weekStart($value = null): Carbon
+    {
+        $date = null;
+
+        if (is_string($value) && trim($value) !== '') {
+            try {
+                $date = Carbon::parse(trim($value));
+            } catch (\Throwable $e) {
+                $date = null;
+            }
+        }
+
+        return ($date ?? now())->startOfWeek(Carbon::MONDAY)->startOfDay();
+    }
+
+    /**
      * Validation rules that depend on the repeat choice. Shared by the admin and
      * tutor schedule forms so both behave the same way.
      *

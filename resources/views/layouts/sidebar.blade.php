@@ -51,6 +51,7 @@
                 ['label' => 'Attendance', 'icon' => 'fa-clipboard-check', 'route' => 'admin.oversight.attendance'],
                 ['label' => 'Assignment Review', 'icon' => 'fa-tasks', 'route' => 'admin.oversight.assignments'],
                 ['label' => 'Materials', 'icon' => 'fa-folder-open', 'route' => 'admin.oversight.materials'],
+                ['label' => 'Class Library', 'icon' => 'fa-book', 'route' => 'admin.class-library.index'],
             ],
         ];
 
@@ -108,6 +109,7 @@
                 ['label' => 'Schedules', 'icon' => 'fa-calendar-alt', 'route' => 'tutor.schedules.index'],
                 ['label' => 'Assignments', 'icon' => 'fa-tasks', 'route' => 'tutor.assignments.index'],
                 ['label' => 'Materials', 'icon' => 'fa-folder-open', 'route' => 'tutor.materials.index'],
+                ['label' => 'Class Library', 'icon' => 'fa-book', 'route' => 'tutor.class-library.index'],
                 ['label' => 'Learning Goals', 'icon' => 'fa-bullseye', 'route' => 'tutor.learning-goals.index'],
                 ['label' => 'Assessments', 'icon' => 'fa-video', 'route' => 'tutor.assessments.index', 'match' => 'tutor.assessments.*'],
             ],
@@ -168,6 +170,7 @@
                 ['label' => 'My Classes', 'icon' => 'fa-chalkboard', 'route' => 'learner.classes'],
                 ['label' => 'Assignments', 'icon' => 'fa-tasks', 'route' => 'learner.assignments'],
                 ['label' => 'Materials', 'icon' => 'fa-folder-open', 'route' => 'learner.materials'],
+                ['label' => 'Class Library', 'icon' => 'fa-book', 'route' => 'learner.class-library.index'],
                 ['label' => 'Learning Goals', 'icon' => 'fa-bullseye', 'route' => 'learner.learning-goals.index', 'match' => 'learner.learning-goals.*'],
             ],
         ];

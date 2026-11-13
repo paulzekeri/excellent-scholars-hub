@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ClassController as AdminClassController;
+use App\Http\Controllers\Admin\ClassLibraryController as AdminClassLibraryController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PaymentAccountController as AdminPaymentAccountController;
@@ -21,16 +22,19 @@ use App\Http\Controllers\Tutor\ScheduleController as TutorScheduleController;
 use App\Http\Controllers\Tutor\AttendanceController as TutorAttendanceController;
 use App\Http\Controllers\Tutor\AssignmentController as TutorAssignmentController;
 use App\Http\Controllers\Tutor\MaterialController as TutorMaterialController;
+use App\Http\Controllers\Tutor\ClassLibraryController as TutorClassLibraryController;
 use App\Http\Controllers\Parent\DashboardController as ParentDashboard;
 use App\Http\Controllers\Parent\PaymentController as ParentPaymentController;
 use App\Http\Controllers\Learner\DashboardController as LearnerDashboard;
 use App\Http\Controllers\Learner\ClassController as LearnerClassController;
 use App\Http\Controllers\Learner\AssignmentController as LearnerAssignmentController;
 use App\Http\Controllers\Learner\LearningGoalController as LearnerLearningGoalController;
+use App\Http\Controllers\Learner\ClassLibraryController as LearnerClassLibraryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\PublicBookingController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\AffirmationController as AdminAffirmationController;
@@ -63,8 +67,15 @@ Route::middleware('auth')->group(function () {
 // Shared notification routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/updates', [NotificationController::class, 'updates'])->name('notifications.updates');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.readAll');
+
+    // Web Push: register/remove this browser's endpoint and report the state the
+    // "Enable phone alerts" button renders from. See PWA.md.
+    Route::get('/push/status', [PushSubscriptionController::class, 'status'])->name('push.status');
+    Route::post('/push/subscribe', [PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
     
     // User Guide
     Route::get('/help/user-guide', [\App\Http\Controllers\HomeController::class, 'userGuide'])
@@ -77,6 +88,12 @@ Route::middleware(['auth'])->group(function () {
 
     // In-app messaging (parents <-> CEO / administrators)
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+
+    // Lightweight polling for the inbox and an open conversation, so new
+    // messages appear without a page reload.
+    Route::get('/messages/updates/inbox', [MessageController::class, 'inboxUpdates'])->name('messages.updates.inbox');
+    Route::get('/messages/{user}/updates', [MessageController::class, 'threadUpdates'])->name('messages.updates.thread');
+
     Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
 });
@@ -95,8 +112,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::resource('schedules', AdminScheduleController::class);
     Route::post('/schedules/{schedule}/complete', [AdminScheduleController::class, 'markCompleted'])->name('schedules.complete');
     Route::post('/schedules/{schedule}/reopen', [AdminScheduleController::class, 'reopen'])->name('schedules.reopen');
+
+    // Class Library: Google Drive folders/files and other external resources
+    // attached to a class, shown to its learners under My Learning.
+    Route::get('/class-library', [AdminClassLibraryController::class, 'index'])->name('class-library.index');
+    Route::post('/class-library', [AdminClassLibraryController::class, 'store'])->name('class-library.store');
+    Route::delete('/class-library/{resource}', [AdminClassLibraryController::class, 'destroy'])->name('class-library.destroy');
     
     Route::resource('notifications', AdminNotificationController::class)->only(['index', 'create', 'store', 'destroy']);
+    Route::get('/notifications/updates', [AdminNotificationController::class, 'updates'])->name('notifications.updates');
     
     // Admin Oversight Routes - View attendance, assignments, materials across all classes
     Route::get('/attendance', [AdminOversightController::class, 'attendance'])->name('oversight.attendance');
@@ -111,6 +135,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
 
     // Categorised messaging (parents / tutors / students / one class)
     Route::get('/messages', [AdminMessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/updates', [AdminMessageController::class, 'updates'])->name('messages.updates');
     Route::get('/messages/broadcast', [AdminMessageController::class, 'create'])->name('messages.create');
     Route::post('/messages/broadcast', [AdminMessageController::class, 'store'])->name('messages.store');
 
@@ -186,6 +211,12 @@ Route::prefix('tutor')->name('tutor.')->middleware(['auth', 'role:tutor'])->grou
     
     Route::resource('materials', TutorMaterialController::class)->only(['index', 'create', 'store', 'destroy']);
 
+    // Class Library: the tutor attaches Google Drive / video / PDF links to their
+    // own classes; learners find them under My Learning → Class Library.
+    Route::get('/class-library', [TutorClassLibraryController::class, 'index'])->name('class-library.index');
+    Route::post('/class-library', [TutorClassLibraryController::class, 'store'])->name('class-library.store');
+    Route::delete('/class-library/{resource}', [TutorClassLibraryController::class, 'destroy'])->name('class-library.destroy');
+
     // Assessment calls assigned to this tutor (note 13, phases 2-3).
     Route::get('/assessments', [TutorAssessmentController::class, 'index'])->name('assessments.index');
     Route::get('/assessments/{assessment}', [TutorAssessmentController::class, 'show'])->name('assessments.show');
@@ -226,6 +257,10 @@ Route::prefix('learner')->name('learner.')->middleware(['auth', 'role:learner'])
     Route::get('/classes', [LearnerClassController::class, 'index'])->name('classes');
     Route::get('/class/{schedule}/join', [LearnerDashboard::class, 'joinClass'])->name('class.join');
     Route::get('/materials', [LearnerClassController::class, 'materials'])->name('materials');
+
+    // External class resources (Google Drive, videos, PDFs) added by the school
+    // or the class tutor.
+    Route::get('/class-library', [LearnerClassLibraryController::class, 'index'])->name('class-library.index');
     Route::get('/assignments', [LearnerAssignmentController::class, 'index'])->name('assignments');
     Route::get('/assignments/{assignment}/submit', [LearnerAssignmentController::class, 'submit'])->name('assignments.submit');
     Route::post('/assignments/{assignment}/submit', [LearnerAssignmentController::class, 'store'])->name('assignments.submit.store');

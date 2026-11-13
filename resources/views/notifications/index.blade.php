@@ -18,34 +18,19 @@
             @endforeach
         </div>
     </div>
+
+    @include('partials.phone-alerts-button')
+
+    @if($notifications->onFirstPage())
+    <div id="notifications-list"
+         data-updates-url="{{ route('notifications.updates', array_filter(['type' => $type])) }}"
+         data-since="{{ $latestId }}"
+         data-unread="{{ $unreadTotal }}"
+         class="space-y-4">
+    @else
     <div class="space-y-4">
-        @forelse($notifications as $notification)
-        @php $meta = $notification->typeMeta(); @endphp
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 {{ $notification->is_read ? 'border-transparent' : $meta['accent'] }}">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $meta['badge'] }}">
-                            <i class="fas {{ $meta['icon'] }} mr-1"></i>{{ $meta['label'] }}
-                        </span>
-                        @if(!$notification->is_read)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">New</span>
-                        @endif
-                    </div>
-                    <h3 class="font-semibold text-gray-800 mt-2">{{ $notification->title }}</h3>
-                    <p class="text-gray-600 mt-1">{{ $notification->message }}</p>
-                    <p class="text-xs text-gray-500 mt-2">{{ $notification->created_at->diffForHumans() }}</p>
-                </div>
-                @if(!$notification->is_read)
-                <form action="{{ route('notifications.read', $notification) }}" method="POST">@csrf
-                    <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 whitespace-nowrap"><i class="fas fa-check"></i> Mark read</button>
-                </form>
-                @endif
-            </div>
-        </div>
-        @empty
-        <div class="text-center py-12 text-gray-500"><i class="fas fa-bell text-4xl mb-4 text-gray-300"></i><p>{{ $type === null ? 'No notifications yet.' : 'No notifications of this type.' }}</p></div>
-        @endforelse
+    @endif
+        @include('notifications._list', ['notifications' => $notifications, 'type' => $type])
     </div>
     <div class="mt-6">{{ $notifications->links() }}</div>
     @if($notifications->count() > 0)
@@ -55,3 +40,45 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// Poll for new notifications (and read-state changes) and redraw the list only
+// when something actually changed.
+(function () {
+    var list = document.getElementById('notifications-list');
+    if (!list) return;
+
+    var url = list.dataset.updatesUrl;
+    var since = parseInt(list.dataset.since || '0', 10);
+    var unread = parseInt(list.dataset.unread || '0', 10);
+    var busy = false;
+
+    function poll() {
+        if (busy || document.visibilityState !== 'visible') return;
+        busy = true;
+
+        var separator = url.indexOf('?') === -1 ? '?' : '&';
+
+        fetch(url + separator + 'since=' + since + '&unread=' + unread, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+        .then(function (response) { return response.ok ? response.json() : null; })
+        .then(function (data) {
+            if (!data) return;
+            if (typeof data.last_id === 'number') since = data.last_id;
+            if (typeof data.unread_total === 'number') unread = data.unread_total;
+            if (data.changed && data.html) list.innerHTML = data.html;
+        })
+        .catch(function () { /* offline — the next tick tries again */ })
+        .finally(function () { busy = false; });
+    }
+
+    setInterval(poll, 8000);
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') poll();
+    });
+})();
+</script>
+@endpush

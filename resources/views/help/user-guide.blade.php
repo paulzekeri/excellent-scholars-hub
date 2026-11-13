@@ -259,11 +259,11 @@
                 <ul class="list-disc list-inside text-sm text-gray-600 mb-4 space-y-1">
                     <li><strong>Overview</strong> — your dashboard</li>
                     @if($guideIsAdmin)
-                        <li><strong>Academics</strong> — classes, schedules, attendance, assignment review and materials</li>
+                        <li><strong>Academics</strong> — classes, schedules, attendance, assignment review, materials and the class library</li>
                     @elseif($guideIsTutor)
-                        <li><strong>Teaching</strong> — your schedules, assignments, materials and learning goals</li>
+                        <li><strong>Teaching</strong> — your schedules, assignments, materials, class library and learning goals</li>
                     @elseif($guideIsLearner)
-                        <li><strong>My Learning</strong> — your classes, assignments and materials</li>
+                        <li><strong>My Learning</strong> — your classes, assignments, materials and class library</li>
                     @endif
                     @if($guideIsAdmin)
                         <li><strong>People</strong> — user and role management (administrators only)</li>
@@ -281,6 +281,20 @@
                         your choice next time. On a computer you can also tap the <i class="fas fa-bars"></i> button in the top bar to shrink the menu
                         to an icon rail and give the page more room. On a phone the menu hides behind the same <i class="fas fa-bars"></i> button and
                         slides out from the left.</p>
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">Install the app &amp; phone alerts</h3>
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
+                    <p class="text-gray-600 mb-2">
+                        Excellent Scholars Hub can be installed on a phone or computer like any other app — an icon on the
+                        home screen and no address bar — and it can ring the phone when something new arrives.
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        <li><strong>Install:</strong> tap <strong>Install app</strong> in the blue top bar (Chrome, Edge, Android). On iPhone/iPad use <strong>Share &rarr; Add to Home Screen</strong>.</li>
+                        <li><strong>Phone alerts:</strong> open <strong>Notifications</strong> and press <strong>Enable phone alerts</strong>, then <em>Allow</em>. The phone now shows broadcasts, messages and other notices even when the app is closed. On iPhone, install the app first and open it from the home screen.</li>
+                        <li>Each browser is its own device: turn alerts on once per phone or computer. The same card has a <strong>Turn off</strong> button.</li>
+                        <li>Phone alerts arrive within about a minute; the bell inside the app updates instantly while a page is open.</li>
+                    </ul>
                 </div>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-6">My profile &amp; testimonials</h3>
@@ -485,12 +499,13 @@
                     <div class="tip-box">
                         <p class="text-sm text-gray-700 mb-2"><strong>Repeat a weekly lesson:</strong> set <strong>Repeat</strong> to <em>Every week on the days &amp; times I choose</em>, then add one row per day &mdash; for example <strong>10:00 am Monday</strong>, <strong>2:00 pm Wednesday</strong> and <strong>6:00 pm Friday</strong>. Choose a <strong>Repeats from</strong> date and a <strong>Repeat until</strong> date: each row is created every week on its own day and time, so one form builds the whole timetable. Enrolled learners and the tutor see every session on their dashboards automatically.</p>
                         <p class="text-sm text-gray-700"><strong>Automatic video room:</strong> choose <strong>Automatic video room (Jitsi Meet)</strong> and leave the link blank &mdash; a free meeting link is generated for you and reused for every session in the series.</p>
-                        <p class="text-sm text-gray-700"><strong>Find a certain day:</strong> the Schedules page has a filter bar &mdash; pick a <strong>Class</strong>, a <strong>Tutor</strong>, a <strong>Start Time (day)</strong> date and/or a <strong>Status</strong>, then click <strong>Filter</strong>. The <strong>Today</strong> link jumps straight to today's sessions, <strong>Any day</strong> clears only the date, and <strong>Reset</strong> clears everything. The count under the filter bar tells you how many sessions matched.</p>
+                        <p class="text-sm text-gray-700"><strong>One week at a time:</strong> the Schedules page opens on the <strong>current week</strong>, grouped by day, so a class that repeats for years never turns into pages of rows. Use <strong>Previous week</strong> / <strong>Next week</strong> to move around and <strong>This week</strong> to jump back; sessions scheduled for today are highlighted in yellow, and each day heading shows how many sessions it holds. <strong>All schedules</strong> shows the full history, 25 sessions per page, when you need to look something up.</p>
+                        <p class="text-sm text-gray-700"><strong>Find a certain day:</strong> the Schedules page has a filter bar &mdash; pick a <strong>Class</strong>, a <strong>Tutor</strong>, a <strong>Start Time (day)</strong> date and/or a <strong>Status</strong>, then click <strong>Filter</strong>. The <strong>Today</strong> link jumps straight to today's sessions, <strong>This week</strong> clears only the date, and <strong>Reset</strong> clears everything. The count under the filter bar tells you how many sessions matched.</p>
                     </div>
 
                     <p class="font-medium text-gray-700 mt-4 mb-2">To tick a class as completed:</p>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        <li>After the scheduled end time, use the green <strong>tick</strong> on the Schedules list (or <strong>Mark completed</strong> on the session page).</li>
+                        <li>After the scheduled end time, use the green <strong>tick</strong> on the Schedules list (or <strong>Mark completed</strong> on the session page). If the class was in an earlier week, step back with <strong>Previous week</strong> &mdash; or open <strong>All schedules</strong> and filter by class or tutor.</li>
                         <li>The tick records who confirmed it and when, and the class starts counting on the monthly tutor report.</li>
                         <li>If it was ticked by mistake, use the yellow <strong>undo</strong> button (or <strong>Reopen</strong>) — it stops counting.</li>
                     </ul>
@@ -684,6 +699,34 @@
                     </div>
                 </div>
 
+                <!-- Class Library -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-book text-blue-600 mr-2"></i>8. Class Library — external links
+                    </h3>
+                    <p class="text-gray-600 mb-2">
+                        The school's videos, PDFs and documents stay in Google Drive; this screen puts the links where
+                        the class can find them, instead of losing them in the class WhatsApp group.
+                    </p>
+                    <ol class="space-y-2 mb-3">
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">1.</span>
+                            <span class="text-gray-600">Open <strong>Academics &rarr; Class Library</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">2.</span>
+                            <span class="text-gray-600">Choose the <strong>Class</strong>, type the <strong>Title</strong> learners will click, paste the <strong>Google Drive link</strong> and pick the <strong>Type</strong> (video, PDF, document or web link). The optional description explains what is inside.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">3.</span>
+                            <span class="text-gray-600">Click <strong>Add to class library</strong>. Learners in that class see it immediately under <strong>My Learning &rarr; Class Library</strong>.</span>
+                        </li>
+                    </ol>
+                    <div class="info-box">
+                        <p class="text-sm text-gray-700"><strong>📌 Note:</strong> only the title and description are visible — the address stays in the background and opens in a new tab. A link must start with <strong>http://</strong> or <strong>https://</strong>. Use the class filter to review one class, and <strong>Remove</strong> to take a broken link down.</p>
+                    </div>
+                </div>
+
                 <div class="guide-card bg-gray-50 rounded-lg p-6 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
                         <i class="fas fa-sun text-orange-700 mr-2"></i>Affirmations
@@ -790,6 +833,7 @@
                     </ol>
                     <div class="tip-box">
                         <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> Pick <strong>Automatic video room (Jitsi Meet)</strong> and leave the link blank &mdash; a free video link is generated for you and used for every session in the weekly series.</p>
+                        <p class="text-sm text-gray-700 mt-2"><strong>One week at a time:</strong> the Schedules page opens on the current week, grouped by day. Use <strong>Previous week</strong> / <strong>Next week</strong> to move around, or <strong>All schedules</strong> for the full history. If the session you need to tick (or take attendance for) was in an earlier week, step back with the arrows.</p>
                     </div>
                 </div>
 
@@ -919,6 +963,34 @@
                         <p class="text-sm text-gray-700"><strong>⚠️ Note:</strong> Once uploaded, learners in the selected class can instantly view and download the material. You can also delete materials if needed.</p>
                     </div>
                 </div>
+
+                <!-- Class Library -->
+                <div class="guide-card bg-gray-50 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <i class="fas fa-book text-blue-600 mr-2"></i>6. Class Library — external links
+                    </h3>
+                    <p class="text-gray-600 mb-2">
+                        When a resource already lives in Google Drive (a video, a PDF, a folder of worksheets), add the
+                        link instead of uploading the file again.
+                    </p>
+                    <ol class="space-y-2 mb-3">
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">1.</span>
+                            <span class="text-gray-600">Open <strong>Teaching &rarr; Class Library</strong>.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">2.</span>
+                            <span class="text-gray-600">Choose one of <strong>your classes</strong>, type the <strong>Title</strong> learners will click, paste the <strong>Google Drive link</strong>, pick the <strong>Type</strong> and add a short description.</span>
+                        </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">3.</span>
+                            <span class="text-gray-600">Click <strong>Add to class library</strong>. Learners open it from <strong>My Learning &rarr; Class Library</strong>.</span>
+                        </li>
+                    </ol>
+                    <div class="info-box">
+                        <p class="text-sm text-gray-700"><strong>📌 Note:</strong> you can add links to your own classes only, and remove the links of those classes. Learners see the title and description — the address stays in the background and opens in a new tab.</p>
+                    </div>
+                </div>
             </section>
             @endif
 
@@ -1032,7 +1104,14 @@
                             <span class="text-blue-600 font-bold">3.</span>
                             <span class="text-gray-600">Click the <strong>"Download"</strong> button to open or save the file.</span>
                         </li>
+                        <li class="flex items-start gap-2 text-sm">
+                            <span class="text-blue-600 font-bold">4.</span>
+                            <span class="text-gray-600">For resources kept in Google Drive (videos, PDFs, documents), open <strong>My Learning &rarr; Class Library</strong>. Each resource sits under its class &mdash; click the <strong>title</strong> to open it in a new tab, and read the description to see what it is.</span>
+                        </li>
                     </ol>
+                    <div class="tip-box mt-3">
+                        <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> only the title is visible &mdash; the link itself stays in the background and opens in a new tab, so you never have to copy an address.</p>
+                    </div>
                 </div>
 
                 <!-- Join Virtual Class -->
@@ -1808,7 +1887,7 @@
                     @if($guideIsParent)
                     <div class="border-b pb-4">
                         <h3 class="font-semibold text-gray-800 mb-2">❓ How do I contact the school as a parent?</h3>
-                        <p class="text-gray-600 text-sm">Click <strong>"Message the School"</strong> on your dashboard, or <strong>"Messages"</strong> in the menu, then choose the CEO or an administrator. Your conversation thread keeps the full history, and the school is notified instantly.</p>
+                        <p class="text-gray-600 text-sm">Click <strong>"Message the School"</strong> on your dashboard, or <strong>"Messages"</strong> in the menu, then click the name of the CEO or an administrator in the list — or the blue <strong>Send message</strong> button beside it. The chat opens on the next screen: type your message and press <strong>Send</strong>. Your conversation thread keeps the full history, and the school is notified instantly.</p>
                     </div>
                     @endif
 

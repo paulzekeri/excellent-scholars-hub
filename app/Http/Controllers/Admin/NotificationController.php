@@ -20,7 +20,32 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Notification::latest()->paginate(20);
-        return view('admin.notifications.index', compact('notifications'));
+
+        return view('admin.notifications.index', [
+            'notifications' => $notifications,
+            'latestId' => (int) Notification::max('id'),
+        ]);
+    }
+
+    /**
+     * Auto-refresh for the notification manager: new rows appear without a
+     * reload. Only page one is polled, so pagination is never disturbed.
+     */
+    public function updates(Request $request)
+    {
+        $lastId = (int) Notification::max('id');
+
+        if ($lastId === (int) $request->query('since')) {
+            return response()->json(['last_id' => $lastId, 'changed' => false]);
+        }
+
+        return response()->json([
+            'last_id' => $lastId,
+            'changed' => true,
+            'html' => view('admin.notifications._rows', [
+                'notifications' => Notification::latest()->paginate(20, ['*'], 'page', 1),
+            ])->render(),
+        ]);
     }
 
     public function create()

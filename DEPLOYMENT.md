@@ -29,8 +29,10 @@ that host but applies to any cPanel + MySQL + Apache environment.
   *MultiPHP INI Editor* if the account ignores `.user.ini`.
 * **Free SSL** via *cPanel → SSL/TLS Status → Run AutoSSL* so `https://` works before you set
   `SESSION_SECURE_COOKIE=true`.
-* No queue worker and no cron job are required: `QUEUE_CONNECTION=sync`, notifications are in-app,
-  and password reset / email verification are disabled in `routes/web.php`.
+* No queue worker is required: `QUEUE_CONNECTION=sync`, notifications are in-app, and password reset /
+  email verification are disabled in `routes/web.php`. **One cron entry is needed for phone alerts**
+  (`* * * * * php artisan schedule:run`) — without it the install button still works, but Web Push
+  messages sit in the `push_messages` outbox until `push:send` runs. See `PWA.md`.
 * The UI loads Tailwind and Font Awesome from **CDNs** — visitors' browsers need outbound HTTPS.
 
 ## 1. Create the subdomain and database (cPanel UI)
@@ -173,6 +175,12 @@ php artisan config:cache
 php artisan view:cache
 #    Do NOT run `php artisan route:cache` or `php artisan optimize`:
 #    routes/web.php contains closures ('/' and '/help/user-guide') which cannot be cached.
+
+# 7. Installable app + phone alerts (optional; full guide in PWA.md)
+php artisan push:keys          # paste the two printed lines into .env, then rebuild the config cache
+#    cron entry (once on the server):
+#    * * * * * cd /home/litgrpco/uat-esh.lit-grp.com && php artisan schedule:run >> /dev/null 2>&1
+#    https:// is required: service workers and the install prompt do not exist on plain HTTP.
 ```
 
 ### Later deploys (same server)
@@ -186,6 +194,7 @@ php artisan storage:link        # no-op if the link exists
 php artisan view:clear && php artisan view:cache
 php artisan config:cache
 php artisan esh:health
+php artisan push:send --prune   # optional: deliver queued phone alerts now, prune old rows
 ```
 
 ### Document root

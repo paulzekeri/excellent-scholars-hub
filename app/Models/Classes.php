@@ -50,6 +50,12 @@ class Classes extends Model
         return $this->hasMany(LearningGoal::class, 'class_id');
     }
 
+    /** External Google Drive / video / PDF links shown under Class Library. */
+    public function libraryResources()
+    {
+        return $this->hasMany(ClassLibraryResource::class, 'class_id');
+    }
+
     /**
      * A class without a maximum is unlimited, so enrolment is always allowed.
      */

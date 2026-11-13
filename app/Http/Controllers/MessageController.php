@@ -26,35 +26,15 @@ class MessageController extends Controller
         $this->ensureMessagingRole();
 
         $me = auth()->user();
-        $category = $me->isAdministrator() ? $request->query('category') : null;
-
-        if (! in_array($category, ['parents', 'tutors', 'learners'], true)) {
-            $category = null;
-        }
-
-        $contacts = $this->contactQuery($category)->orderBy('name')->get();
-
-        $latestMessages = Message::where('sender_id', $me->id)
-            ->orWhere('receiver_id', $me->id)
-            ->latest()
-            ->get()
-            ->groupBy(function ($message) use ($me) {
-                return $message->sender_id === $me->id
-                    ? $message->receiver_id
-                    : $message->sender_id;
-            });
-
-        $unreadCounts = Message::where('receiver_id', $me->id)
-            ->where('is_read', false)
-            ->selectRaw('sender_id, count(*) as total')
-            ->groupBy('sender_id')
-            ->pluck('total', 'sender_id');
+        [$contacts, $latestMessages, $unreadCounts, $category] = $this->inbox($request);
 
         return view('messages.index', [
             'contacts' => $contacts,
             'latestMessages' => $latestMessages,
             'unreadCounts' => $unreadCounts,
+            'unreadTotal' => (int) $unreadCounts->sum(),
             'category' => $category,
+            'latestConversationId' => $this->latestConversationId($me),
             'categories' => [
                 'parents' => 'Parents / Guardians',
                 'tutors' => 'Tutors',
@@ -67,21 +47,69 @@ class MessageController extends Controller
     }
 
     /**
+     * Auto-refresh for the inbox. The page sends the newest message id it has
+     * seen; when something newer exists, the freshly rendered contact list comes
+     * back so the Blade partial stays the only place the markup lives.
+     */
+    public function inboxUpdates(Request $request)
+    {
+        $this->ensureMessagingRole();
+
+        $me = auth()->user();
+        $lastId = $this->latestConversationId($me);
+        $unreadTotal = (int) Message::where('receiver_id', $me->id)->where('is_read', false)->count();
+
+        $changed = $lastId !== (int) $request->query('since')
+            || $unreadTotal !== (int) $request->query('unread');
+
+        if (! $changed) {
+            return response()->json(['last_id' => $lastId, 'unread_total' => $unreadTotal, 'changed' => false]);
+        }
+
+        [$contacts, $latestMessages, $unreadCounts] = $this->inbox($request);
+
+        return response()->json([
+            'last_id' => $lastId,
+            'unread_total' => $unreadTotal,
+            'changed' => true,
+            'html' => view('messages._contacts', compact('contacts', 'latestMessages', 'unreadCounts'))->render(),
+        ]);
+    }
+
+    /**
+     * Auto-refresh for one conversation. Polling marks the incoming messages read,
+     * exactly as opening the page does.
+     */
+    public function threadUpdates(Request $request, User $user)
+    {
+        $this->ensureConversationAllowed($user);
+
+        $lastKnown = (int) $request->query('last');
+        $newest = $this->latestThreadId($user);
+
+        if ($newest === $lastKnown) {
+            return response()->json(['last_id' => $newest, 'changed' => false]);
+        }
+
+        $this->markThreadRead($user);
+        $messages = $this->threadMessages($user);
+
+        return response()->json([
+            'last_id' => $newest,
+            'changed' => true,
+            'html' => view('messages._thread', compact('messages'))->render(),
+        ]);
+    }
+
+    /**
      * Show a single conversation and mark incoming messages as read.
      */
     public function show(User $user)
     {
         $this->ensureConversationAllowed($user);
 
-        Message::where('sender_id', $user->id)
-            ->where('receiver_id', auth()->id())
-            ->where('is_read', false)
-            ->update(['is_read' => true, 'read_at' => now()]);
-
-        $messages = Message::between(auth()->id(), $user->id)
-            ->with('sender')
-            ->orderBy('created_at')
-            ->get();
+        $this->markThreadRead($user);
+        $messages = $this->threadMessages($user);
 
         return view('messages.show', compact('user', 'messages'));
     }
@@ -187,6 +215,73 @@ class MessageController extends Controller
                 'sent_at' => now(),
             ]);
         }
+    }
+
+    /**
+     * Contacts, their newest message and unread totals, shared by the inbox page
+     * and its auto-refresh endpoint.
+     *
+     * @return array{0: \Illuminate\Database\Eloquent\Collection, 1: \Illuminate\Support\Collection, 2: \Illuminate\Support\Collection, 3: ?string}
+     */
+    private function inbox(Request $request): array
+    {
+        $me = auth()->user();
+        $category = $me->isAdministrator() ? $request->query('category') : null;
+
+        if (! in_array($category, ['parents', 'tutors', 'learners'], true)) {
+            $category = null;
+        }
+
+        $contacts = $this->contactQuery($category)->orderBy('name')->get();
+
+        $latestMessages = Message::where('sender_id', $me->id)
+            ->orWhere('receiver_id', $me->id)
+            ->latest()
+            ->get()
+            ->groupBy(function ($message) use ($me) {
+                return $message->sender_id === $me->id
+                    ? $message->receiver_id
+                    : $message->sender_id;
+            });
+
+        $unreadCounts = Message::where('receiver_id', $me->id)
+            ->where('is_read', false)
+            ->selectRaw('sender_id, count(*) as total')
+            ->groupBy('sender_id')
+            ->pluck('total', 'sender_id');
+
+        return [$contacts, $latestMessages, $unreadCounts, $category];
+    }
+
+    /** Newest message id in any of my conversations — the inbox poll watermark. */
+    private function latestConversationId(User $me): int
+    {
+        return (int) Message::where(function ($query) use ($me) {
+            $query->where('sender_id', $me->id)->orWhere('receiver_id', $me->id);
+        })->max('id');
+    }
+
+    /** Newest message id in one conversation — the thread poll watermark. */
+    private function latestThreadId(User $contact): int
+    {
+        return (int) Message::between(auth()->id(), $contact->id)->max('id');
+    }
+
+    /** Opening (or auto-refreshing) a thread marks the incoming messages read. */
+    private function markThreadRead(User $contact): void
+    {
+        Message::where('sender_id', $contact->id)
+            ->where('receiver_id', auth()->id())
+            ->where('is_read', false)
+            ->update(['is_read' => true, 'read_at' => now()]);
+    }
+
+    private function threadMessages(User $contact)
+    {
+        return Message::between(auth()->id(), $contact->id)
+            ->with('sender')
+            ->orderBy('created_at')
+            ->get();
     }
 
     private function contactQuery(?string $category = null)

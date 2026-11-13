@@ -33,6 +33,21 @@
         @endif
     </div>
 
+    @if($contacts->isNotEmpty())
+    <div class="mb-5 flex items-start gap-3 rounded-xl border-l-4 border-blue-600 bg-blue-50 p-4">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white">
+            <i class="fas fa-paper-plane text-sm"></i>
+        </span>
+        <div>
+            <p class="text-sm font-semibold text-blue-900">Want to send a message? Start by clicking a name below.</p>
+            <p class="text-sm text-blue-800 mt-0.5">
+                The conversation opens on the next screen &mdash; type your message there and press <strong>Send</strong>.
+                Replies appear here with a <strong>&ldquo;new&rdquo;</strong> badge next to the person&rsquo;s name.
+            </p>
+        </div>
+    </div>
+    @endif
+
     @if(auth()->user()->isAdministrator())
         <div class="flex flex-wrap gap-2 mb-4">
             <a href="{{ route('messages.index') }}" class="px-4 py-2 rounded-lg text-sm transition {{ $category === null ? 'bg-blue-700 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:bg-blue-50' }}">
@@ -66,58 +81,66 @@
             </h2>
             <p class="text-sm text-gray-500 mt-1">
                 @if(auth()->user()->isAdministrator())
-                    Choose a person to open the private conversation.
+                    Click a person below to open their private conversation.
                 @else
-                    Choose a contact to open the conversation.
+                    Click a contact below to open the conversation and send a message.
                 @endif
             </p>
         </div>
 
-        <ul class="divide-y divide-gray-200">
-            @forelse($contacts as $contact)
-                @php
-                    $contactMessages = $latestMessages->get($contact->id);
-                    $lastMessage = $contactMessages ? $contactMessages->first() : null;
-                    $unread = $unreadCounts->get($contact->id, 0);
-                @endphp
-                <li>
-                    <a href="{{ route('messages.show', $contact) }}" class="flex items-center justify-between px-6 py-4 hover:bg-blue-50 transition">
-                        <div class="min-w-0">
-                            <p class="font-medium text-gray-800 flex items-center flex-wrap gap-2">
-                                {{ $contact->name }}
-                                <span class="px-2 py-0.5 text-xs rounded-full
-                                    @if($contact->isCeo()) bg-sun-light text-sun-ink
-                                    @elseif($contact->isAdmin()) bg-orange-100 text-orange-900
-                                    @elseif($contact->isTutor()) bg-blue-100 text-blue-800
-                                    @elseif($contact->isLearner()) bg-green-100 text-green-800
-                                    @else bg-orange-100 text-orange-800 @endif">
-                                    {{ ucfirst($contact->role->name) }}
-                                </span>
-                                @if($unread > 0)
-                                    <span class="bg-sun text-[#0a2550] text-xs rounded-full px-2 py-0.5">{{ $unread }} new</span>
-                                @endif
-                            </p>
-                            <p class="text-sm text-gray-500 truncate">
-                                {{ $lastMessage ? \Illuminate\Support\Str::limit($lastMessage->body, 80) : 'No messages yet — start the conversation.' }}
-                            </p>
-                        </div>
-                        <span class="text-xs text-gray-500 whitespace-nowrap ml-4">
-                            @if($lastMessage)
-                                {{ $lastMessage->created_at->diffForHumans() }}
-                            @endif
-                        </span>
-                    </a>
-                </li>
-            @empty
-                <li class="px-6 py-10 text-center text-gray-500">
-                    <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
-                    <p>No contacts available yet.</p>
-                    @if(auth()->user()->isAdministrator())
-                        <p class="text-sm text-gray-500 mt-1">Try another category, or send a categorised message from the button above.</p>
-                    @endif
-                </li>
-            @endforelse
+        <ul id="messages-contacts"
+            data-updates-url="{{ route('messages.updates.inbox', array_filter(['category' => $category])) }}"
+            data-since="{{ $latestConversationId }}"
+            data-unread="{{ $unreadTotal }}"
+            class="divide-y divide-gray-200">
+            @include('messages._contacts', [
+                'contacts' => $contacts,
+                'latestMessages' => $latestMessages,
+                'unreadCounts' => $unreadCounts,
+            ])
         </ul>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// Keep the inbox fresh: poll a tiny JSON endpoint and swap the contact list only
+// when a new message (or a change in the unread total) actually arrived.
+(function () {
+    var list = document.getElementById('messages-contacts');
+    if (!list) return;
+
+    var url = list.dataset.updatesUrl;
+    var since = parseInt(list.dataset.since || '0', 10);
+    var unread = parseInt(list.dataset.unread || '0', 10);
+    var busy = false;
+
+    function poll() {
+        if (busy || document.visibilityState !== 'visible') return;
+        busy = true;
+
+        var separator = url.indexOf('?') === -1 ? '?' : '&';
+
+        fetch(url + separator + 'since=' + since + '&unread=' + unread, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+        .then(function (response) { return response.ok ? response.json() : null; })
+        .then(function (data) {
+            if (!data) return;
+            if (typeof data.last_id === 'number') since = data.last_id;
+            if (typeof data.unread_total === 'number') unread = data.unread_total;
+            if (data.changed && data.html) list.innerHTML = data.html;
+        })
+        .catch(function () { /* offline — the next tick tries again */ })
+        .finally(function () { busy = false; });
+    }
+
+    setInterval(poll, 5000);
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') poll();
+    });
+})();
+</script>
+@endpush

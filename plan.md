@@ -116,6 +116,32 @@
       attachment downloads
 - [x] **Categorised messaging** — broadcasts to parents / tutors / students / everyone / one class, fan-out
       `messages` + notifications, broadcast report, inbox for every role, category filters for administrators
+- [x] **Inbox guidance** — `/messages` opens with a *"Want to send a message? Start by clicking a name below"*
+      callout, and every contact row shows a visible **Send message** / **Open chat** button (with avatar, role
+      badge, unread count and last-message preview) instead of relying on a hover; the preview line now reads
+      *No messages yet — click below to send the first one.*
+- [x] **Live inbox and conversation** — both `/messages` and `/messages/{user}` poll small JSON endpoints
+      (`messages/updates/inbox`, `messages/{user}/updates`) every 4–5 seconds, so a new message appears without
+      reloading. The thread poll marks incoming messages read, pauses while the tab is hidden, and re-renders only
+      when the newest message id changes; the inbox poll also watches the unread total. The rendered HTML comes
+      from the shared `messages/_contacts` / `messages/_thread` partials, so no duplicate markup, and no
+      Pusher/WebSocket service or front-end build is needed. Tests: `MessageInboxTest`
+- [x] **Live notifications and broadcast report** — the same pattern covers `/notifications` (personal feed,
+      8s), `/admin/notifications` (manager, page one only, 6s) and `/admin/messages` (broadcast report including
+      its three counters, 6s). Each JSON endpoint (`notifications/updates`, `admin/notifications/updates`,
+      `admin/messages/updates`) compares a newest-id + unread-total watermark and returns the re-rendered partial
+      (`notifications/_list`, `admin.notifications/_rows`, `admin.messages/_batches`) only when something changed;
+      the notification manager's read modal now uses event delegation so freshly polled rows still open it.
+      Tests: `LiveUpdatesTest`
+- [x] **Installable app + phone alerts (PWA & Web Push)** — the app installs to a phone's home screen
+      (`public/manifest.webmanifest` + generated icons + `public/service-worker.js`; an **Install app** button in the
+      top bar uses Chrome's `beforeinstallprompt` and shows the iOS *Add to Home Screen* instructions otherwise).
+      The **Enable phone alerts** card on `/notifications` subscribes the device to Web Push:
+      `app/Services/WebPushCrypto.php` implements RFC 8291 encryption + the RFC 8292 VAPID JWT with `openssl` only
+      (no Composer package), `WebPushService` keeps one row per device plus an outbox drained by `push:send`
+      (scheduled every minute), and `Notification::booted()` queues a push for every in-app notification. A server
+      with no VAPID keys stays completely silent. Tests: `WebPushTest`, `ProgressiveWebAppTest`; setup, cron and
+      troubleshooting in `PWA.md`
 - [x] **Blue / white / orange branding** — navy/blue structure with orange actions and **sun-yellow highlights**;
       indigo, purple and red removed from every view (orange now carries warnings and attention too)
 - [x] **Flyer look and feel** — Poppins headings + Inter body (`Caveat` script on the marketing page only), the
@@ -239,7 +265,28 @@
       Tests: `WeeklySlotScheduleTest`
 - [x] **Schedules filter** — the admin Schedules list filters by **Class**, **Tutor**, a **Start Time (day)**
       date picker and **Status**, keeps the filters across pagination, shows *Showing X of Y sessions*, offers
-      **Today** / **Any day** / **Reset** shortcuts and an empty state. Tests: `ScheduleFiltersTest`
+      **Today** / **This week** / **Reset** shortcuts and an empty state. Tests: `ScheduleFiltersTest`
+- [x] **Schedules week view** — a weekly series can run for years, so the admin list now opens on the
+      **current week (Mon–Sun)** instead of the whole history, groups sessions under a day heading with a
+      per-day session count, highlights today, and moves between weeks with **Previous week** / **This week** /
+      **Next week** (the class/tutor/status filters are kept, and filtering keeps the week you are browsing). A week fits on one screen, so there is no
+      pagination; **All schedules** still offers the full history, 25 sessions per page, for audits, and a
+      filtered week that matches nothing says so with links to clear the filters or browse everything.
+      Saving or deleting a session returns to that session's own week. Tests: `ScheduleWeekViewTest`
+- [x] **Tutor schedule week view** — the tutor *My Schedules* page gets the same treatment: current week
+      (Mon–Sun) grouped by day with **Previous week** / **This week** / **Next week**, a session count, a
+      **Today** shortcut, *No sessions scheduled this week* with a link to the full history, and
+      **All schedules** (`?view=all`, 25 per page). A tutor only ever sees their own sessions. The week maths
+      lives in `ClassScheduleService::weekStart()`, shared with the admin list, and the rows are shared through
+      `tutor/schedules/_row.blade.php`. Migration `add_start_time_index_to_class_schedules_table` indexes
+      `start_time` now that both screens filter and sort by it. Tests: `TutorScheduleWeekViewTest`
+- [x] **Class Library (external Google Drive resources)** — `class_library_resources` holds a title, optional
+      description, URL and type (link / video / PDF / document) for one class. **Academics → Class Library**
+      (administrators + CEO) and **Teaching → Class Library** (tutors) add, filter and remove links; a tutor is
+      limited to their own classes (validated with `Rule::exists(...)`, 403 on deleting another tutor's link).
+      Learners get **My Learning → Class Library**, grouped by class, where the **title** is the clickable link
+      (new tab, `rel="noopener noreferrer"`) and the URL is never shown; links must be real http(s) addresses.
+      Tests: `ClassLibraryTest`
 - [x] **Learning goals as free text** — `learning_goals.title` is now `TEXT`; the upload form is one 5,000-character
       goal area with the learner picker, "What success looks like" and notes removed (existing rows keep their
       data). A free **LanguageTool** wording assistant fixes spelling/grammar via

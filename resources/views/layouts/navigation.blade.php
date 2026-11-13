@@ -68,6 +68,9 @@
                 <i class="fas fa-question-circle text-lg"></i>
             </a>
 
+            {{-- Installable app (PWA): appears only when the browser offers an install. --}}
+            @include('partials.pwa-install-button')
+
             <span class="mx-1 hidden h-8 w-px bg-white/15 sm:block"></span>
 
             <span class="hidden max-w-[12rem] truncate text-sm text-blue-100 md:block">{{ $navUser->name }}</span>

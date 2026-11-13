@@ -14,20 +14,78 @@ class NotificationController extends Controller
 
     public function index(Request $request)
     {
+        $type = $this->typeFilter($request);
+        $notifications = $this->feed($type);
+
+        return view('notifications.index', [
+            'notifications' => $notifications,
+            'type' => $type,
+            'latestId' => $notifications->onFirstPage() ? $this->latestId($type) : 0,
+            'unreadTotal' => $this->unreadTotal($type),
+        ]);
+    }
+
+    /**
+     * Auto-refresh for the notification feed: tells the page whether anything new
+     * arrived and, when it did, returns the freshly rendered list.
+     */
+    public function updates(Request $request)
+    {
+        $type = $this->typeFilter($request);
+        $lastId = $this->latestId($type);
+        $unreadTotal = $this->unreadTotal($type);
+
+        $changed = $lastId !== (int) $request->query('since')
+            || $unreadTotal !== (int) $request->query('unread');
+
+        if (! $changed) {
+            return response()->json(['last_id' => $lastId, 'unread_total' => $unreadTotal, 'changed' => false]);
+        }
+
+        return response()->json([
+            'last_id' => $lastId,
+            'unread_total' => $unreadTotal,
+            'changed' => true,
+            'html' => view('notifications._list', [
+                'notifications' => $this->feed($type),
+                'type' => $type,
+            ])->render(),
+        ]);
+    }
+
+    /** Only the three composable types are accepted from the query string. */
+    private function typeFilter(Request $request): ?string
+    {
         $type = $request->query('type');
-        $type = in_array($type, Notification::COMPOSABLE_TYPES, true) ? $type : null;
 
-        $notifications = Notification::where(function ($query) {
-                $query->where('user_id', auth()->id())->orWhereNull('user_id');
-            })
-            ->when($type, function ($query) use ($type) {
-                $query->where('type', $type);
-            })
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+        return in_array($type, Notification::COMPOSABLE_TYPES, true) ? $type : null;
+    }
 
-        return view('notifications.index', compact('notifications', 'type'));
+    /** The notifications this account can see, newest first, 20 per page. */
+    private function feed(?string $type)
+    {
+        return $this->visibleToMe($type)->latest()->paginate(20)->withQueryString();
+    }
+
+    /** Newest visible notification id — the poll watermark. */
+    private function latestId(?string $type): int
+    {
+        return (int) $this->visibleToMe($type)->max('id');
+    }
+
+    private function unreadTotal(?string $type): int
+    {
+        return (int) $this->visibleToMe($type)->where('is_read', false)->count();
+    }
+
+    /** Personal notifications plus the global ones (user_id is null). */
+    private function visibleToMe(?string $type)
+    {
+        return Notification::where(function ($query) {
+            $query->where('user_id', auth()->id())->orWhereNull('user_id');
+        })->when($type, function ($query) use ($type) {
+            $query->where('type', $type);
+        });
     }
 
     public function markRead(Notification $notification)

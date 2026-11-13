@@ -25,7 +25,16 @@ class ScheduleController extends Controller
             : null;
         $dateFilter = $this->filterDate($request->query('date'));
 
-        $schedules = ClassSchedule::with('class', 'tutor.user')
+        // A weekly series can run for years, which used to fill this screen with
+        // hundreds of rows and dozens of pages. The list now opens on one week
+        // ("week"). Picking a day narrows it to that day ("day"), and the full
+        // paginated history stays one click away under "All schedules" ("all").
+        $scope = $dateFilter ? 'day' : ($request->query('view') === 'all' ? 'all' : 'week');
+
+        $weekStart = $scope === 'week' ? ClassScheduleService::weekStart($request->query('week')) : null;
+        $weekEnd = $weekStart ? $weekStart->copy()->addDays(6) : null;
+
+        $query = ClassSchedule::with('class', 'tutor.user')
             ->when($classFilter, function ($query) use ($classFilter) {
                 $query->where('class_id', $classFilter);
             })
@@ -38,16 +47,42 @@ class ScheduleController extends Controller
             ->when($statusFilter, function ($query) use ($statusFilter) {
                 $query->where('status', $statusFilter);
             })
+            ->when($weekStart, function ($query) use ($weekStart) {
+                $query->whereBetween('start_time', [
+                    $weekStart->copy()->startOfDay(),
+                    $weekStart->copy()->addDays(6)->endOfDay(),
+                ]);
+            });
+
+        if ($scope === 'all') {
             // Upcoming and ongoing sessions first (soonest at the top), then past
             // sessions most-recent-first, so the live session is always on page one.
-            ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
-            ->orderByRaw('CASE WHEN start_time >= ? THEN start_time END ASC', [now()])
-            ->orderByRaw('CASE WHEN start_time < ? THEN start_time END DESC', [now()])
-            ->paginate(10)
-            ->withQueryString();
+            $schedules = $query
+                ->orderByRaw('CASE WHEN start_time >= ? THEN 0 ELSE 1 END', [now()])
+                ->orderByRaw('CASE WHEN start_time >= ? THEN start_time END ASC', [now()])
+                ->orderByRaw('CASE WHEN start_time < ? THEN start_time END DESC', [now()])
+                ->paginate(25)
+                ->withQueryString();
+        } else {
+            // A week or a single day fits on one screen, so it is shown in full
+            // and grouped by day (no pagination).
+            $schedules = $query->orderBy('start_time')->get();
+        }
+
+        $activeFilters = array_filter([
+            'class_id' => $classFilter,
+            'tutor_id' => $tutorFilter,
+            'status' => $statusFilter,
+        ]);
 
         return view('admin.schedules.index', [
             'schedules' => $schedules,
+            'scope' => $scope,
+            'weekStart' => $weekStart,
+            'weekEnd' => $weekEnd,
+            'filterParams' => $activeFilters,
+            'isFiltered' => $activeFilters !== [],
+            'matchedSessions' => $scope === 'all' ? $schedules->total() : $schedules->count(),
             'classes' => Classes::orderBy('name')->get(),
             'tutors' => Tutor::with('user')->get(),
             'classFilter' => $classFilter,
@@ -196,7 +231,11 @@ class ScheduleController extends Controller
 
         $schedule->update($request->all());
 
-        return redirect()->route('admin.schedules.index')->with('success', 'Schedule updated successfully.');
+        // Land back on the week the session belongs to, so a past session that
+        // was edited from the week view does not drop the admin into this week.
+        return redirect()
+            ->route('admin.schedules.index', ['week' => $schedule->start_time->toDateString()])
+            ->with('success', 'Schedule updated successfully.');
     }
 
     /**
@@ -256,7 +295,11 @@ class ScheduleController extends Controller
 
     public function destroy(ClassSchedule $schedule)
     {
+        $week = $schedule->start_time->toDateString();
         $schedule->delete();
-        return redirect()->route('admin.schedules.index')->with('success', 'Schedule deleted successfully.');
+
+        return redirect()
+            ->route('admin.schedules.index', ['week' => $week])
+            ->with('success', 'Schedule deleted successfully.');
     }
 }

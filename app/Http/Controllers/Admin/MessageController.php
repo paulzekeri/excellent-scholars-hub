@@ -21,7 +21,48 @@ class MessageController extends Controller
 {
     public function index()
     {
-        $batches = Message::with('sender', 'schoolClass')
+        return view('admin.messages.index', [
+            'batches' => $this->batches(),
+            'unreadTotal' => $this->unreadTotal(),
+            'latestId' => (int) Message::whereNotNull('batch')->max('id'),
+        ]);
+    }
+
+    /**
+     * Auto-refresh for the broadcast report: new sends (from this administrator
+     * or another) appear without a reload, and the counters follow.
+     */
+    public function updates(Request $request)
+    {
+        $lastId = (int) Message::whereNotNull('batch')->max('id');
+        $unreadTotal = $this->unreadTotal();
+
+        $changed = $lastId > (int) $request->query('since')
+            || $unreadTotal !== (int) $request->query('unread');
+
+        if (! $changed) {
+            return response()->json(['last_id' => $lastId, 'unread_total' => $unreadTotal, 'changed' => false]);
+        }
+
+        $batches = $this->batches();
+
+        return response()->json([
+            'last_id' => $lastId,
+            'unread_total' => $unreadTotal,
+            'changed' => true,
+            'html' => view('admin.messages._batches', compact('batches'))->render(),
+            'stats' => [
+                'broadcasts' => $batches->count(),
+                'delivered' => (int) $batches->sum('recipients'),
+                'unread' => $unreadTotal,
+            ],
+        ]);
+    }
+
+    /** One entry per broadcast batch, newest first. */
+    private function batches()
+    {
+        return Message::with('sender', 'schoolClass')
             ->whereNotNull('batch')
             ->orderByDesc('created_at')
             ->get()
@@ -40,11 +81,12 @@ class MessageController extends Controller
                 ];
             })
             ->values();
+    }
 
-        return view('admin.messages.index', [
-            'batches' => $batches,
-            'unreadTotal' => Message::whereNotNull('batch')->where('is_read', false)->count(),
-        ]);
+    /** Broadcast copies the recipients have not opened yet. */
+    private function unreadTotal(): int
+    {
+        return Message::whereNotNull('batch')->where('is_read', false)->count();
     }
 
     public function create()

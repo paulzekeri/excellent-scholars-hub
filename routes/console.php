@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,8 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Drains the Web Push outbox into real phone notifications (PWA.md). Needs the
+// standard `php artisan schedule:run` cron entry, which also runs every other
+// scheduled task in the app.
+Schedule::command('push:send')->everyMinute()->withoutOverlapping();

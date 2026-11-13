@@ -12,44 +12,13 @@
                 <thead class="bg-[#EAF2FB]">
                     <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Type</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Recipient</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @forelse($notifications as $notification)
-                    @php $typeMeta = $notification->typeMeta(); @endphp
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm font-medium">{{ $notification->title }}</td>
-                        <td class="px-6 py-4 text-sm">
-                            <span class="inline-flex items-center px-2 py-1 text-xs rounded-full {{ $typeMeta['badge'] }}">
-                                <i class="fas {{ $typeMeta['icon'] }} mr-1"></i>{{ $typeMeta['label'] }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm">{{ $notification->user_id ? ($notification->user->name ?? 'Deleted User') : 'All Users' }}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($notification->is_read) bg-green-100 text-green-800 @else bg-sun-light text-sun-ink @endif">{{ $notification->is_read ? 'Read' : 'Unread' }}</span></td>
-                        <td class="px-6 py-4 text-sm">{{ $notification->created_at->format('M d, Y h:i A') }}</td>
-                        <td class="px-6 py-4 text-sm">
-                            <div class="flex items-center gap-4">
-                                <button type="button"
-                                    class="notification-read-btn text-blue-600 hover:text-blue-800"
-                                    title="Read notification"
-                                    data-title="{{ $notification->title }}"
-                                    data-type="{{ $typeMeta['label'] }}"
-                                    data-recipient="{{ $notification->user_id ? ($notification->user->name ?? 'Deleted User') : 'All Users' }}"
-                                    data-status="{{ $notification->is_read ? 'Read' : 'Unread' }}"
-                                    data-date="{{ $notification->created_at->format('M d, Y h:i A') }}"
-                                    data-message="{{ $notification->message }}">
-                                    <i class="fas fa-eye mr-1"></i> Read
-                                </button>
-                                <form action="{{ route('admin.notifications.destroy', $notification) }}" method="POST" class="inline" onsubmit="return confirm('Delete this notification?')">@csrf @method('DELETE')<button type="submit" class="text-orange-700 hover:text-orange-900"><i class="fas fa-trash"></i></button></form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-500">
-                            <i class="fas fa-bell-slash text-3xl text-gray-300 mb-2"></i>
-                            <p>No notifications sent yet.</p>
-                        </td>
-                    </tr>
-                    @endforelse
+                <tbody id="admin-notification-rows"
+                       @if($notifications->onFirstPage())
+                       data-updates-url="{{ route('admin.notifications.updates') }}"
+                       data-since="{{ $latestId }}"
+                       @endif
+                       class="divide-y divide-gray-200">
+                    @include('admin.notifications._rows', ['notifications' => $notifications])
                 </tbody>
             </table>
         </div>
@@ -132,10 +101,10 @@
             document.body.classList.remove('overflow-hidden');
         }
 
-        document.querySelectorAll('.notification-read-btn').forEach(function (button) {
-            button.addEventListener('click', function () {
-                openModal(button);
-            });
+        // Delegated, so rows replaced by the auto-refresh keep working.
+        document.addEventListener('click', function (event) {
+            var button = event.target.closest('.notification-read-btn');
+            if (button) openModal(button);
         });
 
         modal.querySelectorAll('[data-modal-close]').forEach(function (element) {
@@ -148,5 +117,43 @@
             }
         });
     });
+</script>
+@endpush
+
+@push('scripts')
+<script>
+// Poll page one of the notification manager so new sends appear without a
+// reload. Pagination is untouched: other pages do not poll at all.
+(function () {
+    var rows = document.getElementById('admin-notification-rows');
+    if (!rows || !rows.dataset.updatesUrl) return;
+
+    var url = rows.dataset.updatesUrl;
+    var since = parseInt(rows.dataset.since || '0', 10);
+    var busy = false;
+
+    function poll() {
+        if (busy || document.visibilityState !== 'visible') return;
+        busy = true;
+
+        fetch(url + '?since=' + since, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+        .then(function (response) { return response.ok ? response.json() : null; })
+        .then(function (data) {
+            if (!data) return;
+            if (typeof data.last_id === 'number') since = data.last_id;
+            if (data.changed && data.html) rows.innerHTML = data.html;
+        })
+        .catch(function () { /* offline — the next tick tries again */ })
+        .finally(function () { busy = false; });
+    }
+
+    setInterval(poll, 6000);
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') poll();
+    });
+})();
 </script>
 @endpush

@@ -96,12 +96,13 @@ class ScheduleFiltersTest extends TestCase
     {
         [$admin, $tutorA, $tutorB, $classA, $classB] = $this->seedTwoDays();
 
-        $this->actingAs($admin)->get(route('admin.schedules.index', ['class_id' => $classA->id]))
+        // "view=all" asks for the full history; the default page is one week.
+        $this->actingAs($admin)->get(route('admin.schedules.index', ['class_id' => $classA->id, 'view' => 'all']))
             ->assertOk()
             ->assertSee('Filtered Session One')
             ->assertDontSee('Filtered Session Two');
 
-        $this->actingAs($admin)->get(route('admin.schedules.index', ['tutor_id' => $tutorB->id]))
+        $this->actingAs($admin)->get(route('admin.schedules.index', ['tutor_id' => $tutorB->id, 'view' => 'all']))
             ->assertOk()
             ->assertSee('Filtered Session Two')
             ->assertDontSee('Filtered Session One');

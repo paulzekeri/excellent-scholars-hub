@@ -2,42 +2,119 @@
 @section('title', 'My Schedules')
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex justify-between items-center mb-6">
-        <div><h1 class="text-3xl font-bold text-gray-800">My Schedules</h1><p class="text-gray-600 mt-1">Your class schedules</p></div>
+    <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">My Schedules</h1>
+            <p class="text-gray-600 mt-1">
+                @if($scope === 'week')
+                    This week's sessions, grouped by day &mdash; use the arrows to look at another week. <span class="text-sun-ink font-medium">Sessions scheduled for today are highlighted in yellow.</span>
+                @else
+                    Your full schedule history, 25 sessions per page.
+                @endif
+            </p>
+        </div>
         <a href="{{ route('tutor.schedules.create') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-plus mr-1"></i> New Schedule</a>
     </div>
+
+    @if($scope === 'week')
+    <div class="bg-white rounded-xl shadow-md p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ route('tutor.schedules.index', ['week' => $weekStart->copy()->subWeek()->toDateString()]) }}" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-200 transition"><i class="fas fa-chevron-left mr-1"></i> Previous week</a>
+            @unless($weekStart->isCurrentWeek())
+                <a href="{{ route('tutor.schedules.index') }}" class="bg-blue-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-800 transition"><i class="fas fa-calendar-day mr-1"></i> This week</a>
+            @endunless
+            <a href="{{ route('tutor.schedules.index', ['week' => $weekStart->copy()->addWeek()->toDateString()]) }}" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-200 transition">Next week <i class="fas fa-chevron-right ml-1"></i></a>
+        </div>
+        <div class="text-sm font-semibold text-[#0a2550]">
+            <i class="fas fa-calendar-week mr-1"></i>
+            {{ $weekStart->format('D, M d') }} &ndash; {{ $weekEnd->format('D, M d, Y') }}
+            @if($weekStart->isCurrentWeek())
+                <span class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-sun text-blue-950">This week</span>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
+        <span>
+            Showing <strong class="text-gray-700">{{ $matchedSessions }}</strong> session{{ $matchedSessions === 1 ? '' : 's' }}
+            @if($scope === 'week')
+                &middot; in <strong class="text-gray-700">{{ $weekStart->format('D, M d') }} &ndash; {{ $weekEnd->format('D, M d, Y') }}</strong>
+            @endif
+        </span>
+        <span class="flex flex-wrap items-center gap-3">
+            @if($scope === 'week')
+                <a href="{{ route('tutor.schedules.index', ['week' => now()->toDateString()]) }}" class="font-semibold text-blue-700 hover:text-blue-900"><i class="fas fa-calendar-day mr-1"></i>Today</a>
+                <a href="{{ route('tutor.schedules.index', ['view' => 'all']) }}" class="font-semibold text-blue-700 hover:text-blue-900"><i class="fas fa-list mr-1"></i>All schedules</a>
+            @else
+                <a href="{{ route('tutor.schedules.index') }}" class="font-semibold text-blue-700 hover:text-blue-900"><i class="fas fa-calendar-week mr-1"></i>This week</a>
+            @endif
+        </span>
+    </div>
+
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-[#EAF2FB]">
                     <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Title</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Start</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">End</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
                 </thead>
+                @if($scope === 'all')
                 <tbody class="divide-y divide-gray-200">
-                    @foreach($schedules as $schedule)
-                    @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
-                    <tr class="{{ $isToday ? 'bg-sun-light hover:bg-sun-light' : 'hover:bg-gray-50' }}">
-                        <td class="px-6 py-4 text-sm font-medium {{ $isToday ? 'text-sun-ink' : '' }}">{{ $schedule->title }}
-                            @if($schedule->isRecurring())
-                                <span class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-800" title="{{ $schedule->seriesLabel() }}">Weekly</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
-                        <td class="px-6 py-4 text-sm {{ $isToday ? 'text-sun-ink font-semibold' : '' }}">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>@endif</td>
-                        <td class="px-6 py-4 text-sm">{{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}</td>
-                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full @if($schedule->status == 'scheduled') bg-blue-100 text-blue-800 @elseif($schedule->status == 'completed') bg-green-100 text-green-800 @else bg-sun-light text-sun-ink @endif">{{ ucfirst($schedule->status) }}</span></td>
-                        <td class="px-6 py-4 text-sm space-x-2">
-                            <a href="{{ route('tutor.attendance.index', $schedule) }}" class="text-blue-600 hover:text-blue-800"><i class="fas fa-check-circle"></i> Attendance</a>
-                            @if($schedule->status != 'completed')
-                            <form action="{{ route('tutor.schedules.complete', $schedule) }}" method="POST" class="inline" onsubmit="return confirmComplete(this, '{{ $schedule->end_time }}')">@csrf<button type="submit" class="text-green-600 hover:text-green-800"><i class="fas fa-check"></i> Complete</button></form>
-                            @endif
-                            @if($schedule->meeting_link)<a href="{{ $schedule->meeting_link }}" target="_blank" class="text-blue-600 hover:text-blue-800"><i class="fas fa-video"></i> Join</a>@endif
+                    @forelse($schedules as $schedule)
+                        @include('tutor.schedules._row', ['schedule' => $schedule])
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+                            <i class="fas fa-calendar-times mr-2 text-gray-400"></i>
+                            No sessions scheduled yet.
+                            <a href="{{ route('tutor.schedules.create') }}" class="font-semibold text-blue-700 hover:text-blue-900">Create your first schedule</a>.
                         </td>
                     </tr>
-                    @endforeach
+                    @endforelse
                 </tbody>
+                @else
+                @php
+                    // A week is shown in full under day headings, so the date is
+                    // never repeated on every row.
+                    $dayGroups = $schedules->groupBy(function ($session) {
+                        return $session->start_time->toDateString();
+                    });
+                @endphp
+                @forelse($dayGroups as $day => $daySessions)
+                    @php $dayDate = \Carbon\Carbon::parse($day); @endphp
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="{{ $dayDate->isToday() ? 'bg-sun-light' : 'bg-gray-50' }}">
+                            <th colspan="6" scope="colgroup" class="px-6 py-2 text-left text-xs font-semibold uppercase tracking-wide {{ $dayDate->isToday() ? 'text-sun-ink' : 'text-[#0a2550]' }}">
+                                <i class="fas fa-calendar-day mr-1"></i>
+                                {{ $dayDate->format('l, M d, Y') }}
+                                @if($dayDate->isToday())
+                                    <span class="ml-2 px-2 py-0.5 text-[10px] font-bold rounded-full bg-sun text-blue-950">Today</span>
+                                @endif
+                                <span class="ml-2 font-normal normal-case tracking-normal text-gray-500">{{ $daySessions->count() }} {{ $daySessions->count() === 1 ? 'session' : 'sessions' }}</span>
+                            </th>
+                        </tr>
+                        @foreach($daySessions as $schedule)
+                            @include('tutor.schedules._row', ['schedule' => $schedule, 'showDate' => false])
+                        @endforeach
+                    </tbody>
+                @empty
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+                                <i class="fas fa-calendar-times mr-2 text-gray-400"></i>
+                                No sessions scheduled this week.
+                                <a href="{{ route('tutor.schedules.index', ['view' => 'all']) }}" class="font-semibold text-blue-700 hover:text-blue-900">Browse all schedules</a>
+                                or move to another week.
+                            </td>
+                        </tr>
+                    </tbody>
+                @endforelse
+                @endif
             </table>
         </div>
-        <div class="p-4 border-t">{{ $schedules->links() }}</div>
+        @if($scope === 'all')
+            <div class="p-4 border-t">{{ $schedules->links() }}</div>
+        @endif
     </div>
 </div>
 @endsection

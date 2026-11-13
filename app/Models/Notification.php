@@ -78,6 +78,32 @@ class Notification extends Model
         'sent_at' => 'datetime',
     ];
 
+    /**
+     * Every in-app notification is also queued for Web Push, so the phone buzzes
+     * even when the app is closed. The service is silent when no VAPID keys are
+     * configured, so this hook is safe on any server.
+     */
+    protected static function booted()
+    {
+        static::created(function (Notification $notification) {
+            if (! $notification->user_id) {
+                return;
+            }
+
+            try {
+                app(\App\Services\WebPushService::class)->queue(
+                    (int) $notification->user_id,
+                    (string) $notification->type,
+                    (string) $notification->title,
+                    $notification->message,
+                    '/notifications'
+                );
+            } catch (\Throwable $e) {
+                // A push must never break the action that raised the alert.
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

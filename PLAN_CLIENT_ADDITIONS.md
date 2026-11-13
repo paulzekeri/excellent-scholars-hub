@@ -145,6 +145,23 @@ guide, sidebar). This is the honest picture of all 14 notes:
       read and reply; replies stay one-to-one in the same thread.
 - [x] Inbox category tabs for administrators (All / Parents / Tutors / Learners).
 - [x] Conversation permission matrix centralised in the controller.
+- [x] **Inbox guidance + live refresh (4 November 2026)** — `/messages` now opens with a *"Want to
+      send a message? Start by clicking a name below"* callout and every contact row carries a visible
+      **Send message** / **Open chat** button (plus avatar, role badge, unread count and last-message
+      preview), so a new parent or learner knows the next step. Both `/messages` and `/messages/{user}`
+      then poll small JSON endpoints (`messages/updates/inbox`, `messages/{user}/updates`) every 4–5
+      seconds, so new messages appear without reloading; the thread poll marks incoming messages read
+      and pauses while the tab is hidden. Only the two partials (`messages/_contacts`,
+      `messages/_thread`) are re-rendered, and only when the watermark changes — no Pusher/WebSocket
+      account or front-end build is required. Covered by `tests/Feature/MessageInboxTest.php`.
+- [x] **The same live refresh covers notifications and broadcasts** — `/notifications` polls
+      `notifications/updates` (8s, respecting the type filter), the admin notification manager polls
+      `admin/notifications/updates` (6s, page one only) and the broadcast report polls
+      `admin/messages/updates` (6s), which also returns the three counter values. Each endpoint
+      compares a newest-id + unread-total watermark and returns the re-rendered partial
+      (`notifications/_list`, `admin.notifications/_rows`, `admin.messages/_batches`) only when
+      something changed; the manager's read modal uses event delegation so polled rows still open it.
+      Covered by `tests/Feature/LiveUpdatesTest.php`.
 
 ## Phase 8 — Public landing page (note 13)
 
@@ -346,8 +363,23 @@ All six items are implemented and verified. New/updated tests:
 - **Schedules filters:** `/admin/schedules` takes `class_id`, `tutor_id`, `date` (a single day of `start_time`,
   via `whereDate`) and `status`, so the school can drill into "everything on this day / for this class / with
   this tutor". Filters survive pagination (`withQueryString()`), a hand-typed or invalid date is ignored instead
-  of erroring, the bar reports *Showing X of Y sessions* with **Today** / **Any day** shortcuts and a **Reset**,
+  of erroring, the bar reports *Showing X of Y sessions* with **Today** / **This week** shortcuts and a **Reset**,
   and an empty result shows a message instead of a blank table. Covered by `tests/Feature/ScheduleFiltersTest.php`.
+- **Schedules week view:** a year-long weekly series used to fill the list with hundreds of rows and dozens of
+  pages, so the page now opens on the **current week**, Monday to Sunday (`scope = week`). `?week=YYYY-MM-DD`
+  picks any date inside another week (a broken value falls back to this week), the week switcher keeps the
+  class/tutor/status filters, and sessions are grouped under a day heading with a per-day count and a **Today**
+  highlight. Week and day views return a plain collection, so there is no pagination; `?view=all` keeps the old
+  full history (upcoming first, then most recent past) paginated 25 rows at a time. The row markup lives in
+  `admin/schedules/_row.blade.php` so both tables stay identical, and saving or deleting a session redirects to
+  that session's own week. Covered by `tests/Feature/ScheduleWeekViewTest.php`.
+- **Tutor week view:** `/tutor/schedules` opens on the same current week, grouped by day, with the same
+  **Previous week** / **This week** / **Next week** switcher and an **All schedules** (`?view=all`, 25 per page)
+  link. Only the signed-in tutor's rows are queried, so the week can never leak another tutor's timetable. The
+  week maths is shared through `ClassScheduleService::weekStart()` and the row markup lives in
+  `tutor/schedules/_row.blade.php`. Covered by `tests/Feature/TutorScheduleWeekViewTest.php`.
+- Migration `2026_11_04_000001_add_start_time_index_to_class_schedules_table` adds an index on
+  `class_schedules.start_time`, now that both schedules screens filter and sort by it.
 
 ### R5 — learning goals: long text, no target/learner/notes, free AI check
 
@@ -394,9 +426,61 @@ All six items are implemented and verified. New/updated tests:
   "everyone" share and the affected ones show just the named people. The checkbox labels now read
   *Every parent/learner/tutor the goal is about*. Covered by `tests/Feature/LearningGoalSharingTest.php`.
 
+### R7 — Class Library (external Google Drive resources)
+
+- Migration `create_class_library_resources_table`: `class_id`, `created_by`, `title`, optional `description`,
+  `url` (2,048 characters) and `type` (`link`, `video`, `pdf`, `document`); rows cascade with the class and keep
+  their history if the person who added them is deleted (`created_by` set null).
+- **Academics → Class Library** (administrators and the CEO) and **Teaching → Class Library** (tutors): choose a
+  class, type the title learners click, paste the Drive link, pick the type and add an optional description;
+  a class filter and a count sit above the list. Tutors only see their own classes, can only add to them
+  (`Rule::exists('classes', 'id')->where('tutor_id', …)`) and get a 403 when removing another tutor's link;
+  administrators and the CEO manage every class.
+- **My Learning → Class Library** (learners): the links of the classes they are enrolled in, grouped under each
+  class. The **title** is the anchor (`target="_blank"` + `rel="noopener noreferrer"`), so the address itself is
+  never printed; the type shows an icon and badge, and the description explains the resource. An empty state
+  explains that the school or tutor adds them.
+- Links are trimmed and must be real `http(s)` addresses — a bare `drive.google.com/...` value and a
+  `javascript:` value are both refused — so nothing clickable can run script. Covered by
+  `tests/Feature/ClassLibraryTest.php`.
+
+### R8 — installable app (PWA) and phone alerts (Web Push)
+
+- **Install app:** `public/manifest.webmanifest` (standalone, brand colours, icons,
+  Notifications/Messages shortcuts), generated icons in `public/icons/`
+  (`scripts/make-pwa-icons.ps1`), and `public/service-worker.js` with the
+  network-only `fetch` handler Chrome requires for installation. The top bar renders
+  `partials/pwa-install-button`, which uses Chrome's `beforeinstallprompt` for a
+  one-click install, swaps to the *Share → Add to Home Screen* instructions on iOS,
+  and hides itself when the app is already installed.
+- **Phone alerts:** `public/assets/js/esh-pwa.js` registers the worker and owns the
+  subscribe/unsubscribe/status calls; `partials/phone-alerts-button` on
+  `/notifications` asks for the permission and files the device. Server side:
+  `push_subscriptions` (one row per browser, keyed by the endpoint hash) and
+  `push_messages` (outbox), `PushSubscriptionController` (`/push/status`,
+  `/push/subscribe`, `/push/unsubscribe`), `WebPushCrypto` (RFC 8291 `aes128gcm`
+  encryption + RFC 8292 VAPID JWT with `openssl` only — no Composer package) and
+  `WebPushService` (queue, deliver, 404/410 disables the device, retries, prune).
+  `Notification::booted()` queues a push for every in-app notification, so
+  broadcasts, messages and class-library additions reach the phone automatically;
+  `push:send` is scheduled every minute in `routes/console.php`.
+- **Keys and dormancy:** `php artisan push:keys` prints a VAPID pair for `.env`
+  (`WEBPUSH_PUBLIC_KEY` / `WEBPUSH_PRIVATE_KEY` / `WEBPUSH_SUBJECT`). With no keys
+  nothing is queued, sent or advertised — the layout hands over no push meta tags,
+  the alerts card does not render and every page still loads.
+- **Helpers:** `php artisan push:send [--limit=] [--prune]`,
+  `php artisan push:test <user-id>`, `php artisan push:keys [--force]`.
+- Requires HTTPS (or localhost) and the standard `schedule:run` cron; setup,
+  verification and troubleshooting are documented in `PWA.md`. Covered by
+  `tests/Feature/WebPushTest.php` (RFC 8291 test vector, VAPID signature, devices,
+  delivery outcomes, endpoints, notification → push hook, page wiring) and
+  `tests/Feature/ProgressiveWebAppTest.php` (manifest, icons, install button,
+  worker handlers).
+
 ### Documentation
 
 - In-app **Help → What's new in this release**: rows updated for Fees, Learning goals and Classes, new rows for
   Schedules and Users; the Classes, Schedules, Fees and Learning-goals sections were rewritten for the new flow.
+  The **Class Library** has its own section for administrators (8), tutors (6) and learners (step 4 of Materials).
 - `PLAN_CLIENT_ADDITIONS.md` (this file) and `plan.md` (Phase 12) list the same changes.
 
