@@ -1,11 +1,12 @@
 name: Deploy to cPanel (UAT)
 
 # ---------------------------------------------------------------------------
-# Push to uat  ->  build the app on the runner  ->  publish over SFTP to
+# Push to main  ->  build the app on the runner  ->  publish over SFTP to
 # https://uat.eshglobal.org  ->  run the artisan post-deploy steps.
 #
-# This is the UAT workflow (https://uat.eshglobal.org). It deploys the `uat`
-# branch; production (https://eshglobal.org) is deploy-cpanel.yml on `main`.
+# This is the UAT workflow: every push to `main` publishes here automatically so
+# the change can be tested. Production (deploy-cpanel.yml) never runs on a push —
+# it is started from Actions after sign-off.
 #
 # Same mechanism as tcntiu-debug/Smart-Church (.github/workflows/deploy-cpanel.yml),
 # which is how dev.lit-grp.com is published: nobody logs in by hand, the GitHub
@@ -33,7 +34,7 @@ name: Deploy to cPanel (UAT)
 on:
   push:
     branches:
-      - uat
+      - main
   workflow_dispatch:
     inputs:
       note:
@@ -42,7 +43,7 @@ on:
         default: Manual deployment
 
 concurrency:
-  group: cpanel-deploy-eshglobal-uat-${{ github.ref }}
+  group: cpanel-deploy-uat-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -58,7 +59,7 @@ env:
 
 jobs:
   deploy:
-    name: Build and publish to cPanel
+    name: Build and publish to cPanel (UAT)
     runs-on: ubuntu-latest
 
     steps:

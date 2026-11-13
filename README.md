@@ -108,14 +108,15 @@ php artisan esh:create-admin --role=ceo
 The repository is **`https://github.com/paulzekeri/excellent-scholars-hub`** (moved from
 `tcntiu-debug/excellent-scholars-hub`). Two cPanel environments deploy from it with GitHub Actions:
 
-| Environment | Branch | URL | Workflow |
+| Environment | Trigger | URL | Workflow |
 |---|---|---|---|
-| Production | `main` | `https://eshglobal.org` | `.github/workflows/deploy-cpanel.yml` |
-| UAT | `uat` | `https://uat.eshglobal.org` | `.github/workflows/deploy-cpanel-uat.yml` |
+| Production | manual run (approve) | `https://eshglobal.org` | `.github/workflows/deploy-cpanel.yml` |
+| UAT | push to `main` (automatic) | `https://uat.eshglobal.org` | `.github/workflows/deploy-cpanel-uat.yml` |
 
 Both build `vendor/` on the runner, mirror the tree over SFTP (never `.env`, uploads, `public/storage`
 or `bootstrap/cache`), prune files removed from the repo, then run
-`migrate`/`storage:link`/caches/`esh:health` over SSH. Secrets and variables are per-repository, so
+`migrate`/`storage:link`/caches/`esh:health` over SSH. **Pushing `main` deploys UAT only**; production is
+a manual run from Actions after you have tested UAT. Secrets and variables are per-repository, so
 they must be created again in the new account (production `CPANEL_HOST/USER/PASSWORD`, UAT
 `UAT_CPANEL_HOST/USER/PASSWORD` — nothing else). The full runbook — transfer checklist, secrets, domain/PHP/database
 setup, the cPanel Git pipeline (`.cpanel.yml`), the release-zip fallback (`deploy/build-release.ps1`),
@@ -396,7 +397,7 @@ sitting, then the school only confirms the money arrived.
   `--no-dev`, SFTP mirror (`lftp`) to `~/public_html/`, pruning of files removed from the repo, then
   `migrate --force --seed`, `storage:link`, `config:cache`, `view:cache` and `esh:health` over SSH. Never
   uploads `.env`, `storage/` uploads or `public/storage`.
-- **`.github/workflows/deploy-cpanel-uat.yml`** — the same pipeline for UAT on push to `uat`
+- **`.github/workflows/deploy-cpanel-uat.yml`** — the same pipeline for UAT, on every push to `main`
   (`~/public_html/uat.eshglobal.org/`, `UAT_CPANEL_*` secrets).
 - **`.htaccess` (repository root)** — forwards every request into `public/` and returns 403 for `.env`,
   `artisan`, `composer.*`, `*.log`, `*.sql`, `*.sh`, `*.yml`, so the app can live inside the document root.

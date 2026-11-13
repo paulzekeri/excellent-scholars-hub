@@ -5,10 +5,14 @@ The repository lives at **https://github.com/paulzekeri/excellent-scholars-hub**
 (example host `147.124.220.162`, panel <https://cpanel.lit-grp.com>, SSH/FTP ports open); everything
 below applies to any cPanel host.
 
-| Environment | Branch | URL | App folder | Demo accounts |
+| Environment | Trigger | URL | App folder | Demo accounts |
 |---|---|---|---|---|
-| Production | `main` | `https://eshglobal.org` | `/home/<account>/public_html` (primary domain's document root) | **never** (`SEED_DEMO_ACCOUNTS=false`) |
-| UAT | `uat` | `https://uat.eshglobal.org` | `/home/<account>/public_html/uat.eshglobal.org` | yes (`SEED_DEMO_ACCOUNTS=true`) |
+| Production | manual run (approve) | `https://eshglobal.org` | `/home/<account>/public_html` (primary domain's document root) | **never** (`SEED_DEMO_ACCOUNTS=false`) |
+| UAT | push to `main` (automatic) | `https://uat.eshglobal.org` | `/home/<account>/public_html/uat.eshglobal.org` | yes (`SEED_DEMO_ACCOUNTS=true`) |
+
+> **Deploy flow:** commit → push to `main` → **UAT deploys automatically** → test at
+> https://uat.eshglobal.org → Actions → *Deploy to cPanel (Production)* → **Run workflow** →
+> approve (if the `production` environment has required reviewers) → production.
 
 > **DNS + SSL first:** both domains must resolve to their server and have certificates
 > (*SSL/TLS Status → Run AutoSSL*) before `SESSION_SECURE_COOKIE=true` — and before the install button /
@@ -24,7 +28,7 @@ below applies to any cPanel host.
 3. **Secrets are per-repository** — create them again in the new repo
    (*Settings → Secrets and variables → Actions*): production `CPANEL_HOST/USER/PASSWORD`, UAT
    `UAT_CPANEL_HOST/USER/PASSWORD` (see §2.1 and §6). Nothing else is needed.
-4. Enable Actions, keep `main` as the default branch, and create a **`uat`** branch for UAT deploys.
+4. Enable Actions and keep `main` as the default branch. Pushing `main` deploys UAT automatically; production only deploys when you start its workflow.
 
 ## 0. What the app needs
 
@@ -65,9 +69,9 @@ below applies to any cPanel host.
 
 ## 2. Deploy on every push (GitHub Actions) — recommended
 
-`.github/workflows/deploy-cpanel.yml` publishes production on every push to `main`;
-`.github/workflows/deploy-cpanel-uat.yml` publishes UAT on every push to `uat`. Both build `vendor/`,
-mirror the staged tree over SFTP and then run the artisan steps on the server. Nothing has to be
+`.github/workflows/deploy-cpanel-uat.yml` publishes UAT on every push to `main`;
+`.github/workflows/deploy-cpanel.yml` is production and runs only when started manually. Both build
+`vendor/`, mirror the staged tree over SFTP and then run the artisan steps on the server. Nothing has to be
 installed on the account and no SSH session is opened by hand.
 
 ### 2.1 One-time repository setup
@@ -318,9 +322,9 @@ a test push can never touch production data.
    `APP_URL=https://uat.eshglobal.org`, `SESSION_SECURE_COOKIE=true`.
 3. **Repository secrets** in the new repo: `UAT_CPANEL_HOST`, `UAT_CPANEL_USER`,
    `UAT_CPANEL_PASSWORD` — that is all; the workflow targets `~/public_html/uat.eshglobal.org/` on port 22.
-4. **Deploy:** `git push origin uat` (create the branch from `main` first with
-   `git push origin main:uat`). The workflow mirrors the tree, runs `migrate --force --seed`,
-   `storage:link`, the caches and `esh:health` against the UAT database.
+4. **Deploy:** push to `main` (or run *Deploy to cPanel (UAT)* by hand). The workflow mirrors the
+   tree, runs `migrate --force --seed`, `storage:link`, the caches and `esh:health` against the UAT
+   database.
 5. **Verify:** walk the §5 table against `https://uat.eshglobal.org` with the demo accounts, then merge
    into `main` to publish production.
 6. Keep the UAT copy private if you like (cPanel → *Directory Privacy*), and remember it needs its own
@@ -342,8 +346,9 @@ a test push can never touch production data.
 | Upload of a large material fails | `upload_max_filesize`/`post_max_size` below 100M in *MultiPHP INI Editor*. |
 | Login redirects back to `/login` | `SESSION_SECURE_COOKIE=true` while the site is still served over `http://` — either finish AutoSSL or set it to `false`. |
 
-**Rollback:** revert the commit and push (`git revert <sha> && git push`) — the workflow republishes
-the previous code and its prune step removes the files the revert deleted. Manual installs:
+**Rollback:** revert the commit and push (`git revert <sha> && git push`) — UAT redeploys
+automatically and its prune step removes the files the revert deleted; run the production workflow
+manually to do the same there. Manual installs:
 `git checkout <previous-commit>` in `~/public_html`, then `composer install --no-dev` and
 `php artisan config:cache && php artisan view:cache`. Schema changes: `php artisan migrate:rollback
 --step=1` (only migrations from the last batch). Restore the pre-deploy database dump if the rollback

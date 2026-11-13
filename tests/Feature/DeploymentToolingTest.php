@@ -124,6 +124,9 @@ class DeploymentToolingTest extends TestCase
         $this->assertStringContainsString('secrets.CPANEL_HOST', $workflow);
         $this->assertStringContainsString('secrets.CPANEL_USER', $workflow);
         $this->assertStringContainsString('secrets.CPANEL_PASSWORD', $workflow);
+        $this->assertStringContainsString('workflow_dispatch:', $workflow);
+        $this->assertStringNotContainsString('push:', $workflow, 'Production must never deploy automatically.');
+        $this->assertStringContainsString('name: production', $workflow, 'Production runs behind the production environment (required reviewers).');
         $this->assertStringNotContainsString('vars.', $workflow, 'Only the three required secrets are configured; no optional variables.');
         $this->assertStringNotContainsString('ENV_CONTENT', $workflow, 'The .env is created by hand; the workflow never writes it.');
         $this->assertStringContainsString("'public_html/'", $workflow, 'Production deploys to the primary domain document root.');
@@ -140,8 +143,8 @@ class DeploymentToolingTest extends TestCase
         $this->assertStringNotContainsString('vars.', $uatWorkflow, 'Only the three required secrets are configured; no optional variables.');
         $this->assertStringNotContainsString('ENV_CONTENT', $uatWorkflow, 'The .env is created by hand; the workflow never writes it.');
         $this->assertStringContainsString("'public_html/uat.eshglobal.org/'", $uatWorkflow);
-        $this->assertStringContainsString("      - uat", $uatWorkflow, 'The UAT pipeline must listen to the uat branch, not main.');
-        $this->assertStringNotContainsString("      - main", $uatWorkflow);
+        $this->assertStringContainsString("      - main", $uatWorkflow, 'UAT deploys automatically on every push to main.');
+        $this->assertStringNotContainsString("      - uat", $uatWorkflow, 'UAT no longer needs a separate branch.');
 
         // Laravel 13 *can* cache routes — the pipeline may even run `artisan optimize`.
         // That only holds while no route *action* is a closure, because closures

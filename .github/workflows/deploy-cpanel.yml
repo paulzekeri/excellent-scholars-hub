@@ -1,11 +1,14 @@
 name: Deploy to cPanel
 
 # ---------------------------------------------------------------------------
-# Push to main  ->  build the app on the runner  ->  publish over SFTP to
+# Manual run  ->  build the app on the runner  ->  publish over SFTP to
 # https://eshglobal.org  ->  run the artisan post-deploy steps.
 #
-# This is the PRODUCTION workflow (https://eshglobal.org, `main` branch). The UAT
-# site (https://uat.eshglobal.org) deploys from deploy-cpanel-uat.yml on `uat`.
+# This is the PRODUCTION workflow and it never runs on a push. Pushing to `main`
+# deploys UAT first (deploy-cpanel-uat.yml); after testing there, start this one
+# from Actions -> "Deploy to cPanel (Production)" -> Run workflow. Add required
+# reviewers to the `production` environment (Settings -> Environments) to turn
+# that manual start into an explicit approval gate.
 #
 # Same mechanism as tcntiu-debug/Smart-Church (.github/workflows/deploy-cpanel.yml),
 # which is how dev.lit-grp.com is published: nobody logs in by hand, the GitHub
@@ -31,9 +34,7 @@ name: Deploy to cPanel
 # ---------------------------------------------------------------------------
 
 on:
-  push:
-    branches:
-      - main
+  # Production is manual only: pushing to main deploys UAT, never this workflow.
   workflow_dispatch:
     inputs:
       note:
@@ -42,7 +43,7 @@ on:
         default: Manual deployment
 
 concurrency:
-  group: cpanel-deploy-eshglobal-${{ github.ref }}
+  group: cpanel-deploy-production-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -58,8 +59,13 @@ env:
 
 jobs:
   deploy:
-    name: Build and publish to cPanel
+    name: Build and publish to cPanel (production)
     runs-on: ubuntu-latest
+    # Settings -> Environments -> production: add yourself as a required reviewer
+    # to make the manual run an explicit approval before anything is uploaded.
+    environment:
+      name: production
+      url: https://eshglobal.org
 
     steps:
       - name: Checkout repository
