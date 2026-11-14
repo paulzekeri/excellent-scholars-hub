@@ -284,7 +284,7 @@
         </div>
         <div class="mt-10 grid grid-cols-1 md:grid-cols-4 gap-6">
             @foreach([
-                ['icon' => 'fa-user-plus', 'title' => 'Register', 'text' => 'Create a learner, parent or tutor account in under a minute.'],
+                ['icon' => 'fa-user-plus', 'title' => 'Register', 'text' => 'Create a learner account in under a minute.'],
                 ['icon' => 'fa-school', 'title' => 'Get placed', 'text' => 'The school links learners to the right class and their parent.'],
                 ['icon' => 'fa-video', 'title' => 'Attend live classes', 'text' => 'Join Google Meet or Zoom sessions straight from the dashboard.'],
                 ['icon' => 'fa-chart-line', 'title' => 'Track progress', 'text' => 'Grades, attendance and shared learning goals in one place.'],
@@ -508,7 +508,7 @@
 <section id="contact" class="py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="font-display text-3xl font-extrabold text-[#0a2550] sm:text-4xl">Ready to join the next term?</h2>
-        <p class="mt-3 text-gray-600">Create an account as a learner, parent or tutor — the school will place you in the right class.</p>
+        <p class="mt-3 text-gray-600">Create a learner account — the school will place the child in the right class.</p>
         <div class="mt-6 flex flex-wrap justify-center gap-3">
             <a href="{{ route('register') }}" class="bg-accent hover:bg-orange-400 text-blue-950 font-semibold px-6 py-3 rounded-lg transition shadow">Register now</a>
             <a href="{{ route('login') }}" class="bg-white border border-brand text-brand font-semibold px-6 py-3 rounded-lg hover:bg-brand-light transition">Log in</a>

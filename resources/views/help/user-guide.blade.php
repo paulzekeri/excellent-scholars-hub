@@ -189,35 +189,35 @@
                     <li class="flex items-start gap-3">
                         <span class="step-number mt-0.5">2</span>
                         <div>
-                            <p class="font-medium text-gray-800">Choose "I am a" — Learner or Tutor</p>
-                            <p class="text-sm text-gray-600">The <strong>"I am a"</strong> choice is the <strong>first field</strong> on the form and it decides how the rest of the form is worded. Pick <strong>Learner</strong> if you are enrolling a child, or <strong>Tutor</strong> if you want to teach. Parents and staff do not register here.</p>
+                            <p class="font-medium text-gray-800">Learner Registration Only</p>
+                            <p class="text-sm text-gray-600">The public form enrols a child, so it no longer asks who is registering — <strong>Learner</strong> is the only account it can create. Parents, tutors and staff do not register here: an administrator or the CEO creates a tutor account from <strong>Users → Add user</strong>.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3">
                         <span class="step-number mt-0.5">3</span>
                         <div>
                             <p class="font-medium text-gray-800">Fill in Your Details</p>
-                            <p class="text-sm text-gray-600">As a learner the fields are labelled <strong>Learner Full Name</strong>, <strong>Learner Username</strong>, <strong>Learner Email</strong> (optional for a child with no email) and <strong>Learner Phone</strong> (optional) so they are never confused with the parent/guardian details below. A tutor simply sees Full Name, Username, Email (required) and Phone.</p>
+                            <p class="text-sm text-gray-600">The fields are labelled <strong>Learner Full Name</strong>, <strong>Learner Username</strong>, <strong>Learner Email</strong> (optional for a child with no email) and <strong>Learner Phone</strong> (optional) so they are never confused with the parent/guardian details below.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3">
                         <span class="step-number mt-0.5">4</span>
                         <div>
-                            <p class="font-medium text-gray-800">Parent/Guardian Details (for Learners only)</p>
-                            <p class="text-sm text-gray-600">If you register as a <strong>Learner</strong>, the parent/guardian section appears and you must provide the <strong>Parent/Guardian Full Name</strong> and <strong>Parent/Guardian Email</strong>. The guardian email is <strong>required</strong> — it is where login details and password resets go when the child has no mailbox. A parent account is created automatically when that email is new and the login details are emailed to it.</p>
+                            <p class="font-medium text-gray-800">Parent/Guardian Details</p>
+                            <p class="text-sm text-gray-600">The parent/guardian section appears and you must provide the <strong>Parent/Guardian Full Name</strong> and <strong>Parent/Guardian Email</strong>. The guardian email is <strong>required</strong> — it is where login details and password resets go when the child has no mailbox. A parent account is created automatically when that email is new and the login details are emailed to it.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3">
                         <span class="step-number mt-0.5">5</span>
                         <div>
                             <p class="font-medium text-gray-800">Create Password & Submit</p>
-                            <p class="text-sm text-gray-600">Create a password (minimum 8 characters), confirm it, and click <strong>"Create Account"</strong> (this reads <strong>"Create Learner Account"</strong> when you chose Learner).</p>
+                            <p class="text-sm text-gray-600">Create a password (minimum 8 characters), confirm it, and click <strong>"Create Learner Account"</strong>.</p>
                         </div>
                     </li>
                 </ol>
 
                 <div class="tip-box">
-                    <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you are an <strong>Administrator</strong> or the <strong>CEO</strong>, your account will be created by the system owner directly — you won't register via the public form.</p>
+                    <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> If you are an <strong>Administrator</strong>, the <strong>CEO</strong> or a <strong>Tutor</strong>, your account will be created by the school directly (tutors are added by an administrator or the CEO from <strong>Users → Add user</strong>) — you won't register via the public form.</p>
                 </div>
 
                 <h3 class="text-lg font-semibold text-gray-700 mb-3">How to Log In</h3>

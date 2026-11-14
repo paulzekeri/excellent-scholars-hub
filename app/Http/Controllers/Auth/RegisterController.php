@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Learner;
-use App\Models\Tutor;
 use App\Models\ParentModel;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -28,15 +27,17 @@ class RegisterController extends Controller
     }
 
     /**
-     * Roles that may create an account themselves. Parents are provisioned by
-     * the school (or automatically from a learner's guardian details).
+     * Roles that may create an account themselves. Only a learner may sign up
+     * here: tutors are staff and are added by an administrator or the CEO from
+     * Users > Add user. Parents are provisioned by the school (or automatically
+     * from a learner's guardian details).
      */
-    public const SELF_REGISTER_ROLES = ['learner', 'tutor'];
+    public const SELF_REGISTER_ROLES = ['learner'];
 
     public function showRegistrationForm()
     {
-        // "I am a" is the first field on the form, so list the choices in that
-        // order: Learner, then Tutor.
+        // The public form is learner-only, so the sorted lookup simply keeps the
+        // single selectable role in one place.
         $roles = Role::whereIn('slug', self::SELF_REGISTER_ROLES)
             ->get()
             ->sortBy(function (Role $role) {
@@ -66,8 +67,8 @@ class RegisterController extends Controller
                 'string', 'email', 'max:255', 'unique:users',
             ],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            // The first field on the form: only a learner or a tutor can
-            // register here, so a crafted role_id cannot create staff.
+            // The role travels in a hidden field and must be a learner, so a
+            // crafted role_id cannot create a tutor or any other staff account.
             'role_id' => [
                 'required',
                 Rule::exists('roles', 'id')->where(function ($query) {
@@ -125,9 +126,7 @@ class RegisterController extends Controller
 
         $role = Role::find($data['role_id']);
 
-        if ($role->slug === 'tutor') {
-            Tutor::create(['user_id' => $user->id]);
-        } elseif ($role->slug === 'learner') {
+        if ($role->slug === 'learner') {
             // Create learner record
             $learner = Learner::create([
                 'user_id' => $user->id,

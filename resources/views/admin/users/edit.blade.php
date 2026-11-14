@@ -12,6 +12,7 @@
     <a href="{{ route('admin.users.index') }}" class="text-blue-600 hover:text-blue-800 mb-4 inline-block">
         <i class="fas fa-arrow-left mr-1"></i> Back
     </a>
+    @include('admin.users.credentials')
     <div class="bg-white rounded-xl shadow-md p-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">Edit User: {{ $user->name }}</h1>
         <form action="{{ route('admin.users.update', $user) }}" method="POST" class="space-y-6">

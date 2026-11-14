@@ -3,14 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Role;
-use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 /**
- * "I am a — Learner / Tutor" is the first question on the registration form and
- * it decides how the fields below it are worded, so a learner's own details can
- * never be confused with the parent/guardian block.
+ * The public "Create your account" form registers learners only. Tutors are
+ * staff, so an administrator or the CEO adds them from Users > Add user, and a
+ * crafted tutor role_id is refused.
  */
 class RegistrationFormTest extends TestCase
 {
@@ -21,32 +20,37 @@ class RegistrationFormTest extends TestCase
         return Role::where('slug', $slug)->firstOrFail()->id;
     }
 
-    public function test_the_registration_form_asks_who_is_registering_before_any_other_field(): void
+    public function test_the_registration_form_is_a_learner_only_notice_with_no_role_switch(): void
     {
         $response = $this->get(route('register'))->assertOk();
 
         $html = $response->getContent();
 
-        $this->assertNotFalse(strpos($html, 'I am a'));
+        // A plain notice explains what the form does — there is no role picker.
+        $this->assertNotFalse(strpos($html, 'Register to learn'));
         $this->assertLessThan(
             strpos($html, 'name="name"'),
-            strpos($html, 'I am a'),
-            'The "I am a" choice should come before the name fields.'
+            strpos($html, 'Register to learn'),
+            'The learner notice should come before the name fields.'
         );
 
-        // Learner is offered first, then tutor, and a parent cannot self-register.
-        $this->assertLessThan(
-            strpos($html, 'data-role-slug="tutor"'),
-            strpos($html, 'data-role-slug="learner"'),
-            'Learner should be listed before Tutor.'
-        );
+        // Only a learner may self-register. Tutors are added by an administrator
+        // or the CEO, and a parent cannot self-register at all.
         $response->assertSee('name="role_id"', false)
             ->assertSee('data-role-slug="learner"', false)
-            ->assertSee('data-role-slug="tutor"', false)
+            ->assertDontSee('type="radio"', false)
+            ->assertDontSee('data-role-slug="tutor"', false)
             ->assertDontSee('data-role-slug="parent"', false);
+
+        // The learner role travels with the form in a hidden field.
+        $this->assertMatchesRegularExpression(
+            '/<input type="hidden" name="role_id" value="\d+"/',
+            $html,
+            'The learner role should be posted with the form.'
+        );
     }
 
-    public function test_the_shared_fields_carry_learner_wording_so_they_are_not_confused_with_the_parent_fields(): void
+    public function test_the_fields_use_learner_wording_so_they_are_not_confused_with_the_parent_fields(): void
     {
         $this->get(route('register'))
             ->assertOk()
@@ -58,8 +62,7 @@ class RegistrationFormTest extends TestCase
             ->assertSee('Learner Password')
             ->assertSee('Parent/Guardian Details')
             ->assertSee('Parent/Guardian Full Name')
-            ->assertSee('Parent/Guardian Email')
-            ->assertSee('data-label-learner="Learner Full Name"', false);
+            ->assertSee('Parent/Guardian Email');
     }
 
     public function test_a_parent_cannot_register_themselves_through_the_public_form(): void
@@ -75,21 +78,19 @@ class RegistrationFormTest extends TestCase
         $this->assertDatabaseMissing('users', ['name' => 'Sneaky Parent']);
     }
 
-    public function test_a_tutor_can_still_register_from_the_same_form(): void
+    public function test_a_tutor_cannot_register_through_the_public_form(): void
     {
         $email = 'self.tutor.' . uniqid() . '@example.com';
 
-        $this->post(route('register'), [
+        $this->from(route('register'))->post(route('register'), [
             'name' => 'Self Tutor',
             'username' => 'self_tutor_' . uniqid(),
             'email' => $email,
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'role_id' => $this->roleId('tutor'),
-        ])->assertRedirect(route('tutor.dashboard'));
+        ])->assertSessionHasErrors('role_id');
 
-        $tutor = User::where('email', $email)->firstOrFail();
-
-        $this->assertNotNull($tutor->tutor);
+        $this->assertDatabaseMissing('users', ['email' => $email]);
     }
 }

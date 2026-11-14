@@ -135,10 +135,14 @@ class UserController extends Controller
             return $user;
         });
 
-        $this->sendProvisioningMail($user->fresh(['learner.parent.user', 'parent.children.user']), $validated['password']);
+        $emailed = $this->sendProvisioningMail($user->fresh(['learner.parent.user', 'parent.children.user']), $validated['password']);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User created. The login details were emailed to ' . ($user->deliveryEmail() ?: 'the account holder') . '.');
+        return redirect()->route('admin.users.index')->with(
+            $emailed ? 'success' : 'error',
+            $emailed
+                ? 'User created. The login details were emailed to ' . ($user->deliveryEmail() ?: 'the account holder') . '.'
+                : 'User created, but no email could be sent. The login details are shown below — hand them over privately.'
+        );
     }
 
     public function edit(User $user)
@@ -261,7 +265,7 @@ class UserController extends Controller
             $child = User::create([
                 'name' => $validated['name'],
                 'username' => strtolower($validated['username']),
-                'email' => $validated['email'] ?: null,
+                'email' => ($validated['email'] ?? null) ?: null,
                 'password' => Hash::make($validated['password']),
                 'role_id' => $learnerRole->id,
                 'must_change_password' => true,
@@ -275,13 +279,17 @@ class UserController extends Controller
             return $child;
         });
 
-        $this->sendProvisioningMail(
+        $emailed = $this->sendProvisioningMail(
             $child->fresh(['learner.parent.user']),
             $validated['password']
         );
 
-        return redirect()->route('admin.users.edit', $user)
-            ->with('success', $child->name . '\'s account is ready. The login details were sent to the guardian.');
+        return redirect()->route('admin.users.edit', $user)->with(
+            $emailed ? 'success' : 'error',
+            $emailed
+                ? $child->name . '\'s account is ready. The login details were sent to the guardian.'
+                : $child->name . '\'s account is ready, but no email could be sent. The login details are shown on this page — hand them over privately.'
+        );
     }
 
     /**
@@ -291,8 +299,10 @@ class UserController extends Controller
      * password straight to a child) and also to the child's own address when one
      * is on file. A guardian's own account mail lists their linked children's
      * usernames so the family has every login in one place.
+     *
+     * @return bool Whether at least one recipient was actually emailed.
      */
-    private function sendProvisioningMail(User $user, string $plainPassword): void
+    private function sendProvisioningMail(User $user, string $plainPassword): bool
     {
         $recipients = [];
         $linked = [];
@@ -326,6 +336,7 @@ class UserController extends Controller
         }
 
         $recipients = array_values(array_unique(array_filter($recipients)));
+        $sent = false;
 
         foreach ($recipients as $address) {
             try {
@@ -336,6 +347,8 @@ class UserController extends Controller
                     $linked,
                     $guardianOf
                 ));
+
+                $sent = true;
             } catch (Throwable $e) {
                 // One undeliverable address should not stop the other recipient.
                 report($e);
@@ -343,14 +356,22 @@ class UserController extends Controller
             }
         }
 
-        if (! $this->mailCanDeliver()) {
+        // The `log`/`array` mailers "send" without delivering, and a broken SMTP
+        // relay throws. Either way the administrator must still be able to hand
+        // the details over, so flash them whenever nothing really went out.
+        $delivered = $sent && $this->mailCanDeliver();
+
+        if (! $delivered) {
             session()->flash('provisioned_credentials', [
                 'name' => $user->name,
                 'username' => $user->username ?: $user->email,
                 'password' => $plainPassword,
                 'sent_to' => $recipients[0] ?? null,
+                'must_change_password' => (bool) $user->must_change_password,
             ]);
         }
+
+        return $delivered;
     }
 
     /**

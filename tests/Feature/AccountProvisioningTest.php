@@ -68,6 +68,33 @@ class AccountProvisioningTest extends TestCase
             ->assertRedirect(route('password.change'));
     }
 
+    public function test_an_admin_creates_a_tutor_and_the_login_details_are_emailed(): void
+    {
+        Mail::fake();
+
+        $admin = $this->makeUser('admin', 'Tutor Admin');
+        $email = 'new.tutor.' . uniqid() . '@example.com';
+
+        $this->actingAs($admin)->post(route('admin.users.store'), [
+            'name' => 'New Tutor',
+            'username' => 'new_tutor',
+            'email' => $email,
+            'password' => 'tutor-pass-123',
+            'role_id' => $this->roleId('tutor'),
+        ])->assertRedirect(route('admin.users.index'));
+
+        $tutor = User::where('email', $email)->firstOrFail();
+
+        $this->assertNotNull($tutor->tutor);
+        // The school chose this password, so the tutor keeps it until they change it.
+        $this->assertFalse($tutor->must_change_password);
+        $this->assertTrue(Hash::check('tutor-pass-123', $tutor->password));
+
+        Mail::assertSent(AccountProvisionedMail::class, function (AccountProvisionedMail $mail) use ($email) {
+            return $mail->hasTo($email) && $mail->username === 'new_tutor';
+        });
+    }
+
     public function test_an_admin_adds_a_child_to_a_parent_and_the_guardian_receives_the_details(): void
     {
         Mail::fake();
@@ -271,11 +298,40 @@ class AccountProvisioningTest extends TestCase
             'email' => 'unreachable.' . uniqid() . '@example.com',
             'password' => 'temp-pass-123',
             'role_id' => $this->roleId('parent'),
-        ])->assertSessionHas('provisioned_credentials');
+        ])->assertSessionHas('provisioned_credentials')->assertSessionHas('error');
 
         $provisioned = session('provisioned_credentials');
 
         $this->assertSame('unreachable_parent', $provisioned['username']);
         $this->assertSame('temp-pass-123', $provisioned['password']);
+        $this->assertTrue($provisioned['must_change_password']);
+
+        // The panel replaces the misleading "emailed" claim.
+        $this->actingAs($admin)->get(route('admin.users.index'))
+            ->assertOk()
+            ->assertSee('Login details for Unreachable Parent')
+            ->assertSee('temp-pass-123');
+    }
+
+    public function test_a_child_added_without_a_working_mailer_shows_the_credentials_on_the_edit_page(): void
+    {
+        $admin = $this->makeUser('admin', 'Child Fallback Admin');
+        $guardian = $this->makeUser('parent', 'Fallback Guardian', ['username' => 'fallback_guardian']);
+        ParentModel::create(['user_id' => $guardian->id]);
+
+        $response = $this->actingAs($admin)->post(route('admin.users.children.store', $guardian), [
+            'name' => 'Fallback Child',
+            'username' => 'fallback_child',
+            'password' => 'temp-pass-456',
+        ]);
+
+        $response->assertRedirect(route('admin.users.edit', $guardian));
+        $response->assertSessionHas('provisioned_credentials')->assertSessionHas('error');
+
+        // The edit screen is where the administrator lands, so the panel must be there.
+        $this->actingAs($admin)->get(route('admin.users.edit', $guardian))
+            ->assertOk()
+            ->assertSee('Login details for Fallback Child')
+            ->assertSee('temp-pass-456');
     }
 }

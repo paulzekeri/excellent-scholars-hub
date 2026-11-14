@@ -10,8 +10,9 @@
     <div class="bg-white rounded-xl shadow-md p-8">
         <h1 class="text-2xl font-bold text-gray-800 mb-1">Create New User</h1>
         <p class="text-sm text-gray-600 mb-6">
-            The account is created with a temporary password. The login details are emailed, and the owner
-            chooses their own password the first time they sign in.
+            The account is created with a password. The login details are emailed to the account holder; if this
+            installation cannot send email, they are shown to you once so you can pass them on. Parents and learners
+            choose their own password the first time they sign in — a tutor keeps the password you set until they change it.
         </p>
 
         <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-6">
@@ -37,14 +38,14 @@
                     <p class="text-xs text-gray-500 mt-1">Required for staff and parents. <strong>Optional for a child</strong> with no email — the guardian's address is used instead.</p>
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Temporary password</label>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                     <div class="mt-1 flex gap-2">
                         <input id="password" type="text" name="password" required
                             class="block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"
                             placeholder="At least 8 characters">
                         <button type="button" id="generate-password" class="shrink-0 rounded-lg border border-gray-300 px-3 text-sm text-gray-600 hover:bg-gray-50">Generate</button>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Emailed once, then replaced by the account owner at first sign-in.</p>
+                    <p class="text-xs text-gray-500 mt-1">Emailed once. Parents and learners replace it at first sign-in.</p>
                 </div>
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
