@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class DeploymentToolingTest extends TestCase
@@ -177,5 +178,41 @@ class DeploymentToolingTest extends TestCase
         $this->assertStringContainsString("\\App\\Http\\Controllers\\HomeController::class, 'index'", $webRoutes);
         $this->assertStringContainsString("\\App\\Http\\Controllers\\HomeController::class, 'userGuide'", $webRoutes);
         $this->assertStringContainsString('ea-php84', file_get_contents($root.'/.cpanel.yml'), 'The cPanel Git pipeline must select the PHP 8.4 binary.');
+    }
+    public function test_health_reports_a_mailer_that_cannot_deliver()
+    {
+        config(['mail.default' => 'log']);
+
+        $this->artisan('esh:health')
+            ->expectsOutputToContain("MAIL_MAILER = 'log'")
+            ->run();
+    }
+    public function test_mail_test_refuses_a_mailer_that_cannot_deliver()
+    {
+        config(['mail.default' => 'log']);
+        Mail::shouldReceive('raw')->never();
+
+        $this->artisan('esh:mail-test', ['email' => 'owner@example.com'])
+            ->expectsOutputToContain("MAIL_MAILER = 'log'")
+            ->assertExitCode(1);
+    }
+    public function test_mail_test_sends_through_a_working_mailer()
+    {
+        config([
+            'mail.default' => 'smtp',
+            'mail.mailers.smtp.host' => 'smtp.eshglobal.org',
+            'mail.from.address' => 'no-reply@eshglobal.org',
+        ]);
+        Mail::shouldReceive('raw')->once();
+
+        $this->artisan('esh:mail-test', ['email' => 'owner@example.com'])
+            ->expectsOutputToContain('Test email sent to owner@example.com')
+            ->assertExitCode(0);
+    }
+    public function test_mail_test_rejects_an_invalid_address()
+    {
+        $this->artisan('esh:mail-test', ['email' => 'not-an-email'])
+            ->expectsOutputToContain('not a valid email address')
+            ->assertExitCode(1);
     }
 }

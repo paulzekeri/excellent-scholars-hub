@@ -155,12 +155,20 @@ Values that matter on the live site:
 | `APP_KEY` | 51 characters: `base64:` + 44. A trailing CR on this line makes every request fail. |
 | `DB_DATABASE` / `DB_USERNAME` | `eshgloba_esh_uat` (the cPanel prefix plus the name you create in *MySQL® Databases*) |
 | `DB_PASSWORD` | that database user's password |
-| `MAIL_MAILER` | `log` (the live site sends no mail). Password-reset emails need a working mailer; while this is `log`, the CEO/administrator generates a one-time reset link from **Admin → Users → Reset password**. |
+| `MAIL_MAILER` | `smtp` plus `MAIL_HOST`/`MAIL_PORT`/`MAIL_USERNAME`/`MAIL_PASSWORD`/`MAIL_ENCRYPTION` to deliver real mail; `log` only writes messages to `storage/logs/laravel.log` and nothing is sent. UAT and production have separate `.env` files — both must be set. Verify with `php artisan esh:mail-test you@example.com`; `php artisan esh:health` warns while the mailer cannot deliver. |
 | `SESSION_SECURE_COOKIE` | `true` |
 | `PAYSTACK_PUBLIC_KEY` / `PAYSTACK_SECRET_KEY` | optional — leave blank until card payments are switched on; the parent form shows card as "coming soon". |
 | `SEED_DEMO_ACCOUNTS` | `false` for real use; `true` only while testing — creates `ceo@`/`admin@`/`tutor@`/`learner@`/`parent@esh.com`, password `password` |
 
 After editing `.env` by hand run `php artisan config:clear` (each deploy does this for you).
+
+> Email is configured **per environment**. If UAT sends mail but production does not, check
+> `MAIL_MAILER` in the production `.env` (the templates ship `log`), then run `php artisan config:cache`
+> (or `config:clear`) and confirm with `php artisan esh:mail-test you@example.com`. Use a
+> `MAIL_FROM_ADDRESS` on the site's own domain (e.g. `no-reply@eshglobal.org`), not the
+> `lit-grp.com` placeholder, or receiving servers may treat the mail as spoofing. While the mailer is
+> `log`, password-reset links are shown to the CEO/administrator on **Admin → Users → Reset password**
+> instead of being emailed.
 
 ### 2.4 Manual fallback: deploy over SSH
 

@@ -18,7 +18,7 @@ class DeploymentHealthCheck extends Command
     /**
      * @var string
      */
-    protected $description = 'Check PHP, .env, database, migrations, writable folders and the public storage link after a deployment';
+    protected $description = 'Check PHP, .env, mailer, database, migrations, writable folders and the public storage link after a deployment';
 
     private $failures = 0;
 
@@ -31,6 +31,7 @@ class DeploymentHealthCheck extends Command
 
         $this->checkPhp();
         $this->checkEnvironment();
+        $this->checkMail();
         $this->checkDatabase();
         $this->checkFilesystem();
         $this->checkAccounts();
@@ -94,6 +95,43 @@ class DeploymentHealthCheck extends Command
         }
 
         $this->note('Timezone = '.config('app.timezone'));
+    }
+
+    /**
+     * Email is configuration, not code: each environment has its own .env, so a
+     * working UAT mailer says nothing about production. The `log`/`array` drivers
+     * accept mail without delivering it, which is easy to miss.
+     */
+    private function checkMail()
+    {
+        $mailer = (string) config('mail.default');
+
+        if (in_array($mailer, ['log', 'array', ''], true)) {
+            $this->caution(
+                "MAIL_MAILER = '{$mailer}'",
+                'Emails are written to the log, not delivered. Set MAIL_MAILER=smtp and the MAIL_* values in this environment\'s .env, then run `php artisan config:clear` (or `config:cache`).'
+            );
+        } else {
+            $this->pass("MAIL_MAILER = {$mailer}");
+        }
+
+        if ($mailer === 'smtp') {
+            $host = (string) config('mail.mailers.smtp.host');
+
+            if ($host === '' || $host === 'smtp.mailgun.org') {
+                $this->caution('SMTP host', 'MAIL_HOST is missing or still the placeholder, so emails cannot be delivered.');
+            } else {
+                $this->note('SMTP host = '.$host.':'.config('mail.mailers.smtp.port'));
+            }
+        }
+
+        $from = (string) config('mail.from.address');
+
+        if ($from === '') {
+            $this->caution('MAIL_FROM_ADDRESS is empty', 'Set a From address on this site\'s own domain so mail is not treated as spoofing.');
+        } else {
+            $this->note("Mail from = {$from}");
+        }
     }
 
     private function checkDatabase()

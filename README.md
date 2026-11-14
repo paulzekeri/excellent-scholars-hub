@@ -130,11 +130,12 @@ Environment templates:
 | `.env.uat.example` | UAT at `uat.eshglobal.org` (`APP_ENV=production`, `APP_DEBUG=false`, `SEED_DEMO_ACCOUNTS=true`) |
 | `.env.production.example` | production at `eshglobal.org` (`SEED_DEMO_ACCOUNTS=false`, `LOG_LEVEL=warning`) |
 
-Two commands support the deploy:
+These commands support the deploy:
 
 ```bash
-php artisan esh:health                       # PHP/extensions, APP_KEY/URL, DB, pending migrations,
+php artisan esh:health                       # PHP/extensions, APP_KEY/URL, mailer, DB, pending migrations,
                                              # writable storage, public/storage link, upload limits, admin + demo users
+php artisan esh:mail-test you@example.com    # send one test email to prove this environment's SMTP works
 php artisan esh:create-admin --role=ceo      # first real CEO/admin login on a fresh production database
 php artisan esh:create-super-admin ...       # optional hidden maintenance account — see MAINTENANCE-USER.md
 ```
