@@ -75,6 +75,11 @@ class ProgressiveWebAppTest extends TestCase
             ->assertSee('assets/js/esh-pwa.js', false)
             ->assertSee('data-pwa-install', false)
             ->assertSee('data-pwa-install-button', false)
+            ->assertSee('data-pwa-install-ios', false)
+            ->assertSee('data-pwa-install-dismiss', false)
+            // iPadOS reports a Macintosh user agent, so the button's iOS test
+            // has to look at touch points as well.
+            ->assertSee('maxTouchPoints', false)
             ->assertSee('esh:install-available', false)
             ->assertSee('Add to Home Screen', false);
     }

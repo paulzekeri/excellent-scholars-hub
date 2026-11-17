@@ -109,7 +109,10 @@
         },
 
         isIos: function () {
-            return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+            var ua = window.navigator.userAgent || '';
+            var ipadOnDesktopUa = /macintosh/i.test(ua) && (window.navigator.maxTouchPoints || 0) > 1;
+
+            return /iphone|ipad|ipod/i.test(ua) || ipadOnDesktopUa;
         },
 
         isStandalone: function () {

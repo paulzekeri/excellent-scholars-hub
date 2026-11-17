@@ -290,7 +290,7 @@
                         home screen and no address bar — and it can ring the phone when something new arrives.
                     </p>
                     <ul class="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        <li><strong>Install:</strong> tap <strong>Install app</strong> in the blue top bar (Chrome, Edge, Android). On iPhone/iPad use <strong>Share &rarr; Add to Home Screen</strong>.</li>
+                        <li><strong>Install:</strong> tap <strong>Install app</strong> in the blue top bar. Android and desktop browsers install in one tap; on iPhone/iPad the button opens the <strong>Share &rarr; Add to Home Screen</strong> steps.</li>
                         <li><strong>Phone alerts:</strong> open <strong>Notifications</strong> and press <strong>Enable phone alerts</strong>, then <em>Allow</em>. The phone now shows broadcasts, messages and other notices even when the app is closed. On iPhone, install the app first and open it from the home screen.</li>
                         <li>Each browser is its own device: turn alerts on once per phone or computer. The same card has a <strong>Turn off</strong> button.</li>
                         <li>Phone alerts arrive within about a minute; the bell inside the app updates instantly while a page is open.</li>
