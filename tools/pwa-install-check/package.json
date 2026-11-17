@@ -1,0 +1,12 @@
+{
+    "name": "esh-pwa-install-check",
+    "private": true,
+    "description": "Playwright WebKit smoke check for the iPhone/iPad Install app button.",
+    "scripts": {
+        "check": "node check.mjs",
+        "install-browser": "playwright install webkit"
+    },
+    "devDependencies": {
+        "playwright": "^1.65.1"
+    }
+}

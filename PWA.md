@@ -104,6 +104,21 @@ says so until the app is opened from the home screen; then the same button works
 
    The in-app bell is instant; the phone follows within about a minute (or at
    once with `php artisan push:send`).
+4. **iPhone/iPad install button** — no iPhone, Mac or Xcode needed. The check
+   renders the real `pwa-install-button` partial in Playwright's WebKit build
+   and covers every branch: iPhone Safari, iPadOS (desktop Macintosh UA plus
+   touch), installed/standalone, desktop with no prompt, and the Chrome/Android
+   one-tap prompt.
+
+   ```bash
+   npm --prefix tools/pwa-install-check install
+   npm --prefix tools/pwa-install-check run install-browser
+   npm run test:pwa-install
+   ```
+
+   It exits non-zero on a regression, so it can gate a release. The first
+   `install-browser` downloads WebKit (~100 MB) once; the script itself is
+   `tools/pwa-install-check/check.mjs` and runs on Windows, macOS and Linux.
 
 ## Troubleshooting
 
@@ -143,6 +158,11 @@ keeps its `install` / `activate` / `fetch` / `notificationclick` handlers.
 ```bash
 vendor/bin/phpunit --filter 'WebPushTest|ProgressiveWebAppTest'
 ```
+
+`tools/pwa-install-check/check.mjs` is the browser-side half: it runs the real
+install-button partial in Playwright's WebKit build and asserts the iPhone,
+iPadOS, installed, desktop and Chrome/Android prompt branches (see **Verifying**
+step 4).
 
 ## Regenerating the icons
 
