@@ -13,7 +13,10 @@
             <span class="ml-2 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full bg-blue-100 text-blue-800" title="{{ $schedule->seriesLabel() }}">Weekly</span>
         @endif
     </td>
-    <td class="px-6 py-4 text-sm">{{ $schedule->class->name }}</td>
+    <td class="px-6 py-4 text-sm">
+        {{ $schedule->class->name }}
+        <div class="text-xs text-gray-500">{{ $schedule->subjectName() }}</div>
+    </td>
     <td class="px-6 py-4 text-sm {{ $isToday ? 'text-sun-ink font-semibold' : '' }}">
         {{ $schedule->start_time->format($showDate ? 'M d, Y h:i A' : 'h:i A') }}@if($isToday)<span class="ml-2 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>@endif
     </td>

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Enquiry;
 use App\Models\EnquiryNote;
+use App\Models\Grade;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\AssessmentNotifier;
 use Illuminate\Http\Request;
 
 /**
@@ -28,6 +30,7 @@ class PublicBookingController extends Controller
 
         $validated = $request->validate([
             'child_name' => ['required', 'string', 'max:255'],
+            'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
             'guardian_name' => ['required', 'string', 'max:255'],
             'guardian_phone' => ['required', 'string', 'max:30'],
             'guardian_email' => ['required', 'string', 'email', 'max:255'],
@@ -37,8 +40,12 @@ class PublicBookingController extends Controller
             'guardian_email.required' => 'We need an email address to send the assessment link.',
         ]);
 
+        $grade = ! empty($validated['grade_id']) ? Grade::find($validated['grade_id']) : null;
+
         $enquiry = Enquiry::create([
             'child_name' => $validated['child_name'],
+            'grade_id' => $grade ? $grade->id : null,
+            'child_grade_level' => $grade ? $grade->label() : null,
             'guardian_name' => $validated['guardian_name'],
             'guardian_phone' => $validated['guardian_phone'],
             'guardian_email' => $validated['guardian_email'],
@@ -61,6 +68,9 @@ class PublicBookingController extends Controller
         ]);
 
         $this->notifyStaff($enquiry);
+
+        // The office also gets this by email (To/CC configured per environment).
+        app(AssessmentNotifier::class)->notifySchool($enquiry);
 
         return redirect('/#book-assessment')
             ->with('success', 'Thank you — we have your request (' . $enquiry->reference . '). We will contact you within one working day to arrange the assessment.');

@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\Assignment;
 use App\Models\ClassSchedule;
 use App\Models\Classes;
+use App\Models\ClassSubject;
 use App\Models\LearningMaterial;
 use App\Models\Tutor;
 use App\Services\ClassScheduleService;
@@ -17,8 +18,9 @@ class ScheduleController extends Controller
 {
     public function index(Request $request)
     {
-        // Filters: class, tutor, a single day of start times and status.
+        // Filters: class, subject, tutor, a single day of start times and status.
         $classFilter = is_numeric($request->query('class_id')) ? (int) $request->query('class_id') : null;
+        $subjectFilter = is_numeric($request->query('class_subject_id')) ? (int) $request->query('class_subject_id') : null;
         $tutorFilter = is_numeric($request->query('tutor_id')) ? (int) $request->query('tutor_id') : null;
         $statusFilter = in_array($request->query('status'), ['scheduled', 'ongoing', 'completed', 'cancelled'], true)
             ? $request->query('status')
@@ -34,9 +36,12 @@ class ScheduleController extends Controller
         $weekStart = $scope === 'week' ? ClassScheduleService::weekStart($request->query('week')) : null;
         $weekEnd = $weekStart ? $weekStart->copy()->addDays(6) : null;
 
-        $query = ClassSchedule::with('class', 'tutor.user')
+        $query = ClassSchedule::with('class', 'classSubject.subject', 'classSubject.tutor.user', 'tutor.user')
             ->when($classFilter, function ($query) use ($classFilter) {
                 $query->where('class_id', $classFilter);
+            })
+            ->when($subjectFilter, function ($query) use ($subjectFilter) {
+                $query->where('class_subject_id', $subjectFilter);
             })
             ->when($tutorFilter, function ($query) use ($tutorFilter) {
                 $query->where('tutor_id', $tutorFilter);
@@ -71,6 +76,7 @@ class ScheduleController extends Controller
 
         $activeFilters = array_filter([
             'class_id' => $classFilter,
+            'class_subject_id' => $subjectFilter,
             'tutor_id' => $tutorFilter,
             'status' => $statusFilter,
         ]);
@@ -84,13 +90,31 @@ class ScheduleController extends Controller
             'isFiltered' => $activeFilters !== [],
             'matchedSessions' => $scope === 'all' ? $schedules->total() : $schedules->count(),
             'classes' => Classes::orderBy('name')->get(),
+            'classSubjects' => $this->classSubjectOptions(),
             'tutors' => Tutor::with('user')->get(),
             'classFilter' => $classFilter,
+            'subjectFilter' => $subjectFilter,
             'tutorFilter' => $tutorFilter,
             'statusFilter' => $statusFilter,
             'dateFilter' => $dateFilter,
             'totalSessions' => ClassSchedule::count(),
         ]);
+    }
+
+    /**
+     * Every "class → subject → teacher" choice, sorted by class then subject.
+     * Used by the schedule form and the subject filter.
+     *
+     * @return \Illuminate\Support\Collection<int, ClassSubject>
+     */
+    private function classSubjectOptions()
+    {
+        return ClassSubject::with(['class', 'subject', 'tutor.user'])
+            ->get()
+            ->sortBy(function (ClassSubject $row) {
+                return mb_strtolower(($row->class->name ?? '') . '|' . ($row->subject->name ?? ''));
+            })
+            ->values();
     }
 
     /** A valid Y-m-d date from the filter box, or null when blank/invalid. */
@@ -115,7 +139,14 @@ class ScheduleController extends Controller
      */
     public function show(ClassSchedule $schedule)
     {
-        $schedule->load(['class.tutor.user', 'class.learners.user', 'tutor.user', 'attendance.learner.user']);
+        $schedule->load([
+            'class.tutor.user',
+            'class.learners.user',
+            'classSubject.subject',
+            'classSubject.tutor.user',
+            'tutor.user',
+            'attendance.learner.user',
+        ]);
 
         $class = $schedule->class;
         $enrolledLearners = $class ? $class->learners : collect();
@@ -165,12 +196,25 @@ class ScheduleController extends Controller
 
     public function create()
     {
-        $classes = Classes::with('tutor.user')->where('is_active', true)->get();
-        $tutors = Tutor::with('user')->where('is_active', true)->get();
+        $allSubjects = $this->classSubjectOptions();
+
+        // Only subjects with a teacher can be scheduled: the session's tutor is
+        // read from that teacher, so there is nobody to link it to otherwise.
+        $classSubjects = $allSubjects
+            ->filter(function (ClassSubject $row) {
+                return $row->tutor_id && $row->class && $row->class->is_active;
+            })
+            ->values();
+
+        $subjectsMissingTeacher = $allSubjects
+            ->filter(function (ClassSubject $row) {
+                return ! $row->tutor_id && $row->class && $row->class->is_active;
+            })
+            ->values();
 
         return view('admin.schedules.create', [
-            'classes' => $classes,
-            'tutors' => $tutors,
+            'classSubjects' => $classSubjects,
+            'subjectsMissingTeacher' => $subjectsMissingTeacher,
             'weekdays' => ClassScheduleService::weekdays(),
         ]);
     }
@@ -184,8 +228,13 @@ class ScheduleController extends Controller
             : ClassScheduleService::REPEAT_NONE;
 
         $validated = $request->validate(array_merge([
-            'class_id' => 'required|exists:classes,id',
-            'tutor_id' => 'required|exists:tutors,id',
+            // New flow: one session = one subject of one class. The class and
+            // the tutor are read from that subject row, not trusted from the form.
+            'class_subject_id' => 'nullable|exists:class_subject,id',
+            // Legacy flow (old bookmarks/API): no subject posted, so the class
+            // and tutor are still required exactly as before.
+            'class_id' => 'required_without:class_subject_id|exists:classes,id',
+            'tutor_id' => 'required_without:class_subject_id|exists:tutors,id',
             'title' => 'required|string|max:255',
             'meeting_link' => 'nullable|url',
             'meeting_platform' => 'nullable|in:google_meet,zoom,jitsi',
@@ -194,6 +243,8 @@ class ScheduleController extends Controller
             // optionally on several days at different times.
             'repeat' => 'nullable|in:none,weekly',
         ], ClassScheduleService::repeatRules($repeat)));
+
+        $this->applySubjectSelection($validated);
 
         if ($errors = $service->seriesErrors($validated)) {
             throw ValidationException::withMessages($errors);
@@ -209,18 +260,53 @@ class ScheduleController extends Controller
         return redirect()->route('admin.schedules.index')->with('success', $message);
     }
 
+    /**
+     * When a subject row is chosen, its class and teacher win. This is what makes
+     * "only the tutor for that subject is linked to the lesson" true even if a
+     * hand-crafted request tries to post a different tutor.
+     *
+     * @param  array<string, mixed>  $validated
+     */
+    private function applySubjectSelection(array &$validated): void
+    {
+        if (empty($validated['class_subject_id'])) {
+            // Legacy session: keep class_id/tutor_id exactly as posted. When the
+            // edit form explicitly chose "no subject", clear any old link.
+            if (array_key_exists('class_subject_id', $validated)) {
+                $validated['class_subject_id'] = null;
+            }
+
+            return;
+        }
+
+        $classSubject = ClassSubject::with('subject')->findOrFail($validated['class_subject_id']);
+
+        if (! $classSubject->tutor_id) {
+            throw ValidationException::withMessages([
+                'class_subject_id' => 'Assign a teacher to '
+                    . (optional($classSubject->subject)->name ?? 'this subject')
+                    . ' on the class page before scheduling it.',
+            ]);
+        }
+
+        $validated['class_id'] = $classSubject->class_id;
+        $validated['tutor_id'] = $classSubject->tutor_id;
+    }
+
     public function edit(ClassSchedule $schedule)
     {
-        $classes = Classes::where('is_active', true)->get();
-        $tutors = Tutor::with('user')->where('is_active', true)->get();
-        return view('admin.schedules.edit', compact('schedule', 'classes', 'tutors'));
+        return view('admin.schedules.edit', [
+            'schedule' => $schedule,
+            'classSubjects' => $this->classSubjectOptions(),
+        ]);
     }
 
     public function update(Request $request, ClassSchedule $schedule)
     {
-        $request->validate([
-            'class_id' => 'required|exists:classes,id',
-            'tutor_id' => 'required|exists:tutors,id',
+        $validated = $request->validate([
+            'class_subject_id' => 'nullable|exists:class_subject,id',
+            'class_id' => 'required_without:class_subject_id|exists:classes,id',
+            'tutor_id' => 'required_without:class_subject_id|exists:tutors,id',
             'title' => 'required|string|max:255',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
@@ -229,7 +315,9 @@ class ScheduleController extends Controller
             'status' => 'required|string',
         ]);
 
-        $schedule->update($request->all());
+        $this->applySubjectSelection($validated);
+
+        $schedule->update($validated);
 
         // Land back on the week the session belongs to, so a past session that
         // was edited from the week view does not drop the admin into this week.

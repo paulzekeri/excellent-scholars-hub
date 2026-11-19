@@ -25,7 +25,7 @@ class AssignmentController extends Controller
     public function create()
     {
         $tutor = auth()->user()->tutor;
-        $classes = Classes::where('tutor_id', $tutor->id)->where('is_active', true)->get();
+        $classes = Classes::query()->taughtBy($tutor->id)->where('is_active', true)->get();
         return view('tutor.assignments.create', compact('classes'));
     }
 
@@ -36,9 +36,8 @@ class AssignmentController extends Controller
         $validated = $request->validate([
             'class_id' => [
                 'required',
-                Rule::exists('classes', 'id')->where(function ($query) use ($tutor) {
-                    $query->where('tutor_id', $tutor->id);
-                }),
+                // Leading a class or taking one of its subjects both count.
+                Rule::exists('classes', 'id')->whereIn('id', Classes::idsTaughtBy($tutor->id)),
             ],
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',

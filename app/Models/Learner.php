@@ -10,7 +10,7 @@ class Learner extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'date_of_birth', 'phone', 'address', 'grade_level', 'parent_id', 'is_active',
+        'user_id', 'date_of_birth', 'phone', 'address', 'grade_level', 'grade_id', 'parent_id', 'is_active',
     ];
 
     protected $casts = [
@@ -21,6 +21,12 @@ class Learner extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** The grade catalogue entry behind `grade_level`. */
+    public function grade()
+    {
+        return $this->belongsTo(Grade::class);
     }
 
     public function parent()

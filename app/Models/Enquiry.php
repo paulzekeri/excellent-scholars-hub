@@ -102,7 +102,7 @@ class Enquiry extends Model
     ];
 
     protected $fillable = [
-        'reference', 'child_name', 'child_dob', 'child_grade_level',
+        'reference', 'child_name', 'child_dob', 'child_grade_level', 'grade_id',
         'guardian_name', 'guardian_phone', 'guardian_email', 'preferred_at',
         'source', 'status', 'assigned_to', 'created_by',
         'converted_learner_id', 'converted_at', 'declined_reason', 'notes',
@@ -132,6 +132,12 @@ class Enquiry extends Model
     public function timeline()
     {
         return $this->hasMany(EnquiryNote::class)->latest();
+    }
+
+    /** The grade catalogue entry behind `child_grade_level`. */
+    public function grade()
+    {
+        return $this->belongsTo(Grade::class);
     }
 
     /** Every assessment booked for this child. */

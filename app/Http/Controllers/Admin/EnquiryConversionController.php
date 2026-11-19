@@ -144,6 +144,7 @@ class EnquiryConversionController extends Controller
             $learner = Learner::create([
                 'user_id' => $childUser->id,
                 'parent_id' => $parent->id,
+                'grade_id' => $enquiry->grade_id,
                 'grade_level' => $enquiry->child_grade_level,
             ]);
 

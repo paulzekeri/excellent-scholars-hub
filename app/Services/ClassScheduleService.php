@@ -207,6 +207,7 @@ class ClassScheduleService
 
                 return ClassSchedule::create([
                     'class_id' => $data['class_id'],
+                    'class_subject_id' => $data['class_subject_id'] ?? null,
                     'tutor_id' => $data['tutor_id'],
                     'title' => $data['title'],
                     'description' => $data['description'] ?? null,

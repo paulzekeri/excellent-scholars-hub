@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Learner;
+use App\Models\Grade;
 use App\Models\ParentModel;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
@@ -45,7 +46,10 @@ class RegisterController extends Controller
             })
             ->values();
 
-        return view('auth.register', compact('roles'));
+        // The grade dropdown reads from the school's catalogue.
+        $grades = Grade::active()->ordered()->get();
+
+        return view('auth.register', compact('roles', 'grades'));
     }
 
     protected function validator(array $data)
@@ -76,6 +80,9 @@ class RegisterController extends Controller
                 }),
             ],
             'phone' => ['nullable', 'string', 'max:20'],
+            // Optional at the database level so older registration links keep
+            // working; the form reads its choices from the grades catalogue.
+            'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
         ];
 
         // A child must always have a guardian — that address is the reset
@@ -127,9 +134,14 @@ class RegisterController extends Controller
         $role = Role::find($data['role_id']);
 
         if ($role->slug === 'learner') {
-            // Create learner record
+            // Create learner record with the chosen grade (the label is also
+            // stored in the legacy `grade_level` column for older screens).
+            $grade = ! empty($data['grade_id']) ? Grade::find($data['grade_id']) : null;
+
             $learner = Learner::create([
                 'user_id' => $user->id,
+                'grade_id' => $grade ? $grade->id : null,
+                'grade_level' => $grade ? $grade->label() : null,
             ]);
 
             // Check if learner provided parent details

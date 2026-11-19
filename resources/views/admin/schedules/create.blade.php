@@ -8,8 +8,40 @@
         <form action="{{ route('admin.schedules.store') }}" method="POST" class="space-y-6">@csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div><label class="block text-sm font-medium text-gray-700">Title</label><input type="text" name="title" value="{{ old('title') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
-                <div><label class="block text-sm font-medium text-gray-700">Class</label><select name="class_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">@foreach($classes as $class)<option value="{{ $class->id }}">{{ $class->name }} - {{ $class->tutor->user->name }}</option>@endforeach</select></div>
-                <div><label class="block text-sm font-medium text-gray-700">Tutor</label><select name="tutor_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">@foreach($tutors as $tutor)<option value="{{ $tutor->id }}">{{ $tutor->user->name }}</option>@endforeach</select></div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Class &amp; Subject</label>
+                    <select name="class_subject_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">— Choose a class and subject —</option>
+                        @foreach($classSubjects->groupBy(function ($row) { return $row->class->name ?? 'Class'; }) as $className => $rows)
+                            <optgroup label="{{ $className }}">
+                                @foreach($rows as $row)
+                                    <option value="{{ $row->id }}" {{ (string) old('class_subject_id') === (string) $row->id ? 'selected' : '' }}>
+                                        {{ $row->subject->name ?? 'Subject' }} — {{ $row->tutor->user->name ?? 'No teacher' }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    @error('class_subject_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    <p class="text-xs text-gray-500 mt-1">
+                        Each session teaches <strong>one subject</strong>, so a class with Mathematics, Physics and English gets one schedule per subject —
+                        on the same day at different times or on different days. The session is linked automatically to that subject's teacher.
+                    </p>
+                    @if($classSubjects->isEmpty())
+                        <p class="mt-2 text-xs text-orange-700">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            No subject has a teacher yet.
+                            <a href="{{ route('admin.classes.index') }}" class="font-semibold underline">Assign teachers on the class page</a>
+                            before scheduling.
+                        </p>
+                    @endif
+                    @if($subjectsMissingTeacher->isNotEmpty())
+                        <p class="mt-2 text-xs text-gray-600">
+                            Waiting for a teacher (not shown above):
+                            {{ $subjectsMissingTeacher->map(function ($row) { return ($row->class->name ?? 'Class') . ' → ' . ($row->subject->name ?? 'Subject'); })->implode(', ') }}.
+                        </p>
+                    @endif
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Meeting Platform</label>
                     <select name="meeting_platform" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">

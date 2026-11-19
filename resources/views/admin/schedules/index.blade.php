@@ -45,13 +45,28 @@
             {{-- Filtering while browsing another week stays on that week. --}}
             <input type="hidden" name="week" value="{{ $weekStart->toDateString() }}">
         @endif
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
             <div>
                 <label for="schedule-class-filter" class="block text-xs font-medium text-gray-600 mb-1">Class</label>
                 <select id="schedule-class-filter" name="class_id" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">All classes</option>
                     @foreach($classes as $class)
                         <option value="{{ $class->id }}" {{ (string) $classFilter === (string) $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="schedule-subject-filter" class="block text-xs font-medium text-gray-600 mb-1">Subject</label>
+                <select id="schedule-subject-filter" name="class_subject_id" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">All subjects</option>
+                    @foreach($classSubjects->groupBy(function ($row) { return $row->class->name ?? 'Class'; }) as $className => $rows)
+                        <optgroup label="{{ $className }}">
+                            @foreach($rows as $row)
+                                <option value="{{ $row->id }}" {{ (string) $subjectFilter === (string) $row->id ? 'selected' : '' }}>
+                                    {{ $row->subject->name ?? 'Subject' }} — {{ $row->tutor->user->name ?? 'No teacher' }}
+                                </option>
+                            @endforeach
+                        </optgroup>
                     @endforeach
                 </select>
             </div>

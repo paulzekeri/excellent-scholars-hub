@@ -143,17 +143,60 @@
                         <p class="text-sm text-gray-600"><i class="fas fa-phone mr-2"></i>{{ $child->phone ?? 'N/A' }}</p>
                     </div>
 
+                    @php $weekSessions = $childWeekSessions[$child->id] ?? collect(); @endphp
+                    <div class="mb-5 rounded-lg border border-gray-200 overflow-hidden">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b bg-gray-50 px-3 py-2">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-[#0a2550]">
+                                <i class="fas fa-calendar-week mr-1"></i>This week
+                                <span class="ml-1 font-normal normal-case tracking-normal text-gray-500">{{ $weekStart->format('M d') }} – {{ $weekEnd->format('M d') }}</span>
+                            </p>
+                            <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'schedule']) }}"
+                               class="text-xs font-semibold text-blue-700 hover:text-blue-900">
+                                View schedule <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                        <div class="p-3">
+                            @if($weekSessions->isEmpty())
+                                <p class="text-sm text-gray-500">No sessions this week.</p>
+                            @else
+                                <ul class="space-y-2">
+                                    @foreach($weekSessions->take(4) as $session)
+                                        <li class="flex items-start justify-between gap-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-800">{{ $session->subjectName() }}</p>
+                                                <p class="text-xs text-gray-500">
+                                                    {{ $session->start_time->format('D, M d · h:i A') }} – {{ $session->end_time->format('h:i A') }}
+                                                </p>
+                                            </div>
+                                            <span class="mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase
+                                                @if($session->status === 'completed') bg-green-100 text-green-800
+                                                @elseif($session->status === 'ongoing') bg-sun-light text-sun-ink
+                                                @else bg-blue-100 text-blue-800 @endif">
+                                                {{ $session->status === 'scheduled'
+                                                    ? ($session->end_time->isPast() ? 'Ended' : 'Upcoming')
+                                                    : ucfirst($session->status) }}
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                    @if($weekSessions->count() > 4)
+                                        <li class="text-xs text-gray-500">+ {{ $weekSessions->count() - 4 }} more this week</li>
+                                    @endif
+                                </ul>
+                            @endif
+                        </div>
+                    </div>
+
                     <p class="text-xs font-semibold text-[#0a2550] uppercase tracking-wide mb-2">Tap a card to see the details</p>
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'schedule']) }}"
                            class="block rounded-lg border border-gray-200 p-3 hover:border-blue-400 hover:bg-blue-50 transition"
-                           title="View {{ $child->user->name }}'s class schedule">
+                           title="View {{ $child->user->name }}'s sessions for this week">
                             <div class="flex items-center justify-between">
                                 <i class="fas fa-calendar-alt text-blue-500"></i>
                                 <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
                             </div>
-                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $stats['upcomingClasses'] }}</p>
-                            <p class="text-xs text-gray-500 leading-tight">Class Schedule</p>
+                            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $stats['weekSessions'] }}</p>
+                            <p class="text-xs text-gray-500 leading-tight">This Week's Sessions</p>
                         </a>
                         <a href="{{ route('parent.child.progress', ['learner' => $child, 'tab' => 'pending']) }}"
                            class="block rounded-lg border border-gray-200 p-3 hover:border-sun hover:bg-sun-light transition"

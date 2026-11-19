@@ -11,6 +11,7 @@ use App\Models\EnquiryNote;
 use App\Models\Notification;
 use App\Models\Tutor;
 use App\Models\Classes;
+use App\Services\AssessmentNotifier;
 use App\Services\AssessmentResultService;
 use App\Http\Requests\AssessmentResultRequest;
 use Illuminate\Http\Request;
@@ -113,6 +114,9 @@ class AssessmentController extends Controller
 
         $this->notifyTutor($tutor, $assessment, $enquiry);
         $this->emailGuardian($assessment, $enquiry);
+
+        // Internal copy for the office (To/CC configured per environment).
+        app(AssessmentNotifier::class)->notifySchool($enquiry, $assessment);
 
         ActivityLog::create([
             'user_id' => auth()->id(),

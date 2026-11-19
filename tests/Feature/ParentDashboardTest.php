@@ -180,7 +180,7 @@ class ParentDashboardTest extends TestCase
         ]);
 
         $this->actingAs($parentUser)
-            ->get(route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']))
+            ->get(route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule', 'view' => 'all']))
             ->assertOk()
             ->assertSee('Upcoming Lesson')
             ->assertDontSee('Pending Task');

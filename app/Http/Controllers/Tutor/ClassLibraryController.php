@@ -18,14 +18,16 @@ class ClassLibraryController extends Controller
     public function index(Request $request)
     {
         $tutor = auth()->user()->tutor;
-        $ownClassIds = Classes::where('tutor_id', $tutor->id)->pluck('id');
+        // A tutor's classes are the ones they lead plus any where they take a
+        // subject (e.g. a Physics teacher whose class lead is the Maths tutor).
+        $ownClassIds = Classes::idsTaughtBy($tutor->id);
 
         // The add form and filter offer the active classes; links already on a
         // class that was switched off stay visible in the list.
         $classes = Classes::whereIn('id', $ownClassIds)->where('is_active', true)->orderBy('name')->get();
 
         $classFilter = is_numeric($request->query('class_id')) ? (int) $request->query('class_id') : null;
-        $classFilter = in_array($classFilter, $ownClassIds->all(), true) ? $classFilter : null;
+        $classFilter = in_array($classFilter, $ownClassIds, true) ? $classFilter : null;
 
         $resources = ClassLibraryResource::with(['class', 'addedBy'])
             ->whereIn('class_id', $ownClassIds)
@@ -65,7 +67,7 @@ class ClassLibraryController extends Controller
         $tutor = auth()->user()->tutor;
 
         // A tutor may only manage the library of a class they teach.
-        abort_unless($resource->class && $resource->class->tutor_id === $tutor->id, 403);
+        abort_unless($resource->class && $resource->class->isTaughtBy($tutor->id), 403);
 
         $title = $resource->title;
         $resource->delete();
@@ -79,8 +81,8 @@ class ClassLibraryController extends Controller
         $request->merge(['url' => trim((string) $request->input('url'))]);
 
         return $request->validate([
-            // Only the tutor's own classes can receive a link.
-            'class_id' => ['required', Rule::exists('classes', 'id')->where('tutor_id', $tutorId)],
+            // Only the tutor's own classes (led or taught) can receive a link.
+            'class_id' => ['required', Rule::exists('classes', 'id')->whereIn('id', Classes::idsTaughtBy($tutorId))],
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
             'url' => ['required', 'url', 'max:2048', 'regex:/^https?:\/\//i'],

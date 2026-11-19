@@ -15,10 +15,19 @@
     </div>
 
     <div>
-        <label for="child_grade_level" class="block text-sm font-medium text-gray-700">Class / year group</label>
-        <input id="child_grade_level" type="text" name="child_grade_level" value="{{ old('child_grade_level', $enquiry->child_grade_level) }}"
-            class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g. JSS1">
+        <label for="grade_id" class="block text-sm font-medium text-gray-700">Class / year group</label>
+        <select id="grade_id" name="grade_id"
+            class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Not recorded</option>
+            @foreach($grades as $grade)
+                <option value="{{ $grade->id }}" {{ (string) old('grade_id', $enquiry->grade_id) === (string) $grade->id ? 'selected' : '' }}>{{ $grade->label() }}</option>
+            @endforeach
+            @if($enquiry->grade_id === null && $enquiry->child_grade_level)
+                {{-- A legacy free-text value that is not in the catalogue. --}}
+                <option value="" selected disabled>{{ $enquiry->child_grade_level }} (not in the list)</option>
+            @endif
+        </select>
+        <p class="text-xs text-gray-500 mt-1">Managed under <strong>Academics → Grades</strong>.</p>
     </div>
 
     <div>

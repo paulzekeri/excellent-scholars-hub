@@ -49,23 +49,35 @@
                         @endforeach
                     </select>
                 </div>
-                <div id="learner-parent-field" class="md:col-span-2 {{ $selectedRoleSlug === 'learner' ? '' : 'hidden' }}">
-                    <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent / Guardian (learners only)</label>
-                    <select id="parent_id" name="parent_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select the parent/guardian</option>
-                        @foreach($parents as $parent)
-                            <option value="{{ $parent->id }}" {{ (string) $selectedParentId === (string) $parent->id ? 'selected' : '' }}>
-                                {{ $parent->user->name }} ({{ $parent->user->email }}){{ $parent->user->is_active ? '' : ' - inactive' }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">
-                        @if($parents->isEmpty())
-                            No parent accounts exist yet. Create one first (choose the <strong>Parent</strong> role) — every child must have a guardian whose email receives their login details.
-                        @else
-                            Every child must stay linked to a guardian. Password resets and account details go to the guardian's email.
-                        @endif
-                    </p>
+                <div id="learner-parent-field" class="md:col-span-2 space-y-4 {{ $selectedRoleSlug === 'learner' ? '' : 'hidden' }}">
+                    <div>
+                        <label for="grade_id" class="block text-sm font-medium text-gray-700">Grade / Class (learners only)</label>
+                        <select id="grade_id" name="grade_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select the learner's grade</option>
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade->id }}" {{ (string) old('grade_id', optional($user->learner)->grade_id) === (string) $grade->id ? 'selected' : '' }}>{{ $grade->label() }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">The list is managed under <strong>Academics → Grades</strong>.</p>
+                    </div>
+                    <div>
+                        <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent / Guardian (learners only)</label>
+                        <select id="parent_id" name="parent_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select the parent/guardian</option>
+                            @foreach($parents as $parent)
+                                <option value="{{ $parent->id }}" {{ (string) $selectedParentId === (string) $parent->id ? 'selected' : '' }}>
+                                    {{ $parent->user->name }} ({{ $parent->user->email }}){{ $parent->user->is_active ? '' : ' - inactive' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">
+                            @if($parents->isEmpty())
+                                No parent accounts exist yet. Create one first (choose the <strong>Parent</strong> role) — every child must have a guardian whose email receives their login details.
+                            @else
+                                Every child must stay linked to a guardian. Password resets and account details go to the guardian's email.
+                            @endif
+                        </p>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Status</label>
@@ -117,6 +129,16 @@
                             <input id="child_password" type="text" name="password" required
                                 class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="At least 8 characters">
+                        </div>
+                        <div>
+                            <label for="child_grade_id" class="block text-xs font-medium text-gray-600">Grade / Class</label>
+                            <select id="child_grade_id" name="grade_id"
+                                class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Select the learner's grade</option>
+                                @foreach($grades as $grade)
+                                    <option value="{{ $grade->id }}" {{ (string) old('grade_id') === (string) $grade->id ? 'selected' : '' }}>{{ $grade->label() }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">

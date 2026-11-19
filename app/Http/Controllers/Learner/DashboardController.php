@@ -7,6 +7,7 @@ use App\Models\ClassSchedule;
 use App\Models\Assignment;
 use App\Models\LearningMaterial;
 use App\Models\LearningGoal;
+use App\Services\ClassScheduleService;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -17,32 +18,43 @@ class DashboardController extends Controller
         
         $classIds = $learner->classes->pluck('id');
 
+        // The dashboard shows the current week's timetable. "View all" opens
+        // the full session list on My Classes.
+        $weekStart = ClassScheduleService::weekStart();
+        $weekEndExclusive = $weekStart->copy()->addDays(7);
+
+        $weekSessions = ClassSchedule::whereIn('class_id', $classIds)
+            ->where('status', '!=', 'cancelled')
+            ->where('start_time', '>=', $weekStart)
+            ->where('start_time', '<', $weekEndExclusive)
+            ->with('class', 'classSubject.subject', 'tutor.user')
+            ->orderBy('start_time')
+            ->get();
+
         $data = [
-            'myClasses' => $learner->classes()->with('tutor.user')->get(),
+            'myClasses' => $learner->classes()->with(['tutor.user', 'subjectAssignments.subject', 'subjectAssignments.tutor.user'])->get(),
             // "The ongoing or nearest class should be on the panel": a session
             // that is live right now wins, otherwise the closest future one.
             'liveSession' => ClassSchedule::whereIn('class_id', $classIds)
                 ->where('status', 'scheduled')
                 ->where('start_time', '<=', now())
                 ->where('end_time', '>=', now())
-                ->with('class', 'tutor.user')
+                ->with('class', 'classSubject.subject', 'tutor.user')
                 ->orderBy('start_time')
                 ->first(),
             'nextSession' => ClassSchedule::whereIn('class_id', $classIds)
                 ->where('status', 'scheduled')
                 ->where('start_time', '>', now())
-                ->with('class', 'tutor.user')
+                ->where('start_time', '<', $weekEndExclusive)
+                ->with('class', 'classSubject.subject', 'tutor.user')
                 ->orderBy('start_time')
                 ->first(),
-            'upcomingClasses' => ClassSchedule::whereIn('class_id', $classIds)
-                ->where('start_time', '>', now())
-                ->with('class', 'tutor.user')
-                ->orderBy('start_time')
-                ->take(5)
-                ->get(),
-            'upcomingCount' => ClassSchedule::whereIn('class_id', $classIds)
-                ->where('start_time', '>', now())
-                ->count(),
+            // Only this week, so the panel is a timetable rather than a growing
+            // list of every future occurrence.
+            'weekSessions' => $weekSessions,
+            'weekSessionCount' => $weekSessions->count(),
+            'weekStart' => $weekStart,
+            'weekEnd' => $weekStart->copy()->addDays(6),
             'pendingAssignments' => Assignment::whereIn('class_id', $classIds)
                 ->where('status', 'active')
                 ->where('due_date', '>', now())

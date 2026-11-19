@@ -59,23 +59,35 @@
                         @endforeach
                     </select>
                 </div>
-                <div id="learner-parent-field" class="md:col-span-2 hidden">
-                    <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent / Guardian (learners only)</label>
-                    <select id="parent_id" name="parent_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Select the parent/guardian</option>
-                        @foreach($parents as $parent)
-                            <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                {{ $parent->user->name }} ({{ $parent->user->email }}){{ $parent->user->is_active ? '' : ' - inactive' }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">
-                        @if($parents->isEmpty())
-                            No parent accounts exist yet. Create one first (choose the <strong>Parent</strong> role) — every child must have a guardian whose email receives their login details.
-                        @else
-                            Every child must be linked to a guardian. The login details and future password resets go to the guardian's email.
-                        @endif
-                    </p>
+                <div id="learner-parent-field" class="md:col-span-2 hidden space-y-4">
+                    <div>
+                        <label for="grade_id" class="block text-sm font-medium text-gray-700">Grade / Class (learners only)</label>
+                        <select id="grade_id" name="grade_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select the learner's grade</option>
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade->id }}" {{ (string) old('grade_id') === (string) $grade->id ? 'selected' : '' }}>{{ $grade->label() }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">The list is managed under <strong>Academics → Grades</strong>.</p>
+                    </div>
+                    <div>
+                        <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent / Guardian (learners only)</label>
+                        <select id="parent_id" name="parent_id" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select the parent/guardian</option>
+                            @foreach($parents as $parent)
+                                <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
+                                    {{ $parent->user->name }} ({{ $parent->user->email }}){{ $parent->user->is_active ? '' : ' - inactive' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">
+                            @if($parents->isEmpty())
+                                No parent accounts exist yet. Create one first (choose the <strong>Parent</strong> role) — every child must have a guardian whose email receives their login details.
+                            @else
+                                Every child must be linked to a guardian. The login details and future password resets go to the guardian's email.
+                            @endif
+                        </p>
+                    </div>
                 </div>
             </div>
             <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition w-full md:w-auto">

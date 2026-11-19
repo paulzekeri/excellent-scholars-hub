@@ -11,6 +11,7 @@ use App\Models\LearningMaterial;
 use App\Models\LearningGoal;
 use App\Models\Payment;
 use App\Models\Submission;
+use App\Services\ClassScheduleService;
 use App\Services\LearnerPasswordResetService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -45,6 +46,15 @@ class DashboardController extends Controller
             return [$child->id => $this->statsFor($child)];
         });
 
+        // Each child card previews this week's sessions only. Clicking opens the
+        // child's schedule tab, which opens on the same week.
+        $weekStart = ClassScheduleService::weekStart();
+        $childWeekSessions = $children->mapWithKeys(function (Learner $child) use ($weekStart) {
+            return [
+                $child->id => $this->sessionsForWeek($child->classes->pluck('id'), $weekStart)->get(),
+            ];
+        });
+
         // Goals the school shared with this parent, across every child, so the
         // dashboard can show them without opening a child first.
         $sharedGoals = $this->dashboardGoals($children);
@@ -52,6 +62,9 @@ class DashboardController extends Controller
         return view('parent.dashboard', [
             'children' => $children,
             'childStats' => $childStats,
+            'childWeekSessions' => $childWeekSessions,
+            'weekStart' => $weekStart,
+            'weekEnd' => $weekStart->copy()->addDays(6),
             'totalChildren' => $children->count(),
             'totalMissedClasses' => $childStats->sum('missedClasses'),
             'sharedGoals' => $sharedGoals->take(5),
@@ -99,11 +112,21 @@ class DashboardController extends Controller
         $classIds = $learner->classes()->pluck('classes.id');
         $stats = $this->statsFor($learner, $classIds);
 
+        // The Class Schedule tab opens on the current week. "All sessions"
+        // keeps the full history, and the week arrows move one week at a time.
+        $scheduleScope = $request->query('view') === 'all' ? 'all' : 'week';
+        $scheduleWeekStart = $scheduleScope === 'week'
+            ? ClassScheduleService::weekStart($request->query('week'))
+            : null;
+
         $data = [
             'learner' => $learner->load(['user', 'classes.tutor.user']),
             'tabs' => self::TABS,
             'tab' => $tab,
             'stats' => $stats,
+            'scheduleScope' => $scheduleScope,
+            'scheduleWeekStart' => $scheduleWeekStart,
+            'scheduleWeekEnd' => $scheduleWeekStart ? $scheduleWeekStart->copy()->addDays(6) : null,
             'missedClasses' => $this->missedClasses($learner),
             'unrecordedSessions' => ClassSchedule::whereIn('class_id', $classIds)
                 ->where('end_time', '<', now())
@@ -118,9 +141,9 @@ class DashboardController extends Controller
 
         switch ($tab) {
             case 'schedule':
-                $data['upcomingClasses'] = $this->upcomingSessions($classIds)
-                    ->paginate(15)
-                    ->withQueryString();
+                $data['upcomingClasses'] = $scheduleScope === 'all'
+                    ? $this->allSessions($classIds)->paginate(15)->withQueryString()
+                    : $this->sessionsForWeek($classIds, $scheduleWeekStart)->get();
                 break;
 
             case 'pending':
@@ -193,6 +216,8 @@ class DashboardController extends Controller
 
         return [
             'upcomingClasses' => $this->upcomingSessions($classIds)->count(),
+            // The dashboard card and the schedule tile show this week only.
+            'weekSessions' => $this->sessionsForWeek($classIds, ClassScheduleService::weekStart())->count(),
             'pendingAssignments' => $this->pendingAssignments($learner, $classIds)->count(),
             'completedAssignments' => $this->completedSubmissions($learner, $classIds)->count(),
             'materials' => LearningMaterial::whereIn('class_id', $classIds)
@@ -286,6 +311,32 @@ class DashboardController extends Controller
             ->where('start_time', '>=', now())
             ->where('status', '!=', 'cancelled')
             ->with(['class.tutor.user'])
+            ->orderBy('start_time');
+    }
+
+    /**
+     * Every session in one week (Monday to Sunday), including sessions that have
+     * already happened this week so the week reads as a timetable.
+     */
+    private function sessionsForWeek(Collection $classIds, $weekStart)
+    {
+        $start = $weekStart->copy()->startOfDay();
+        $end = $start->copy()->addDays(7);
+
+        return ClassSchedule::whereIn('class_id', $classIds)
+            ->where('status', '!=', 'cancelled')
+            ->where('start_time', '>=', $start)
+            ->where('start_time', '<', $end)
+            ->with(['class', 'classSubject.subject', 'tutor.user'])
+            ->orderBy('start_time');
+    }
+
+    /** All sessions (past and upcoming) for the "All sessions" view. */
+    private function allSessions(Collection $classIds)
+    {
+        return ClassSchedule::whereIn('class_id', $classIds)
+            ->where('status', '!=', 'cancelled')
+            ->with(['class', 'classSubject.subject', 'tutor.user'])
             ->orderBy('start_time');
     }
 

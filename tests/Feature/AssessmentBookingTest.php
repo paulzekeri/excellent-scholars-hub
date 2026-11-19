@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\AssessmentBookedMail;
 use App\Mail\AssessmentScheduledMail;
 use App\Models\AssessmentSession;
 use App\Models\Enquiry;
@@ -353,5 +354,65 @@ class AssessmentBookingTest extends TestCase
         $this->actingAs($admin)->get(route('admin.enquiries.show', $contactedEnquiry))
             ->assertOk()
             ->assertSee('Book assessment and email the link');
+    }
+
+    public function test_a_public_assessment_request_is_emailed_to_the_school_office(): void
+    {
+        Mail::fake();
+
+        $this->post(route('assessments.request'), [
+            'child_name' => 'Emailed Request Child',
+            'guardian_name' => 'Emailed Request Guardian',
+            'guardian_phone' => '0803 555 0099',
+            'guardian_email' => 'emailed.request.' . uniqid() . '@example.com',
+            'notes' => 'Please call after 4pm.',
+        ])->assertRedirect('/#book-assessment')->assertSessionHas('success');
+
+        $enquiry = Enquiry::where('child_name', 'Emailed Request Child')->firstOrFail();
+
+        Mail::assertSent(AssessmentBookedMail::class, function (AssessmentBookedMail $mail) use ($enquiry) {
+            return $mail->enquiry->is($enquiry)
+                && $mail->assessment === null
+                && $mail->hasTo('excellentscholars2@gmail.com')
+                && $mail->hasCc('admin@eshglobal.org')
+                && $mail->hasCc('ceo@eshglobal.org');
+        });
+
+        // The internal email actually renders (catches template mistakes).
+        $html = (new AssessmentBookedMail($enquiry))->render();
+        $this->assertStringContainsString('New assessment request', $html);
+        $this->assertStringContainsString($enquiry->reference, $html);
+    }
+
+    public function test_a_booked_assessment_is_emailed_to_the_school_office(): void
+    {
+        Mail::fake();
+
+        $admin = $this->makeUser('admin', 'Office Copy Admin');
+        [, $tutor] = $this->makeTutor('Office Copy Tutor');
+        $enquiry = $this->makeEnquiry([
+            'child_name' => 'Emailed Booking Child',
+            'status' => Enquiry::STATUS_CONTACTED,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.enquiries.assessments.store', $enquiry), $this->bookingPayload($tutor, [
+                'guardian_email' => $enquiry->guardian_email,
+            ]))
+            ->assertRedirect(route('admin.enquiries.show', $enquiry));
+
+        $assessment = AssessmentSession::where('enquiry_id', $enquiry->id)->firstOrFail();
+
+        Mail::assertSent(AssessmentBookedMail::class, function (AssessmentBookedMail $mail) use ($enquiry, $assessment) {
+            return $mail->enquiry->is($enquiry)
+                && $mail->assessment && $mail->assessment->is($assessment)
+                && $mail->hasTo('excellentscholars2@gmail.com')
+                && $mail->hasCc('admin@eshglobal.org')
+                && $mail->hasCc('ceo@eshglobal.org');
+        });
+
+        $html = (new AssessmentBookedMail($enquiry, $assessment))->render();
+        $this->assertStringContainsString('Assessment booked', $html);
+        $this->assertStringContainsString('https://meet.google.com/abc-defg-hij', $html);
     }
 }

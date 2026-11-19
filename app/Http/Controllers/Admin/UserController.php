@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Tutor;
 use App\Models\Learner;
+use App\Models\Grade;
 use App\Models\ParentModel;
 use App\Mail\AccountProvisionedMail;
 use App\Services\LearnerPasswordResetService;
@@ -69,7 +70,8 @@ class UserController extends Controller
     {
         $roles = $this->assignableRoles();
         $parents = $this->parentOptions();
-        return view('admin.users.create', compact('roles', 'parents'));
+        $grades = Grade::active()->ordered()->get();
+        return view('admin.users.create', compact('roles', 'parents', 'grades'));
     }
 
     /**
@@ -104,6 +106,7 @@ class UserController extends Controller
             'role_id' => ['required', 'exists:roles,id'],
             'phone' => ['nullable', 'string', 'max:20'],
             'parent_id' => [$isLearner ? 'required' : 'nullable', 'exists:parents,id'],
+            'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
         ], [
             'username.required' => 'A username is required for parents and learners — it is how they sign in.',
             'parent_id.required' => 'Choose the parent/guardian. Every child must have a reachable guardian.',
@@ -124,9 +127,13 @@ class UserController extends Controller
             if ($role->slug === 'tutor') {
                 Tutor::create(['user_id' => $user->id]);
             } elseif ($isLearner) {
+                $grade = ! empty($validated['grade_id']) ? Grade::find($validated['grade_id']) : null;
+
                 Learner::create([
                     'user_id' => $user->id,
                     'parent_id' => $validated['parent_id'],
+                    'grade_id' => $grade ? $grade->id : null,
+                    'grade_level' => $grade ? $grade->label() : null,
                 ]);
             } elseif ($isParent) {
                 ParentModel::create(['user_id' => $user->id]);
@@ -151,9 +158,10 @@ class UserController extends Controller
 
         $roles = $this->assignableRoles();
         $parents = $this->parentOptions();
+        $grades = Grade::active()->ordered()->get();
         $user->load(['learner.parent.user', 'parent.children.user']);
 
-        return view('admin.users.edit', compact('user', 'roles', 'parents'));
+        return view('admin.users.edit', compact('user', 'roles', 'parents', 'grades'));
     }
 
     public function update(Request $request, User $user)
@@ -181,6 +189,7 @@ class UserController extends Controller
             'role_id' => ['required', 'exists:roles,id'],
             'phone' => ['nullable', 'string', 'max:20'],
             'parent_id' => [$isLearner ? 'required' : 'nullable', 'exists:parents,id'],
+            'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
             'is_active' => ['nullable', 'boolean'],
         ], [
             'username.required' => 'A username is required for parents and learners — it is how they sign in.',
@@ -200,7 +209,13 @@ class UserController extends Controller
             // Keep the profile rows in sync with the role.
             if ($isLearner) {
                 $learner = $user->learner ?: Learner::create(['user_id' => $user->id]);
-                $learner->update(['parent_id' => $validated['parent_id']]);
+                $grade = ! empty($validated['grade_id']) ? Grade::find($validated['grade_id']) : null;
+
+                $learner->update([
+                    'parent_id' => $validated['parent_id'],
+                    'grade_id' => $grade ? $grade->id : null,
+                    'grade_level' => $grade ? $grade->label() : null,
+                ]);
             }
 
             if ($role->slug === 'tutor' && ! $user->tutor) {
@@ -257,6 +272,7 @@ class UserController extends Controller
             ],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:8'],
+            'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
         ]);
 
         $learnerRole = Role::where('slug', 'learner')->firstOrFail();
@@ -274,6 +290,10 @@ class UserController extends Controller
             Learner::create([
                 'user_id' => $child->id,
                 'parent_id' => $parent->id,
+                'grade_id' => ! empty($validated['grade_id']) ? (int) $validated['grade_id'] : null,
+                'grade_level' => ! empty($validated['grade_id'])
+                    ? optional(Grade::find($validated['grade_id']))->label()
+                    : null,
             ]);
 
             return $child;

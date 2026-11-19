@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Learner;
 use App\Http\Controllers\Controller;
 use App\Models\Classes;
 use App\Models\LearningMaterial;
+use App\Services\ClassScheduleService;
 use Illuminate\Http\Request;
 
 class ClassController extends Controller
@@ -15,11 +16,34 @@ class ClassController extends Controller
         $this->middleware('role:learner');
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $learner = auth()->user()->learner;
-        $classes = $learner->classes()->with('schedules')->get();
-        return view('learner.classes', compact('classes'));
+
+        // The page opens on the current week, like the admin and tutor schedule
+        // screens. "All sessions" keeps the full history one click away.
+        $scope = $request->query('view') === 'all' ? 'all' : 'week';
+        $weekStart = $scope === 'week' ? ClassScheduleService::weekStart($request->query('week')) : null;
+        $weekEnd = $weekStart ? $weekStart->copy()->addDays(6) : null;
+        $weekEndExclusive = $weekStart ? $weekStart->copy()->addDays(7) : null;
+
+        $classes = $learner->classes()
+            ->with([
+                'subjectAssignments.subject',
+                'subjectAssignments.tutor.user',
+                'schedules' => function ($query) use ($weekStart, $weekEndExclusive) {
+                    $query->where('status', '!=', 'cancelled')->orderBy('start_time');
+
+                    if ($weekStart) {
+                        $query->where('start_time', '>=', $weekStart)
+                            ->where('start_time', '<', $weekEndExclusive);
+                    }
+                },
+                'schedules.classSubject.subject',
+            ])
+            ->get();
+
+        return view('learner.classes', compact('classes', 'scope', 'weekStart', 'weekEnd'));
     }
 
     public function materials()

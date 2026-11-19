@@ -259,7 +259,7 @@
                 <ul class="list-disc list-inside text-sm text-gray-600 mb-4 space-y-1">
                     <li><strong>Overview</strong> — your dashboard</li>
                     @if($guideIsAdmin)
-                        <li><strong>Academics</strong> — classes, schedules, attendance, assignment review, materials and the class library</li>
+                        <li><strong>Academics</strong> — classes, subjects, grades, schedules, attendance, assignment review, materials and the class library</li>
                     @elseif($guideIsTutor)
                         <li><strong>Teaching</strong> — your schedules, assignments, materials, class library and learning goals</li>
                     @elseif($guideIsLearner)
@@ -333,7 +333,7 @@
                     <p class="text-sm"><strong><i class="fas fa-map-signs mr-1"></i> Admin Navigation Tip:</strong></p>
                     <p class="text-sm mt-1">The admin menu lives in the <strong>left sidebar</strong>, grouped by area:</p>
                     <ul class="list-disc list-inside text-sm mt-2 space-y-1">
-                        <li><strong>Academics</strong> — <em>Classes</em>, <em>Schedules</em>, <em>Attendance</em>, <em>Assignment Review</em> (including submission review &amp; grading) and <em>Materials</em></li>
+                        <li><strong>Academics</strong> — <em>Classes</em>, <em>Subjects</em>, <em>Grades</em>, <em>Schedules</em>, <em>Attendance</em>, <em>Assignment Review</em> (including submission review &amp; grading) and <em>Materials</em></li>
                         @if($guideIsCeo)
                         <li><strong>Finance</strong> — <em>Payments</em> (verify what parents record) and <em>Bank accounts</em></li>
                         @endif
@@ -441,7 +441,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Class Code</strong> (optional), <strong>Subject</strong>, <strong>Grade Level</strong>, assign a <strong>Tutor</strong>, set <strong>Max Students</strong> (optional — leave blank for no limit), and add a <strong>Description</strong> (optional).</span>
+                            <span class="text-gray-600">Fill in: <strong>Name</strong>, <strong>Class Code</strong> (optional), the <strong>Lead Tutor</strong> (class coordinator), set <strong>Max Students</strong> (optional — leave blank for no limit), and add a <strong>Description</strong> (optional). Under <strong>Subjects &amp; Teachers</strong>, add every subject the class teaches and choose the teacher for each one — the same teacher can take more than one subject, and a subject can be left unassigned for now.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -452,6 +452,8 @@
                     <div class="tip-box">
                         <p class="text-sm text-gray-700"><strong>💡 Tip:</strong> <strong>Class Code is optional.</strong> Leave it blank and the school generates a short, unique code from the class name (for example <em>MATHS-7K2QP</em>) that learners can use for enrollment.</p>
                         <p class="text-sm text-gray-700 mt-2"><strong>💡 Tip:</strong> <strong>Max Students is optional too.</strong> Leave it blank for a class with no cap — the list and detail pages show <strong>No limit</strong>, and enrolment is never blocked by capacity.</p>
+                        <p class="text-sm text-gray-700 mt-2"><strong>💡 Tip:</strong> <strong>Subjects are managed separately.</strong> Add Biology, Physics, Chemistry and the rest once under <strong>Academics → Subjects</strong>, and they appear in every class form. You can also pick <em>+ Add a new subject…</em> directly on a class form and it is saved to that list automatically.</p>
+                        <p class="text-sm text-gray-700 mt-2"><strong>💡 Tip:</strong> <strong>Grades are managed separately too.</strong> Add or rename grades such as <em>KG1 - Pre Primary</em> under <strong>Academics → Grades</strong>; the same list fills the grade dropdown on learner registration, admin user creation, assessment booking, enquiries and the class form.</p>
                     </div>
 
                     <p class="font-medium text-gray-700 mb-2">Enrolling Learners in a Class:</p>
@@ -488,7 +490,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class</strong> and <strong>Tutor</strong>, then choose a <strong>Meeting Platform</strong> and, if you have one, a <strong>Meeting Link</strong> (Zoom/Google Meet). For a single lesson set the <strong>Start/End Time</strong>; for a repeating class use the weekly builder described below.</span>
+                            <span class="text-gray-600">Fill in: <strong>Title</strong>, select the <strong>Class &amp; Subject</strong> for this lesson, then choose a <strong>Meeting Platform</strong> and, if you have one, a <strong>Meeting Link</strong> (Zoom/Google Meet). The subject's teacher is attached automatically. For a single lesson set the <strong>Start/End Time</strong>; for a repeating class use the weekly builder described below.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -497,10 +499,11 @@
                     </ol>
 
                     <div class="tip-box">
+                        <p class="text-sm text-gray-700 mb-2"><strong>One schedule per subject:</strong> a class can teach several subjects (say Mathematics, Physics and English). Each lesson belongs to <strong>one subject</strong>, so create one schedule per subject &mdash; for example Mathematics on Monday 9:00 am, Physics on Monday 11:00 am and English on Wednesday 4:00 pm. Only the teacher assigned to that subject is linked to the session, and the subject is shown on every schedule list and on the learner and tutor dashboards. A subject with no teacher cannot be scheduled until a teacher is assigned on the class page.</p>
                         <p class="text-sm text-gray-700 mb-2"><strong>Repeat a weekly lesson:</strong> set <strong>Repeat</strong> to <em>Every week on the days &amp; times I choose</em>, then add one row per day &mdash; for example <strong>10:00 am Monday</strong>, <strong>2:00 pm Wednesday</strong> and <strong>6:00 pm Friday</strong>. Choose a <strong>Repeats from</strong> date and a <strong>Repeat until</strong> date: each row is created every week on its own day and time, so one form builds the whole timetable. Enrolled learners and the tutor see every session on their dashboards automatically.</p>
                         <p class="text-sm text-gray-700"><strong>Automatic video room:</strong> choose <strong>Automatic video room (Jitsi Meet)</strong> and leave the link blank &mdash; a free meeting link is generated for you and reused for every session in the series.</p>
                         <p class="text-sm text-gray-700"><strong>One week at a time:</strong> the Schedules page opens on the <strong>current week</strong>, grouped by day, so a class that repeats for years never turns into pages of rows. Use <strong>Previous week</strong> / <strong>Next week</strong> to move around and <strong>This week</strong> to jump back; sessions scheduled for today are highlighted in yellow, and each day heading shows how many sessions it holds. <strong>All schedules</strong> shows the full history, 25 sessions per page, when you need to look something up.</p>
-                        <p class="text-sm text-gray-700"><strong>Find a certain day:</strong> the Schedules page has a filter bar &mdash; pick a <strong>Class</strong>, a <strong>Tutor</strong>, a <strong>Start Time (day)</strong> date and/or a <strong>Status</strong>, then click <strong>Filter</strong>. The <strong>Today</strong> link jumps straight to today's sessions, <strong>This week</strong> clears only the date, and <strong>Reset</strong> clears everything. The count under the filter bar tells you how many sessions matched.</p>
+                        <p class="text-sm text-gray-700"><strong>Find a certain day:</strong> the Schedules page has a filter bar &mdash; pick a <strong>Class</strong>, a <strong>Subject</strong>, a <strong>Tutor</strong>, a <strong>Start Time (day)</strong> date and/or a <strong>Status</strong>, then click <strong>Filter</strong>. The <strong>Today</strong> link jumps straight to today's sessions, <strong>This week</strong> clears only the date, and <strong>Reset</strong> clears everything. The count under the filter bar tells you how many sessions matched.</p>
                     </div>
 
                     <p class="font-medium text-gray-700 mt-4 mb-2">To tick a class as completed:</p>
@@ -824,7 +827,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Choose the <strong>Class</strong>, set the <strong>Title</strong> and <strong>Meeting Platform</strong>. Set <strong>Repeat</strong> to <em>Every week on the days &amp; times I choose</em> and add a row per day (for example Monday 10:00 am, Wednesday 2:00 pm, Friday 6:00 pm), then choose <strong>Repeats from</strong> and <strong>Repeat until</strong> &mdash; each day repeats weekly at its own time.</span>
+                            <span class="text-gray-600">Choose the <strong>Class &amp; Subject</strong> you teach (only your own subjects are listed), set the <strong>Title</strong> and <strong>Meeting Platform</strong>. Set <strong>Repeat</strong> to <em>Every week on the days &amp; times I choose</em> and add a row per day (for example Monday 10:00 am, Wednesday 2:00 pm, Friday 6:00 pm), then choose <strong>Repeats from</strong> and <strong>Repeat until</strong> &mdash; each day repeats weekly at its own time.</span>
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">4.</span>
@@ -1015,12 +1018,12 @@
                         <li><strong>My Classes</strong> — number of classes you're enrolled in</li>
                         <li><strong>Pending Assignments</strong> — assignments not yet submitted</li>
                         <li><strong>Materials</strong> — available learning resources</li>
-                        <li><strong>Upcoming Sessions</strong> — your next scheduled classes</li>
+                        <li><strong>This Week's Sessions</strong> — your classes for the current week only; use <strong>View All</strong> for the full session history</li>
                     </ul>
                     <p class="text-gray-600 mb-2">It also lists:</p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1">
                         <li>Your enrolled classes with tutor names</li>
-                        <li>Upcoming class sessions with date, time, and a <strong>"Join"</strong> button for virtual classes</li>
+                        <li>This week's class sessions with subject, date, time, and a <strong>"Join"</strong> button for virtual classes (past sessions show <strong>Ended</strong>)</li>
                     </ul>
                 </div>
 
@@ -1029,7 +1032,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">
                         <i class="fas fa-chalkboard text-sun-ink mr-2"></i>2. My Classes
                     </h3>
-                    <p class="text-gray-600 mb-3">View your enrolled classes and their schedules.</p>
+                    <p class="text-gray-600 mb-3">View your enrolled classes and their schedules. The page opens on <strong>this week</strong>; use <strong>Previous week</strong> / <strong>Next week</strong> to move around, or <strong>All sessions</strong> for the full history.</p>
                     <ol class="space-y-2">
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">1.</span>
@@ -1041,7 +1044,7 @@
                         </li>
                         <li class="flex items-start gap-2 text-sm">
                             <span class="text-blue-600 font-bold">3.</span>
-                            <span class="text-gray-600">Under each class, view the <strong>Upcoming Schedules</strong> with dates, times, and a <strong>"Join Class"</strong> button if the session has a meeting link.</span>
+                            <span class="text-gray-600">Under each class, view <strong>This Week's Sessions</strong> with subject, dates, times, and a <strong>"Join Class"</strong> button if the session has a meeting link. Use <strong>All sessions</strong> at the top of the page to see every session, or the week arrows to browse another week.</span>
                         </li>
                     </ol>
                 </div>
@@ -1189,8 +1192,9 @@
                     </p>
                     <ul class="list-disc list-inside text-gray-600 space-y-1 mb-3">
                         <li>Your child's <strong>Name</strong>, <strong>Grade Level</strong>, <strong>Email</strong> and <strong>Phone</strong></li>
-                        <li>Four clickable counters: <strong>Class Schedule</strong> (upcoming sessions), <strong>Assignments Pending</strong>,
-                            <strong>Assignments Completed</strong> and <strong>Materials Shared</strong></li>
+                        <li>A <strong>This week</strong> panel listing your child's sessions for the current week (subject, day, time and status); <strong>View schedule</strong> opens the same week in full</li>
+                        <li>Clickable counters: <strong>This Week's Sessions</strong>, <strong>Assignments Pending</strong>,
+                            <strong>Assignments Completed</strong>, <strong>Materials Shared</strong> and <strong>Learning Goals</strong></li>
                         <li>An <strong>attendance rate</strong> with the number of sessions attended</li>
                         <li>A <strong>fees line</strong> — verified amount, outstanding balance and any pending submissions — that opens <strong>Fees &amp; Payments</strong></li>
                         <li>An orange <strong>"N missed"</strong> badge whenever a tutor has marked your child absent</li>
@@ -1233,10 +1237,10 @@
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">
-                                <i class="fas fa-calendar text-orange-700 mr-2"></i>Upcoming Classes
+                                <i class="fas fa-calendar text-orange-700 mr-2"></i>Class Schedule
                             </h4>
-                            <p class="text-sm text-gray-600">A list of upcoming scheduled sessions for your child, with the 
-                                session title, class name, date, and time.</p>
+                            <p class="text-sm text-gray-600">Opens on <strong>this week</strong> by default, with the subject and tutor of each session.
+                                Use <strong>Previous week</strong> / <strong>Next week</strong> to browse, or <strong>All sessions</strong> for the full history.</p>
                         </div>
                         <div class="bg-white border rounded-lg p-4">
                             <h4 class="font-semibold text-gray-800 mb-2 flex items-center">

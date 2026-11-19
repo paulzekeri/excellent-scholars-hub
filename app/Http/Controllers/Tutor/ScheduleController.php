@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\ClassSchedule;
 use App\Models\Classes;
+use App\Models\ClassSubject;
 use App\Services\ClassScheduleService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ScheduleController extends Controller
@@ -24,7 +26,7 @@ class ScheduleController extends Controller
         $weekEnd = $weekStart ? $weekStart->copy()->addDays(6) : null;
 
         $query = ClassSchedule::where('tutor_id', $tutor->id)
-            ->with('class')
+            ->with('class', 'classSubject.subject', 'classSubject.tutor.user')
             ->when($weekStart, function ($query) use ($weekStart) {
                 $query->whereBetween('start_time', [
                     $weekStart->copy()->startOfDay(),
@@ -50,10 +52,23 @@ class ScheduleController extends Controller
     public function create()
     {
         $tutor = auth()->user()->tutor;
-        $classes = Classes::where('tutor_id', $tutor->id)->where('is_active', true)->get();
+
+        // A tutor schedules only the class subjects they themselves teach. The
+        // session's teacher is read from that row, so another subject's lessons
+        // never end up under the wrong tutor.
+        $classSubjects = ClassSubject::with(['class', 'subject'])
+            ->where('tutor_id', $tutor->id)
+            ->whereHas('class', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->get()
+            ->sortBy(function (ClassSubject $row) {
+                return mb_strtolower(($row->class->name ?? '') . '|' . ($row->subject->name ?? ''));
+            })
+            ->values();
 
         return view('tutor.schedules.create', [
-            'classes' => $classes,
+            'classSubjects' => $classSubjects,
             'weekdays' => ClassScheduleService::weekdays(),
         ]);
     }
@@ -68,7 +83,16 @@ class ScheduleController extends Controller
             : ClassScheduleService::REPEAT_NONE;
 
         $validated = $request->validate(array_merge([
-            'class_id' => 'required|exists:classes,id',
+            // New flow: choose one of the tutor's own class subjects.
+            'class_subject_id' => [
+                'nullable',
+                Rule::exists('class_subject', 'id')->where('tutor_id', $tutor->id),
+            ],
+            // Legacy flow (old bookmarks/API): class only, as before.
+            'class_id' => [
+                'required_without:class_subject_id',
+                Rule::exists('classes', 'id')->whereIn('id', Classes::idsTaughtBy($tutor->id)),
+            ],
             'title' => 'required|string|max:255',
             'meeting_link' => 'nullable|url',
             'meeting_platform' => 'nullable|in:google_meet,zoom,jitsi',
@@ -77,6 +101,16 @@ class ScheduleController extends Controller
             // or run the same class on several days at different times.
             'repeat' => 'nullable|in:none,weekly',
         ], ClassScheduleService::repeatRules($repeat)));
+
+        if (! empty($validated['class_subject_id'])) {
+            $classSubject = ClassSubject::findOrFail($validated['class_subject_id']);
+
+            $validated['class_id'] = $classSubject->class_id;
+        } else {
+            if (array_key_exists('class_subject_id', $validated)) {
+                $validated['class_subject_id'] = null;
+            }
+        }
 
         if ($errors = $service->seriesErrors($validated)) {
             throw ValidationException::withMessages($errors);

@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ClassController as AdminClassController;
 use App\Http\Controllers\Admin\ClassLibraryController as AdminClassLibraryController;
+use App\Http\Controllers\Admin\GradeController as AdminGradeController;
+use App\Http\Controllers\Admin\SubjectController as AdminSubjectController;
 use App\Http\Controllers\Admin\ScheduleController as AdminScheduleController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PaymentAccountController as AdminPaymentAccountController;
@@ -108,6 +110,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin,ceo'])->
     Route::resource('classes', AdminClassController::class);
     Route::post('/classes/{class}/enroll', [AdminClassController::class, 'enroll'])->name('classes.enroll');
     Route::delete('/classes/{class}/unenroll/{learner}', [AdminClassController::class, 'unenroll'])->name('classes.unenroll');
+    // A class teaches several subjects; each subject has its own teacher.
+    Route::post('/classes/{class}/subjects', [AdminClassController::class, 'storeSubject'])->name('classes.subjects.store');
+    Route::delete('/classes/{class}/subjects/{classSubject}', [AdminClassController::class, 'destroySubject'])->name('classes.subjects.destroy');
+
+    // The subject catalogue behind the class form's subject dropdown.
+    Route::resource('subjects', AdminSubjectController::class)->except(['show', 'create', 'edit']);
+
+    // Grade levels behind every grade dropdown (registration, users, bookings).
+    Route::resource('grades', AdminGradeController::class)->except(['show', 'create', 'edit']);
 
     Route::resource('schedules', AdminScheduleController::class);
     Route::post('/schedules/{schedule}/complete', [AdminScheduleController::class, 'markCompleted'])->name('schedules.complete');

@@ -10,7 +10,7 @@ class ClassSchedule extends Model
     use HasFactory;
 
     protected $fillable = [
-        'class_id', 'tutor_id', 'title', 'description', 'start_time', 'end_time',
+        'class_id', 'class_subject_id', 'tutor_id', 'title', 'description', 'start_time', 'end_time',
         'meeting_link', 'meeting_platform', 'status', 'completed_at', 'completed_by', 'recording_url',
         'recurrence_rule', 'recurrence_until', 'recurrence_group',
     ];
@@ -25,6 +25,12 @@ class ClassSchedule extends Model
     public function class()
     {
         return $this->belongsTo(Classes::class, 'class_id');
+    }
+
+    /** The subject of the class this session teaches (and therefore its teacher). */
+    public function classSubject()
+    {
+        return $this->belongsTo(ClassSubject::class, 'class_subject_id');
     }
 
     public function tutor()
@@ -117,5 +123,28 @@ class ClassSchedule extends Model
         ];
 
         return $labels[$this->meeting_platform] ?? 'No platform';
+    }
+
+    /** The subject this session teaches (legacy sessions fall back to the class). */
+    public function subjectName(): string
+    {
+        return optional(optional($this->classSubject)->subject)->name
+            ?: (optional($this->class)->subject ?: 'General');
+    }
+
+    /** The teacher linked to this session's subject, when there is one. */
+    public function subjectTeacherName(): ?string
+    {
+        $subjectTeacher = optional(optional(optional($this->classSubject)->tutor)->user)->name;
+
+        return $subjectTeacher ?: optional(optional($this->tutor)->user)->name;
+    }
+
+    /** "Mathematics · John Tutor" for lists that show the subject at a glance. */
+    public function subjectLabel(): string
+    {
+        $teacher = $this->subjectTeacherName();
+
+        return $this->subjectName() . ($teacher ? ' · ' . $teacher : '');
     }
 }

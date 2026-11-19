@@ -28,7 +28,7 @@
                 @if($focusSession)
                     <h2 class="text-2xl font-bold mt-1">{{ $focusSession->title }}</h2>
                     <p class="text-sm {{ $isLive ? 'text-orange-50' : 'text-blue-50' }}">
-                        {{ $focusSession->class->name }} · {{ $focusSession->tutor->user->name ?? 'Tutor' }}
+                        {{ $focusSession->class->name }} · {{ $focusSession->subjectName() }} · {{ $focusSession->tutor->user->name ?? 'Tutor' }}
                     </p>
                     <p class="text-sm {{ $isLive ? 'text-orange-50' : 'text-blue-100' }} mt-1">
                         <i class="far fa-clock mr-1"></i>
@@ -64,7 +64,7 @@
         @include('partials.stat-card', ['label' => 'My Classes', 'value' => $myClasses->count(), 'icon' => 'fa-chalkboard', 'tone' => 'navy', 'href' => route('learner.classes')])
         @include('partials.stat-card', ['label' => 'Pending Assignments', 'value' => $pendingAssignments, 'icon' => 'fa-tasks', 'tone' => 'blue', 'href' => route('learner.assignments')])
         @include('partials.stat-card', ['label' => 'Materials', 'value' => $materials->count(), 'icon' => 'fa-folder-open', 'tone' => 'blue', 'href' => route('learner.materials')])
-        @include('partials.stat-card', ['label' => 'Upcoming Sessions', 'value' => $upcomingCount, 'icon' => 'fa-calendar', 'tone' => 'sun', 'href' => route('learner.classes')])
+        @include('partials.stat-card', ['label' => 'This Week\'s Sessions', 'value' => $weekSessionCount, 'icon' => 'fa-calendar', 'tone' => 'sun', 'href' => route('learner.classes')])
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -79,7 +79,7 @@
                     <a href="{{ route('learner.classes') }}" class="block border rounded-lg p-4 hover:bg-gray-50 transition">
                         <h3 class="font-semibold text-gray-800">{{ $class->name }}</h3>
                         <p class="text-sm text-gray-600">Tutor: {{ $class->tutor->user->name }}</p>
-                        <p class="text-xs text-gray-500">{{ $class->subject ?? 'General' }}</p>
+                        <p class="text-xs text-gray-500">{{ $class->subjectSummary() }}</p>
                         <div class="mt-2 flex items-center text-xs text-blue-600">
                             <i class="fas fa-calendar mr-1"></i> 
                             {{ $class->schedules_count ?? $class->schedules()->where('start_time', '>', now())->count() }} upcoming session(s)
@@ -91,20 +91,24 @@
             </div>
         </div>
 
-        <!-- Upcoming Classes (Schedules) -->
+        <!-- This week's sessions -->
         <div class="bg-white rounded-xl shadow-md p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">Upcoming Sessions</h2>
-                <a href="{{ route('learner.classes') }}" class="text-sm text-blue-600 hover:text-blue-800">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            <div class="flex flex-wrap justify-between items-start gap-2 mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">This Week's Sessions</h2>
+                    <p class="text-xs text-gray-500">{{ $weekStart->format('D, M d') }} – {{ $weekEnd->format('D, M d, Y') }}</p>
+                </div>
+                <a href="{{ route('learner.classes', ['view' => 'all']) }}" class="text-sm text-blue-600 hover:text-blue-800">View All <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
             <div class="space-y-4">
-                @forelse($upcomingClasses as $schedule)
+                @forelse($weekSessions as $schedule)
                     @php $isToday = \Carbon\Carbon::parse($schedule->start_time)->isToday(); @endphp
                     <div class="border-l-4 {{ $isToday ? 'border-sun bg-sun-light' : 'border-blue-500 bg-blue-50' }} p-4 rounded-r-lg">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="font-semibold {{ $isToday ? 'text-sun-ink' : 'text-gray-800' }}">{{ $schedule->title }}@if($isToday) <span class="ml-1 px-2 py-0.5 text-xs font-bold uppercase rounded-full bg-sun text-blue-950">Today</span>@endif</p>
                                 <p class="text-sm text-gray-600">{{ $schedule->class->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $schedule->subjectName() }}</p>
                                 <p class="text-xs {{ $isToday ? 'text-sun-ink font-semibold' : 'text-gray-500' }}">
                                     <i class="far fa-calendar-alt mr-1"></i>
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('D, M d, Y') }}
@@ -114,11 +118,13 @@
                                     {{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}
                                 </p>
                             </div>
-                            @if($schedule->meeting_link && $schedule->status == 'scheduled')
+                            @if($schedule->meeting_link && $schedule->status == 'scheduled' && $schedule->end_time->greaterThanOrEqualTo(now()))
                                 <a href="{{ route('learner.class.join', $schedule) }}" target="_blank" 
                                     class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition flex items-center">
                                     <i class="fas fa-video mr-1"></i> Join
                                 </a>
+                            @elseif($schedule->status == 'scheduled' && $schedule->end_time->isPast())
+                                <span class="text-gray-500 text-sm"><i class="fas fa-check-circle"></i> Ended</span>
                             @else
                                 <span class="text-gray-500 text-sm"><i class="fas fa-check-circle"></i> {{ ucfirst($schedule->status) }}</span>
                             @endif
@@ -127,8 +133,11 @@
                 @empty
                     <div class="text-center py-8">
                         <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
-                        <p class="text-gray-500">No upcoming sessions scheduled.</p>
-                        <p class="text-xs text-gray-500 mt-1">Sessions appear here when your tutor creates schedules for your classes.</p>
+                        <p class="text-gray-500">No sessions this week.</p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            <a href="{{ route('learner.classes', ['view' => 'all']) }}" class="text-blue-600 hover:text-blue-800">View all sessions</a>
+                            to see the full timetable.
+                        </p>
                     </div>
                 @endforelse
             </div>

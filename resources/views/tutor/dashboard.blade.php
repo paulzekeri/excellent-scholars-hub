@@ -79,7 +79,7 @@
                 <div class="flex items-center justify-between border-b pb-3">
                     <div>
                         <p class="font-semibold">{{ $schedule->title }}</p>
-                        <p class="text-sm text-gray-600">{{ $schedule->class->name }}</p>
+                        <p class="text-sm text-gray-600">{{ $schedule->class->name }} <span class="text-gray-400">·</span> {{ $schedule->subjectName() }}</p>
                         <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($schedule->start_time)->format('M d, Y h:i A') }}</p>
                     </div>
                     <div class="flex space-x-2">

@@ -424,6 +424,18 @@
                         class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
                 </div>
 
+                <div>
+                    <label for="grade_id" class="block text-sm font-medium text-gray-700">Current class / grade</label>
+                    <select id="grade_id" name="grade_id"
+                        class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-accent focus:border-accent">
+                        <option value="">Not sure / choose later</option>
+                        @foreach($grades as $grade)
+                            <option value="{{ $grade->id }}" {{ (string) old('grade_id') === (string) $grade->id ? 'selected' : '' }}>{{ $grade->label() }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">This helps the tutor prepare the right assessment.</p>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="guardian_name" class="block text-sm font-medium text-gray-700">Parent / guardian name</label>

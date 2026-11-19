@@ -17,7 +17,9 @@ class DashboardController extends Controller
         $tutor = auth()->user()->tutor;
         
         $data = [
-            'myClasses' => Classes::where('tutor_id', $tutor->id)->count(),
+            // Includes classes where this tutor takes a subject, even when
+            // another tutor is the class's lead tutor.
+            'myClasses' => Classes::taughtBy($tutor->id)->count(),
             'upcomingSchedules' => ClassSchedule::where('tutor_id', $tutor->id)
                 ->where('start_time', '>', now())
                 ->with('class')

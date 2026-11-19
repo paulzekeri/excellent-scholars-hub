@@ -13,7 +13,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-[#EAF2FB]">
-                    <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Code</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Tutor</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Subject</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Students</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
+                    <tr><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Name</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Code</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Lead Tutor</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Subjects &amp; Teachers</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Students</th><th class="px-6 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Actions</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @foreach($classes as $class)
@@ -21,7 +21,20 @@
                         <td class="px-6 py-4 text-sm font-medium">{{ $class->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $class->code }}</td>
                         <td class="px-6 py-4 text-sm">{{ $class->tutor->user->name ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-sm">{{ $class->subject ?? 'General' }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            @if($class->subjectAssignments->isNotEmpty())
+                                <ul class="space-y-1">
+                                    @foreach($class->subjectAssignments as $assignment)
+                                        <li>
+                                            <span class="font-medium text-gray-800">{{ $assignment->subject->name ?? 'Subject' }}</span>
+                                            <span class="text-gray-500">— {{ $assignment->tutor->user->name ?? 'Not assigned yet' }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                {{ $class->subjectSummary() }}
+                            @endif
+                        </td>
                         <td class="px-6 py-4 text-sm">{{ $class->learners_count ?? $class->learners->count() }} / {{ $class->max_students ?? 'No limit' }}</td>
                         <td class="px-6 py-4 text-sm">
                             <a href="{{ route('admin.classes.show', $class) }}" class="text-green-600 hover:text-green-800 mr-3" title="Manage Students"><i class="fas fa-users"></i></a>

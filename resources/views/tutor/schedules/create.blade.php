@@ -8,7 +8,32 @@
         <form action="{{ route('tutor.schedules.store') }}" method="POST" class="space-y-6">@csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div><label class="block text-sm font-medium text-gray-700">Title</label><input type="text" name="title" value="{{ old('title') }}" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"></div>
-                <div><label class="block text-sm font-medium text-gray-700">Class</label><select name="class_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">@foreach($classes as $class)<option value="{{ $class->id }}">{{ $class->name }}</option>@endforeach</select></div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">Class &amp; Subject</label>
+                    <select name="class_subject_id" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">— Choose a class and subject —</option>
+                        @foreach($classSubjects->groupBy(function ($row) { return $row->class->name ?? 'Class'; }) as $className => $rows)
+                            <optgroup label="{{ $className }}">
+                                @foreach($rows as $row)
+                                    <option value="{{ $row->id }}" {{ (string) old('class_subject_id') === (string) $row->id ? 'selected' : '' }}>
+                                        {{ $row->subject->name ?? 'Subject' }} — {{ $row->tutor->user->name ?? 'No teacher' }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    @error('class_subject_id')<p class="mt-1 text-xs text-orange-700">{{ $message }}</p>@enderror
+                    <p class="text-xs text-gray-500 mt-1">
+                        You can schedule only the subjects you teach. Each session belongs to one subject, so Mathematics and Physics can run on the same day at different times.
+                    </p>
+                    @if($classSubjects->isEmpty())
+                        <p class="mt-2 text-xs text-orange-700">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            You are not assigned to a subject in any active class yet, so there is nothing to schedule here.
+                            Ask the school to add you as the teacher of a subject on the class page.
+                        </p>
+                    @endif
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Meeting Platform</label>
                     <select name="meeting_platform" class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">

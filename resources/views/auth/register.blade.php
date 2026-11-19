@@ -65,6 +65,21 @@
             </div>
 
             <div>
+                <label for="grade_id" class="block text-sm font-medium text-gray-700">Current Class / Grade <span class="text-orange-700">*</span></label>
+                <select id="grade_id" name="grade_id" required
+                    class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 @error('grade_id') border-orange-500 @enderror">
+                    <option value="">Select the learner's class / grade</option>
+                    @foreach($grades as $grade)
+                        <option value="{{ $grade->id }}" {{ (string) old('grade_id') === (string) $grade->id ? 'selected' : '' }}>{{ $grade->label() }}</option>
+                    @endforeach
+                </select>
+                @error('grade_id')
+                    <p class="text-orange-700 text-xs mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-gray-500 mt-1">This is how the school places the learner in the right class.</p>
+            </div>
+
+            <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700">Learner Phone (optional)</label>
                 <input id="phone" type="text" name="phone" value="{{ old('phone') }}"
                     placeholder="Enter the learner's phone number"

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classes;
+use App\Models\Grade;
 use App\Models\Testimonial;
 
 class HomeController extends Controller
@@ -32,6 +33,8 @@ class HomeController extends Controller
                 ->orderBy('name')
                 ->take(6)
                 ->get(),
+            // Grades for the public assessment booking form.
+            'grades' => Grade::active()->ordered()->get(),
             // Approved member testimonials (note 10); the view falls back to samples.
             'testimonials' => Testimonial::with('user.role')
                 ->where('status', Testimonial::STATUS_APPROVED)

@@ -60,8 +60,8 @@
     <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
         @include('parent.partials.stat-card', [
             'href' => route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']),
-            'count' => $stats['upcomingClasses'],
-            'label' => 'Class Schedule',
+            'count' => $stats['weekSessions'],
+            'label' => "This Week's Sessions",
             'icon' => 'fa-calendar-alt',
             'iconClass' => 'text-blue-500',
             'active' => $tab === 'schedule',
@@ -224,18 +224,50 @@
                     <h2 class="text-lg font-semibold text-gray-800">
                         <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>Class Schedule
                     </h2>
-                    <p class="text-sm text-gray-500">Upcoming sessions for {{ $learner->user->name }}</p>
+                    <p class="text-sm text-gray-500">
+                        @if($scheduleScope === 'all')
+                            All sessions for {{ $learner->user->name }}
+                        @else
+                            Sessions for {{ $scheduleWeekStart->format('D, M d') }} – {{ $scheduleWeekEnd->format('D, M d, Y') }}
+                        @endif
+                    </p>
                 </div>
                 <span class="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700 font-semibold self-start">
-                    {{ $upcomingClasses->total() }} upcoming
+                    @if($scheduleScope === 'all')
+                        {{ $upcomingClasses->total() }} session{{ $upcomingClasses->total() === 1 ? '' : 's' }}
+                    @else
+                        {{ $upcomingClasses->count() }} this week
+                    @endif
                 </span>
             </div>
+
+            @if($scheduleScope === 'week')
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule', 'week' => $scheduleWeekStart->copy()->subWeek()->toDateString()]) }}" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-200 transition"><i class="fas fa-chevron-left mr-1"></i> Previous week</a>
+                        @unless($scheduleWeekStart->isCurrentWeek())
+                            <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']) }}" class="bg-blue-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-800 transition"><i class="fas fa-calendar-day mr-1"></i> This week</a>
+                        @endunless
+                        <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule', 'week' => $scheduleWeekStart->copy()->addWeek()->toDateString()]) }}" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-200 transition">Next week <i class="fas fa-chevron-right ml-1"></i></a>
+                    </div>
+                    <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule', 'view' => 'all']) }}" class="text-sm font-semibold text-blue-700 hover:text-blue-900">
+                        <i class="fas fa-list mr-1"></i>All sessions
+                    </a>
+                </div>
+            @else
+                <div class="mb-4">
+                    <a href="{{ route('parent.child.progress', ['learner' => $learner, 'tab' => 'schedule']) }}" class="inline-flex items-center text-sm font-semibold text-blue-700 hover:text-blue-900">
+                        <i class="fas fa-calendar-week mr-1"></i>Back to this week
+                    </a>
+                </div>
+            @endif
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead>
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Date &amp; Time</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Session</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Subject</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Class</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Tutor</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold text-[#0a2550] uppercase">Status</th>
@@ -249,8 +281,9 @@
                                     <p class="text-xs text-gray-500">{{ $schedule->start_time->format('h:i A') }} - {{ $schedule->end_time->format('h:i A') }}</p>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-gray-800">{{ $schedule->title }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ $schedule->subjectName() }}</td>
                                 <td class="px-4 py-3 text-sm text-gray-600">{{ $schedule->class->name ?? 'Class' }}</td>
-                                <td class="px-4 py-3 text-sm text-gray-600">{{ $schedule->class->tutor->user->name ?? 'N/A' }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ $schedule->subjectTeacherName() ?? 'N/A' }}</td>
                                 <td class="px-4 py-3">
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($schedule->status === 'ongoing') bg-green-100 text-green-800
@@ -262,12 +295,18 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No upcoming classes scheduled.</td></tr>
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    {{ $scheduleScope === 'all' ? 'No sessions recorded yet.' : 'No sessions scheduled for this week.' }}
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="mt-4">{{ $upcomingClasses->links() }}</div>
+            @if($scheduleScope === 'all')
+                <div class="mt-4">{{ $upcomingClasses->links() }}</div>
+            @endif
         </div>
     @endif
 

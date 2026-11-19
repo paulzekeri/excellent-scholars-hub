@@ -42,7 +42,8 @@
                     @else
                         <span class="text-gray-500">Class no longer available</span>
                     @endif
-                    <span class="text-gray-500 mx-1">|</span> Tutor: <strong>{{ $schedule->tutor->user->name ?? 'N/A' }}</strong>
+                    <span class="text-gray-500 mx-1">|</span> Subject: <strong>{{ $schedule->subjectName() }}</strong>
+                    <span class="text-gray-500 mx-1">|</span> Tutor: <strong>{{ $schedule->subjectTeacherName() ?? 'N/A' }}</strong>
                 </p>
                 <p class="mt-1 {{ $schedule->start_time->isToday() ? 'text-sun-ink font-semibold' : 'text-gray-600' }}">
                     <i class="far fa-calendar-alt mr-1"></i> {{ $schedule->start_time->format('D, M d, Y') }}

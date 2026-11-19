@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Enquiry;
 use App\Models\EnquiryNote;
+use App\Models\Grade;
 use App\Models\Tutor;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -69,6 +70,7 @@ class EnquiryController extends Controller
         return view('admin.enquiries.create', [
             'enquiry' => new Enquiry(['source' => Enquiry::SOURCE_WHATSAPP, 'status' => Enquiry::STATUS_NEW]),
             'owners' => $this->owners(),
+            'grades' => Grade::active()->ordered()->get(),
         ]);
     }
 
@@ -113,6 +115,7 @@ class EnquiryController extends Controller
         return view('admin.enquiries.edit', [
             'enquiry' => $enquiry,
             'owners' => $this->owners(),
+            'grades' => Grade::active()->ordered()->get(),
         ]);
     }
 
@@ -215,9 +218,11 @@ class EnquiryController extends Controller
      */
     private function validateEnquiry(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'child_name' => ['required', 'string', 'max:255'],
             'child_dob' => ['nullable', 'date', 'before:today'],
+            'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
+            // Legacy text field, still accepted from older forms.
             'child_grade_level' => ['nullable', 'string', 'max:100'],
             'guardian_name' => ['required', 'string', 'max:255'],
             'guardian_phone' => ['required', 'string', 'max:30'],
@@ -226,6 +231,15 @@ class EnquiryController extends Controller
             'assigned_to' => ['nullable', 'exists:users,id'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        // The selected grade is the source of truth; keep the text column in
+        // step so the enquiry list and conversion see the same label.
+        if (! empty($validated['grade_id'])) {
+            $grade = Grade::find($validated['grade_id']);
+            $validated['child_grade_level'] = $grade ? $grade->label() : null;
+        }
+
+        return $validated;
     }
 
     /** Administrators and the CEO can own an enquiry. */

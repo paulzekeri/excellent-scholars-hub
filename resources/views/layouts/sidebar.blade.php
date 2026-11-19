@@ -47,6 +47,8 @@
             'icon' => 'fa-graduation-cap',
             'items' => [
                 ['label' => 'Classes', 'icon' => 'fa-chalkboard', 'route' => 'admin.classes.index'],
+                ['label' => 'Subjects', 'icon' => 'fa-book-open', 'route' => 'admin.subjects.index', 'match' => 'admin.subjects.*'],
+                ['label' => 'Grades', 'icon' => 'fa-layer-group', 'route' => 'admin.grades.index', 'match' => 'admin.grades.*'],
                 ['label' => 'Schedules', 'icon' => 'fa-calendar-alt', 'route' => 'admin.schedules.index'],
                 ['label' => 'Attendance', 'icon' => 'fa-clipboard-check', 'route' => 'admin.oversight.attendance'],
                 ['label' => 'Assignment Review', 'icon' => 'fa-tasks', 'route' => 'admin.oversight.assignments'],

@@ -156,11 +156,17 @@ class RoundTwoEnhancementsTest extends TestCase
         $this->assertStringStartsWith('https://meet.jit.si/esh-', (string) $sessions->first()->meeting_link);
         $this->assertSame($sessions->first()->meeting_link, $sessions->last()->meeting_link);
 
-        // The class's learners see every Monday automatically.
+        // The class's learners see every Monday automatically on the full
+        // schedule page ("All sessions"); the dashboard itself is week-only.
+        $this->actingAs($learner->user)
+            ->get(route('learner.classes', ['view' => 'all']))
+            ->assertOk()
+            ->assertSee('Weekly Algebra');
+
         $this->actingAs($learner->user)
             ->get(route('learner.dashboard'))
             ->assertOk()
-            ->assertSee('Weekly Algebra');
+            ->assertDontSee('Weekly Algebra');
     }
 
     public function test_the_payment_form_lists_every_child_for_one_submission(): void
