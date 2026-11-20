@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\LearnerPasswordResetService;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +34,7 @@ class ResetPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    public function showResetForm(Request $request, $token = null, LearnerPasswordResetService $learners)
+    public function showResetForm(Request $request, LearnerPasswordResetService $learners, $token = null)
     {
         if (! $request->filled('uid')) {
             return $this->showEmailResetForm($request, $token);
@@ -88,6 +89,26 @@ class ResetPasswordController extends Controller
         Auth::login($user);
 
         return redirect($this->redirectPath())->with('success', 'Your password has been reset.');
+    }
+
+    /**
+     * Laravel's default only writes the new password. School-provisioned
+     * accounts also carry `must_change_password`; using an emailed reset link is
+     * proof that the owner has just chosen their own password, so the forced
+     * "temporary password" screen must not appear after the reset.
+     */
+    protected function resetPassword($user, $password)
+    {
+        $user->forceFill([
+            'password' => Hash::make($password),
+            'must_change_password' => false,
+            'password_changed_at' => now(),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        event(new PasswordReset($user));
+
+        Auth::login($user);
     }
 
     /** Send the user to the dashboard for their role after a successful reset. */

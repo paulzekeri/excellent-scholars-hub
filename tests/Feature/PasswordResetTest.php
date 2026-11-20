@@ -117,6 +117,32 @@ class PasswordResetTest extends TestCase
         ])->assertRedirect(route('learner.dashboard'));
     }
 
+    public function test_an_emailed_reset_also_clears_the_forced_password_change(): void
+    {
+        $user = $this->makeUser('parent', 'Provisioned Parent');
+        $user->forceFill(['must_change_password' => true])->save();
+
+        $token = $this->resetToken($user);
+
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => 'chosen-by-owner',
+            'password_confirmation' => 'chosen-by-owner',
+        ])->assertRedirect(route('parent.dashboard'));
+
+        $fresh = $user->fresh();
+
+        $this->assertFalse($fresh->must_change_password);
+        $this->assertNotNull($fresh->password_changed_at);
+        $this->assertTrue(Hash::check('chosen-by-owner', $fresh->password));
+
+        // The "temporary password" screen must not stand in the way after a reset.
+        $this->get(route('parent.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Choose your own password');
+    }
+
     public function test_a_used_token_cannot_be_replayed(): void
     {
         $user = $this->makeUser('parent', 'Replay Parent');
