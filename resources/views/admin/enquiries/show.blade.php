@@ -125,16 +125,12 @@
                         <dd class="text-gray-800">{{ $enquiry->child_grade_level ?: 'Not recorded' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs uppercase tracking-wide text-gray-500">Date of birth</dt>
-                        <dd class="text-gray-800">{{ optional($enquiry->child_dob)->format('M j, Y') ?: 'Not recorded' }}</dd>
-                    </div>
-                    <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500">Owner</dt>
                         <dd class="text-gray-800">{{ optional($enquiry->assignedTo)->name ?? 'Unassigned' }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500">Captured by</dt>
-                        <dd class="text-gray-800">{{ optional($enquiry->createdBy)->name ?? 'Unknown' }}</dd>
+                        <dd class="text-gray-800">{{ optional($enquiry->createdBy)->name ?? $enquiry->sourceLabel() }}</dd>
                     </div>
                 </dl>
                 @if($enquiry->notes)

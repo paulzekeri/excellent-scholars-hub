@@ -8,9 +8,6 @@
 **Reference:** {{ $enquiry->reference }}
 **Child:** {{ $enquiry->child_name }}
 **Grade / class:** {{ $enquiry->child_grade_level ?: 'Not recorded' }}
-@if($enquiry->child_dob)
-**Date of birth:** {{ $enquiry->child_dob->format('M j, Y') }}
-@endif
 
 **Guardian:** {{ $enquiry->guardian_name }}
 **Phone / WhatsApp:** {{ $enquiry->guardian_phone }}

@@ -315,4 +315,25 @@ class AdmissionsTest extends TestCase
             ->assertSee('Render Child')->assertSee($enquiry->reference)->assertSee('Timeline');
         $this->actingAs($admin)->get(route('admin.enquiries.edit', $enquiry))->assertOk()->assertSee('Edit enquiry');
     }
+    public function test_the_enquiry_screens_do_not_ask_for_a_date_of_birth(): void
+    {
+        $admin = $this->makeUser('admin', 'No Dob Admin');
+        $enquiry = $this->makeEnquiry([
+            'child_name' => 'No Dob Child',
+            'child_dob' => '2015-01-01',
+        ]);
+
+        $this->actingAs($admin)->get(route('admin.enquiries.create'))
+            ->assertOk()
+            ->assertDontSee('Date of birth')
+            ->assertDontSee('name="child_dob"', false);
+
+        // Even an old record's stored date is no longer surfaced.
+        $this->actingAs($admin)->get(route('admin.enquiries.show', $enquiry))
+            ->assertOk()
+            ->assertDontSee('Date of birth')
+            ->assertDontSee('Jan 1, 2015')
+            ->assertSee('Captured by');
+    }
+
 }

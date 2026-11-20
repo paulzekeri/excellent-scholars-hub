@@ -220,7 +220,6 @@ class EnquiryController extends Controller
     {
         $validated = $request->validate([
             'child_name' => ['required', 'string', 'max:255'],
-            'child_dob' => ['nullable', 'date', 'before:today'],
             'grade_id' => ['nullable', 'integer', 'exists:grades,id'],
             // Legacy text field, still accepted from older forms.
             'child_grade_level' => ['nullable', 'string', 'max:100'],

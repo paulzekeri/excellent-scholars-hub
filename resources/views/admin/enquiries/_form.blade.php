@@ -31,12 +31,6 @@
     </div>
 
     <div>
-        <label for="child_dob" class="block text-sm font-medium text-gray-700">Date of birth</label>
-        <input id="child_dob" type="date" name="child_dob" value="{{ old('child_dob', optional($enquiry->child_dob)->format('Y-m-d')) }}"
-            class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
-    </div>
-
-    <div>
         <label for="source" class="block text-sm font-medium text-gray-700">Where did they come from? <span class="text-orange-700">*</span></label>
         <select id="source" name="source" required class="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
             @foreach(\App\Models\Enquiry::SOURCES as $value => $label)
